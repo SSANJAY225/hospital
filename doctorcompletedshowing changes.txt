@@ -1,0 +1,1306 @@
+run this query in the patients table :
+
+ALTER TABLE patients
+ADD COLUMN entrydatedoctor DATE;
+
+
+
+modify the save-data api:
+
+app.post('/save-data', uploadfiles.array('uploadfiles', 10), (req, res) => {
+  const formData = req.body;
+  console.log('Received formData:', formData);
+
+  const patientSql = `
+    INSERT INTO general_patient (
+      Name, Phone_Number, Visted, 
+      Major_Complaints, FollowUpDate, Advice_Given, LocalExamination, Dignosis, doctor_name
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+  `;
+  const patientValues = [
+    formData.name,
+    formData.businessName,
+    formData.visited || 0,
+    formData.majorComplaints || null,
+    formData.followupdate || null,
+    formData.advicegiven || null,
+    formData.local || null,
+    formData.dignosis || null,
+    formData.doctorName || null,
+  ];
+
+  db.query(patientSql, patientValues, (err, result) => {
+    if (err) {
+      console.error('Error inserting general patient data:', err);
+      return res.status(500).json({ message: 'Database error', error: err });
+    }
+
+    // Update patient status, doctorname, and entrydatedoctor
+    const updateStatusSql = `
+      UPDATE patients
+      SET status = ?, doctorname = ?, entrydatedoctor = ?
+      WHERE full_name = ? AND phone_number = ? AND visted = ?;
+    `;
+    const currentDate = new Date().toISOString().slice(0, 19).replace('T', ' '); // Format: YYYY-MM-DD HH:MM:SS
+    const updateStatusValues = [
+      'doctorcompleted',
+      formData.doctorName || null,
+      currentDate, // Add current date for entrydatedoctor
+      formData.name,
+      formData.businessName,
+      formData.visited || 0,
+    ];
+
+    db.query(updateStatusSql, updateStatusValues, (err, result) => {
+      if (err) {
+        console.error('Error updating patient status and entrydatedoctor:', err);
+        return res.status(500).json({ message: 'Database error updating status', error: err });
+      }
+      console.log('Patient status and entrydatedoctor updated:', result);
+    });
+
+    // Rest of the code remains unchanged
+    const insertData = (tableName, columns, dataArray) => {
+      if (dataArray && dataArray.length > 0) {
+        const sql = `
+          INSERT INTO ${tableName} (${columns.join(', ')})
+          VALUES (${columns.map(() => '?').join(', ')});
+        `;
+        dataArray.forEach((item) => {
+          db.query(sql, item, (err, result) => {
+            if (err) {
+              console.error(`Error inserting into ${tableName}:`, err);
+            } else {
+              console.log(`Inserted into ${tableName}:`, item);
+            }
+          });
+        });
+      }
+    };
+
+    const onExaminationData = (Array.isArray(formData.selectonexamination) ? formData.selectonexamination : [])
+      .filter((key) => typeof key === 'string' && key.trim() !== '' && key !== '0')
+      .map((key) => [
+        formData.name,
+        formData.businessName,
+        formData.visited || 0,
+        key,
+      ]);
+
+    console.log('onExaminationData:', onExaminationData);
+
+    insertData('on_examination_form', ['Name', 'Phone_Number', 'Visited', 'onexam_form'], onExaminationData);
+
+    const treatmentData = (formData.treatment || []).map((treatment) => [
+      formData.name,
+      formData.businessName,
+      formData.visited || 0,
+      treatment.treatmentdosage || null,
+      treatment.treatmentgivenname || null,
+      treatment.treatmentrout || null,
+    ]);
+    insertData('treatment_given_form', ['Name', 'Phone_Number', 'Visited', 'Dosage', 'Route_Of_Administration', 'treatmentgivenname'], treatmentData);
+
+    const prescriptionData = (formData.prescription || []).map((prescription) => [
+      formData.name,
+      formData.businessName,
+      formData.visited || 0,
+      prescription.medicine || null,
+      prescription.dosage || null,
+      prescription.timing || null,
+      prescription.duration || null,
+    ]);
+    insertData('prescription_form', ['Name', 'Phone_Number', 'Visited', 'Medicine', 'Dosage', 'Timing', 'Duration'], prescriptionData);
+
+    insertData('famil_history', ['Name', 'Phone_Number', 'Visted', 'Family_History'], (formData.familyHistory || []).map((item) => [
+      formData.name,
+      formData.businessName,
+      formData.visited || 0,
+      item,
+    ]));
+
+    insertData('birth_history', ['Name', 'Phone_Number', 'Visted', 'Birth_History'], (formData.birthHistory || []).map((item) => [
+      formData.name,
+      formData.businessName,
+      formData.visited || 0,
+      item,
+    ]));
+
+    insertData('surgical_history', ['Name', 'Phone_Number', 'Visted', 'Surgical_History'], (formData.surgicalHistory || []).map((item) => [
+      formData.name,
+      formData.businessName,
+      formData.visited || 0,
+      item,
+    ]));
+
+    insertData('anyotherhistory', ['Name', 'Phone_Number', 'Visted', 'Other_History'], (formData.otherHistory || []).map((item) => [
+      formData.name,
+      formData.businessName,
+      formData.visited || 0,
+      item,
+    ]));
+
+    const TestData = Object.entries(formData.selectavailableTests || {})
+      .filter(([key, value]) => value)
+      .map(([key]) => [
+        formData.name,
+        formData.businessName,
+        formData.visited || 0,
+        key,
+      ]);
+    insertData('test_to_take', ['Name', 'Phone_Number', 'Visited', 'TestToTake'], TestData);
+
+    const SystematicExamData = Object.entries(formData.selectsystematic || {})
+      .filter(([key, value]) => value)
+      .map(([key]) => [
+        formData.name,
+        formData.businessName,
+        formData.visited || 0,
+        key,
+      ]);
+    insertData('systemic_examination_form', ['Name', 'Phone_Number', 'Visited', 'sysexam_form'], SystematicExamData);
+
+    if (req.files.length > 0) {
+      const fileInsertSql = `
+        INSERT INTO uploaded_files (Phone_Number, Visted, FilePath)
+        VALUES (?, ?, ?);
+      `;
+      req.files.forEach((file) => {
+        const filePath = `/usersfiles/${file.filename}`;
+        db.query(fileInsertSql, [formData.businessName, formData.visited, filePath], (err, result) => {
+          if (err) {
+            console.error('Error inserting file path:', err);
+          }
+        });
+      });
+    }
+
+    res.status(200).json({ message: 'Data stored successfully' });
+  });
+});
+
+
+
+
+
+Adminformin.js change the handlesubmit:
+
+
+ const handleSubmit = async () => {
+    const urlParams = getUrlParams();
+    const formData = new FormData();
+    formData.append("dignosis", dignosis);
+    formData.append("majorComplaints", majorComplaints);
+    formData.append("followupdate", followupdate);
+    formData.append("advicegiven", advicegiven);
+    formData.append("local", local);
+    formData.append("name", urlParams.name);
+    formData.append("businessName", urlParams.businessName);
+    formData.append("visited", urlParams.visited || 0);
+    formData.append("doctorName", doctorName);
+    Object.entries(vitals).forEach(([key, value]) => {
+      formData.append(`vitals[${key}]`, value);
+    });
+    Object.entries(selectavailableTests).forEach(([key, value]) => {
+      if (value) formData.append("selectavailableTests[]", key);
+    });
+    Object.entries(selectonexamination).forEach(([key, value]) => {
+      if (value) formData.append("selectonexamination[]", key);
+    });
+    Object.entries(selectsystematic).forEach(([key, value]) => {
+      if (value) formData.append("selectsystematic[]", key);
+    });
+    familyHistory.forEach((item) => formData.append("familyHistory[]", item));
+    birthHistory.forEach((item) => formData.append("birthHistory[]", item));
+    surgicalHistory.forEach((item) => formData.append("surgicalHistory[]", item));
+    otherHistory.forEach((item) => formData.append("otherHistory[]", item));
+    treatment.forEach((t, index) => {
+      formData.append(`treatment[${index}][treatmentgivenname]`, t.treatmentgivenname);
+      formData.append(`treatment[${index}][treatmentdosage]`, t.treatmentdosage);
+      formData.append(`treatment[${index}][treatmentrout]`, t.treatmentrout);
+    });
+    prescription.forEach((p, index) => {
+      formData.append(`prescription[${index}][medicine]`, p.medicine);
+      formData.append(`prescription[${index}][dosage]`, p.dosage);
+      formData.append(`prescription[${index}][timing]`, p.timing);
+      formData.append(`prescription[${index}][duration]`, p.duration);
+    });
+  
+    try {
+      // Save general form data
+      const response = await fetch("https://verifyme.vpserver.online/save-data", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      console.log("Form data response:", data);
+  
+      // Save dental data
+      const hasDentalData = Object.values(dental).some(value => value !== "");
+      if (hasDentalData) {
+        const encodedName = encodeURIComponent(urlParams.name);
+        const encodedVisit = encodeURIComponent(urlParams.visited);
+        const encodedPhone = encodeURIComponent(urlParams.businessName);
+        const dentalSequentialArray = Array.from({ length: 32 }, (_, i) => {
+          const toothIndex = i + 1;
+          const fdiTooth = sequentialToFdiMap[toothIndex];
+          return dental[fdiTooth] 
+        });
+        const dentalData = { dental: JSON.stringify(Object.fromEntries(dentalSequentialArray.map((value, i) => [i + 1, value]))) };
+        console.log("Sending dental data:", {
+          url: `https://verifyme.vpserver.online/adddental/${encodedName}/${encodedVisit}/${encodedPhone}`,
+          body: dentalData
+        });
+        const den = await axios.post(
+          `https://verifyme.vpserver.online/adddental/${encodedName}/${encodedVisit}/${encodedPhone}`,
+          dentalData
+        );
+        console.log("Dental data response:", den.data);
+      }
+  
+      // Upload files
+      const fileData = new FormData();
+      multipleFiles.forEach((file) => fileData.append("upload", file));
+      if (multipleFiles.length > 0) {
+        const fileUploadResponse = await axios.post(
+          `https://verifyme.vpserver.online/upload/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`,
+          fileData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        console.log("Uploaded Files:", fileUploadResponse.data.filePaths);
+      }
+  
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Patient data and files uploaded successfully.",
+        confirmButtonText: "OK",
+      });
+    } catch (error) {
+      console.error("Error:", error.response?.data?.message || error.message);
+      Swal.fire({
+        icon: "error",
+        title: "An Error Occurred!",
+        text: "Something went wrong while saving the data. Please try again.",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
+
+Adminformout.js change the handlesubmit:
+
+
+ const handleSubmit = async () => {
+    const urlParams = getUrlParams();
+    const formData = new FormData();
+    formData.append("dignosis", dignosis);
+    formData.append("majorComplaints", majorComplaints);
+    formData.append("followupdate", followupdate);
+    formData.append("advicegiven", advicegiven);
+    formData.append("local", local);
+    formData.append("name", urlParams.name);
+    formData.append("businessName", urlParams.businessName);
+    formData.append("visited", urlParams.visited || 0);
+    formData.append("doctorName", doctorName);
+    Object.entries(vitals).forEach(([key, value]) => {
+      formData.append(`vitals[${key}]`, value);
+    });
+    Object.entries(selectavailableTests).forEach(([key, value]) => {
+      if (value) formData.append("selectavailableTests[]", key);
+    });
+    Object.entries(selectonexamination).forEach(([key, value]) => {
+      if (value) formData.append("selectonexamination[]", key);
+    });
+    Object.entries(selectsystematic).forEach(([key, value]) => {
+      if (value) formData.append("selectsystematic[]", key);
+    });
+    familyHistory.forEach((item) => formData.append("familyHistory[]", item));
+    birthHistory.forEach((item) => formData.append("birthHistory[]", item));
+    surgicalHistory.forEach((item) => formData.append("surgicalHistory[]", item));
+    otherHistory.forEach((item) => formData.append("otherHistory[]", item));
+    treatment.forEach((t, index) => {
+      formData.append(`treatment[${index}][treatmentgivenname]`, t.treatmentgivenname);
+      formData.append(`treatment[${index}][treatmentdosage]`, t.treatmentdosage);
+      formData.append(`treatment[${index}][treatmentrout]`, t.treatmentrout);
+    });
+    prescription.forEach((p, index) => {
+      formData.append(`prescription[${index}][medicine]`, p.medicine);
+      formData.append(`prescription[${index}][dosage]`, p.dosage);
+      formData.append(`prescription[${index}][timing]`, p.timing);
+      formData.append(`prescription[${index}][duration]`, p.duration);
+    });
+  
+    try {
+      // Save general form data
+      const response = await fetch("https://verifyme.vpserver.online/save-data", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      console.log("Form data response:", data);
+  
+      // Save dental data
+      const hasDentalData = Object.values(dental).some(value => value !== "");
+      if (hasDentalData) {
+        const encodedName = encodeURIComponent(urlParams.name);
+        const encodedVisit = encodeURIComponent(urlParams.visited);
+        const encodedPhone = encodeURIComponent(urlParams.businessName);
+        const dentalSequentialArray = Array.from({ length: 32 }, (_, i) => {
+          const toothIndex = i + 1;
+          const fdiTooth = sequentialToFdiMap[toothIndex];
+          return dental[fdiTooth] 
+        });
+        const dentalData = { dental: JSON.stringify(Object.fromEntries(dentalSequentialArray.map((value, i) => [i + 1, value]))) };
+        console.log("Sending dental data:", {
+          url: `https://verifyme.vpserver.online/adddental/${encodedName}/${encodedVisit}/${encodedPhone}`,
+          body: dentalData
+        });
+        const den = await axios.post(
+          `https://verifyme.vpserver.online/adddental/${encodedName}/${encodedVisit}/${encodedPhone}`,
+          dentalData
+        );
+        console.log("Dental data response:", den.data);
+      }
+  
+      // Upload files
+      const fileData = new FormData();
+      multipleFiles.forEach((file) => fileData.append("upload", file));
+      if (multipleFiles.length > 0) {
+        const fileUploadResponse = await axios.post(
+          `https://verifyme.vpserver.online/upload/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`,
+          fileData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        console.log("Uploaded Files:", fileUploadResponse.data.filePaths);
+      }
+  
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Patient data and files uploaded successfully.",
+        confirmButtonText: "OK",
+      });
+    } catch (error) {
+      console.error("Error:", error.response?.data?.message || error.message);
+      Swal.fire({
+        icon: "error",
+        title: "An Error Occurred!",
+        text: "Something went wrong while saving the data. Please try again.",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
+
+
+MODIFY THE FETCH-PATEINTS-IN :
+
+
+app.get('/api/fetch-patients-in', (req, res) => {
+  const { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, statusFilter, currentDate } = req.query;
+
+  console.log('Received query params:', { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, statusFilter, currentDate });
+
+  // Base query
+  let query = `
+    SELECT 
+      id,
+      full_name,
+      fathers_name,
+      age,
+      gender,
+      city,
+      phone_number,
+      appointment_date,
+      appointment_time,
+      services,
+      status,
+      queue,
+      nursename,
+      MAX(visted) AS visted
+    FROM patients
+    WHERE patient_type = 'Inpatient'`;
+  const params = [];
+
+  // Add status condition based on statusFilter
+  if (statusFilter === 'completed' && currentDate) {
+    query += ' AND LOWER(status) = ? AND DATE(entrydatedoctor) = ?';
+    params.push('doctorcompleted', currentDate);
+  } else {
+    query += ' AND LOWER(status) IN (?, ?)';
+    params.push('receptioncompleted', 'nursecompleted');
+  }
+
+  // Add conditions with LIKE for partial matching
+  if (PhoneNumber) {
+    query += ' AND phone_number LIKE ?';
+    params.push(`%${PhoneNumber}%`);
+  }
+  if (BusinessName) {
+    query += ' AND full_name LIKE ?';
+    params.push(`%${BusinessName}%`);
+  }
+  if (BusinessID) {
+    query += ' AND id LIKE ?';
+    params.push(`%${BusinessID}%`);
+  }
+  if (fromDate) {
+    query += ' AND appointment_date >= ?';
+    params.push(fromDate);
+  }
+  if (toDate) {
+    query += ' AND appointment_date <= ?';
+    params.push(toDate);
+  }
+  if (franchiselocation) {
+    query += ' AND belongedlocation = ?';
+    params.push(franchiselocation);
+  }
+
+  query += ' GROUP BY phone_number ORDER BY id DESC';
+
+  console.log('Executing query:', query);
+  console.log('Query parameters:', params);
+
+  // Execute the query with parameters
+  db.query(query, params, (error, results) => {
+    if (error) {
+      console.error('Error executing query:', error);
+      return res.status(500).send({ message: 'Error fetching data', error: error.message });
+    }
+    console.log('Query results:', results);
+    res.json(results);
+  });
+});
+
+
+MODIFY THE FETCH-PATIENTS-OUT:
+
+app.get('/api/fetch-patients-out', (req, res) => {
+  const { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, statusFilter, currentDate } = req.query;
+
+  console.log('Received query params:', { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, statusFilter, currentDate });
+
+  // Base query
+  let query = `
+    SELECT 
+      id,
+      full_name,
+      fathers_name,
+      age,
+      gender,
+      city,
+      phone_number,
+      appointment_date,
+      appointment_time,
+      services,
+      queue,
+      status,
+      nursename,
+      MAX(visted) AS visted
+    FROM patients
+    WHERE patient_type = 'Outpatient'`;
+  const params = [];
+
+  // Add status condition based on statusFilter
+  if (statusFilter === 'completed' && currentDate) {
+    query += ' AND LOWER(status) = ? AND DATE(entrydatedoctor) = ?';
+    params.push('doctorcompleted', currentDate);
+  } else {
+    query += ' AND LOWER(status) IN (?, ?)';
+    params.push('receptioncompleted', 'nursecompleted');
+  }
+
+  // Add conditions with LIKE for partial matching
+  if (PhoneNumber) {
+    query += ' AND phone_number LIKE ?';
+    params.push(`%${PhoneNumber}%`);
+  }
+  if (BusinessName) {
+    query += ' AND full_name LIKE ?';
+    params.push(`%${BusinessName}%`);
+  }
+  if (BusinessID) {
+    query += ' AND id LIKE ?';
+    params.push(`%${BusinessID}%`);
+  }
+  if (fromDate) {
+    query += ' AND appointment_date >= ?';
+    params.push(fromDate);
+  }
+  if (toDate) {
+    query += ' AND appointment_date <= ?';
+    params.push(toDate);
+  }
+  if (franchiselocation) {
+    query += ' AND belongedlocation = ?';
+    params.push(franchiselocation);
+  }
+
+  query += ' GROUP BY phone_number ORDER BY queue DESC'; // Changed from 'id DESC' to 'queue DESC'
+
+  console.log('Executing query:', query);
+  console.log('Query parameters:', params);
+
+  // Execute the query with parameters
+  db.query(query, params, (error, results) => {
+    if (error) {
+      console.error('Error executing query:', error);
+      return res.status(500).send({ message: 'Error fetching data', error: error.message });
+    }
+    console.log('Query results:', results);
+    res.json(results);
+  });
+});
+
+Sanjay =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.
+created api udate-dats
+VITALS UPDATED
+const vitals = req.body.vitals;
+  console.log("vitals =>", vitals);
+  console.log("data", req.body)
+
+  if (!vitals || !vitals.Name || !vitals.Phone_number || !vitals.Visit) {
+    return res.status(400).json({
+      message: "Missing required fields: Phone_number, Name, or Visit",
+    });
+  }
+
+  const identifiers = {
+    Name: vitals.Name,
+    Phone_number: vitals.Phone_number,
+    Visit: vitals.Visit,
+  };
+
+  // Remove identifiers from update fields
+  const updateFields = { ...vitals };
+  delete updateFields.Name;
+  delete updateFields.Phone_number;
+  delete updateFields.Visit;
+
+  const updateKeys = Object.keys(updateFields);
+  if (updateKeys.length === 0) {
+    return res.status(400).json({ message: "No fields to update" });
+  }
+
+  // Replace _ with space in field names only for SQL
+  const sqlSetClause = updateKeys
+    .map(key => `\`${key.replace(/_/g, " ")}\` = ?`)
+    .join(", ");
+
+  const sqlValues = updateKeys.map(key => updateFields[key]);
+
+  const sql = `UPDATE vitals SET ${sqlSetClause} WHERE Name = ? AND Phone_number = ? AND Visit = ?`;
+  const values = [...sqlValues, identifiers.Name, identifiers.Phone_number, identifiers.Visit];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error updating vitals:", err);
+      return res.status(500).json({ message: "Failed to update vitals" });
+    }
+    // res.status(200).json({ message: "Vitals updated successfully", result });
+  });
+ changed the add and eit funcationality in treatment and prescription
+const handleEditTreatment = (index) => {
+    const item = treatment[index];
+    document.querySelector('input[placeholder="Name"]').value=item.treatmentgivenname
+    document.querySelector('input[placeholder="Dosage"]').value=item.treatmentdosage
+    document.querySelector('input[placeholder="Route of Administration"]').value=item.treatmentrout
+    handleDeleteHistory(treatment, settreatment, item);
+  };
+
+  const handleEditPrescription = (index) => {
+    
+    const item = prescription[index];
+    document.querySelector('input[placeholder="Duration"]').value=item.duration
+    document.querySelector('input[placeholder="Timing"]').value=item.timing
+    document.querySelector('input[id="dos"]').value=item.dosage
+    document.querySelector('input[placeholder="Medicine"]').value=item.medicine
+    handleDeleteHistory(prescription, setPrescription, item);
+  };
+HISTORY UPDATED
+const updateHistory = (tableName, columnName, historyArray, callback) => {
+    if (!Array.isArray(historyArray)) return callback();
+
+    const { Name, Phone_number, Visit } = req.body.formData;
+    const deleteSql = `DELETE FROM \`${tableName}\` WHERE Name = ? AND Phone_number = ? AND Visted = ?`;
+    db.query(deleteSql, [identifiers.Name, identifiers.Phone_number, identifiers.Visit], (deleteErr) => {
+      if (deleteErr) return callback(deleteErr);
+      if (historyArray.length === 0) return callback();
+
+      const insertSql = `INSERT INTO \`${tableName}\` (Name, Phone_number, Visted, \`${columnName}\`) VALUES ?`;
+      const values = historyArray.map((item) => [identifiers.Name, identifiers.Phone_number, identifiers.Visit, item]);
+
+      db.query(insertSql, [values], callback);
+    });
+  };
+  // console.log(req.body.formData.birthHistory)  
+
+  updateHistory("birth_history", "Birth_History", req.body.formData.birthHistory, (err1) => {
+    if (err1 != null) return res.status(500).json({ message: "Failed to update birth history", error: err1 });
+    updateHistory("surgical_history", "Surgical_History", req.body.formData.surgicalHistory, (err2) => {
+      if (err2 != null) return res.status(500).json({ message: "Failed to update surgical history", error: err2 });
+      updateHistory("anyotherhistory", "Other_History", req.body.formData.otherHistory, (err3) => {
+        if (err3 != null) return res.status(500).json({ message: "Failed to update other history", error: err3 });
+        updateHistory("famil_history", "Family_History", req.body.formData.familyHistory, (err4) => {
+          if (err4 != null) return res.status(500).json({ message: "Failed to update family history", error: err4 });
+        })
+      })
+    })
+  })
+
+CHANGES IN UDATING LOCAL EXMINATION, DIAGNOSIS ,MAJOR COMPLAINTS => IF THE DATA EXISTS IT UPDAES IF NOT IT INSERTS THE DATA
+
+const checkExistQuery = `SELECT COUNT(1) AS count FROM general_patient WHERE Phone_Number = ? AND Visted = ?`;
+  const checkValues = [identifiers.Phone_number, identifiers.Visit];
+
+  db.query(checkExistQuery, checkValues, (err, results) => {
+    if (err) {
+      console.error("Error checking existence:", err);
+      return res.status(500).json({ message: "Database error", error: err });
+    }
+
+    const exists = results[0].count > 0;
+    const data = req.body.formData;
+
+    const fieldsMap = {
+      Dignosis: data.dignosis,
+      Major_Complaints: data.majorComplaints,
+      LocalExamination: data.local,
+      Advice_Given: data.advicegiven,
+      FollowUpDate: data.followupdate,
+      Name: identifiers.Name,
+      Phone_Number: identifiers.Phone_number,
+      Visted: identifiers.Visit
+    };
+
+    // Filter only defined fields
+    const keys = Object.keys(fieldsMap).filter(key => fieldsMap[key] !== undefined && fieldsMap[key] !== null);
+    const values = keys.map(key => fieldsMap[key]);
+
+    if (exists) {
+      const updateKeys = keys.filter(k => !["Phone_Number", "Visted"].includes(k));
+      const updateQuery = `UPDATE general_patient SET ${updateKeys.map(k => `${k} = ?`).join(", ")} WHERE Phone_Number = ? AND Visted = ?`;
+      const updateValues = updateKeys.map(k => fieldsMap[k]);
+      updateValues.push(identifiers.Phone_number, identifiers.Visit);
+
+      db.query(updateQuery, updateValues, (updateErr, updateResult) => {
+        if (updateErr) {
+          console.error("Update error:", updateErr);
+          return res.status(500).json({ message: "Failed to update", error: updateErr });
+        }
+
+        res.json({ message: "Record updated successfully" });
+        // return 0
+      });
+
+    } else {
+      const insertQuery = `INSERT INTO general_patient (${keys.join(", ")}) VALUES (${keys.map(() => '?').join(", ")})`;
+
+      db.query(insertQuery, values, (insertErr, insertResult) => {
+        if (insertErr) {
+          console.error("Insert error:", insertErr);
+          return res.status(500).json({ message: "Failed to insert", error: insertErr });
+        }
+        return res.status(201).json({ message: "Record inserted successfully", result: insertResult });
+      });
+    }
+  });
+
+TREATMENT TABLE UPDATION USING DELETA AND INSERT MENTHOD
+const deleteSql_for_treatment = `DELETE FROM treatment_given_form WHERE Name = ? AND Phone_Number = ? AND Visited = ?`;
+  db.query(deleteSql_for_treatment, [identifiers.Name, identifiers.Phone_number, identifiers.Visit], (deleteErr) => {
+    if (deleteErr) return res.status(500).json({ error: deleteErr });
+
+    const treatments = req.body.formData.treatment;
+
+    if (!Array.isArray(treatments) || treatments.length === 0) {
+      return res.status(200).json({ message: "No treatments to insert." });
+    }
+
+    const insertSql = `
+        INSERT INTO treatment_given_form 
+        (Name, Phone_Number, Visited, Dosage, Route_Of_Administration, treatmentgivenname) 
+        VALUES ?
+      `;
+
+    const values = treatments.map(item => [
+      identifiers.Name,
+      identifiers.Phone_number,
+      identifiers.Visit,
+      item.treatmentdosage,
+      item.treatmentrout,
+      item.treatmentgivenname
+    ]);
+
+    db.query(insertSql, [values], (insertErr, result) => {
+      if (insertErr) return res.status(500).json({ error: insertErr });
+
+      // return res.status(200).json({ message: "Treatment data updated successfully.", inserted: result.affectedRows });
+    });
+  })
+
+PRESCRIPTION UPDATIONS BY DELETING AND INSERTING
+const deleteSql_for_prescription = `DELETE FROM prescription_form WHERE Name = ? AND Phone_Number = ? AND Visited = ?`;
+  const prescription = req.body.formData.prescription
+  db.query(deleteSql_for_prescription, [identifiers.Name, identifiers.Phone_number, identifiers.Visit], (deleteErr) => {
+
+    if (deleteErr) return res.status(500).json({ error: deleteErr });
+    const insertsql_for_prescription = `INSERT INTO prescription_form (Name, Phone_Number, Visited, Medicine, Dosage, Timing,Duration) VALUES ?`
+    const values = prescription.map(item => [
+      identifiers.Name,
+      identifiers.Phone_number,
+      identifiers.Visit,
+      item.medicine,
+      item.dosage,
+      item.timing,
+      item.duration
+    ])
+    db.query(insertsql_for_prescription, [values], (insertErr, result) => {
+      if (insertErr) return res.status(500).json({ error: insertErr });
+      // return res.status(200).json({ message: "prescription data updated successfully.", inserted: result.affectedRows });
+    });
+  })
+
+EXAMFORM UPDATION 
+const updateExamination = (tableName, columnName, historyArray, callback) => {
+    if (!Array.isArray(historyArray)) return callback();
+    const { Name, Phone_number, Visit } = req.body.formData;
+    const deleteSql = `DELETE FROM \`${tableName}\` WHERE Name = ? AND Phone_number = ? AND Visited = ?`;
+    db.query(deleteSql, [identifiers.Name, identifiers.Phone_number, identifiers.Visit], (deleteErr) => {
+      if (deleteErr) return callback(deleteErr);
+      if (historyArray.length === 0) return callback();
+      const insertSql = `INSERT INTO \`${tableName}\` (Name, Phone_Number, Visited, \`${columnName}\`) VALUES ?`;
+      const values = historyArray.map((item) => [identifiers.Name, identifiers.Phone_number, identifiers.Visit, item]);
+
+      db.query(insertSql, [values], callback);
+    });
+  };
+  updateExamination("on_examination_form", "onexam_form", req.body.formData.selectonexamination, (err1) => {
+    if (err1 != null) return res.status(500).json({ message: "Failed to update on examination", error: err1 });
+  })
+  updateExamination("systemic_examination_form", "sysexam_form", req.body.formData.selectsystematic, (err1) => {
+    if (err1 != null) return res.status(500).json({ message: "Failed to update Symentic examination", error: err1 });
+  })
+  updateExamination("test_to_take", "TestToTake", req.body.formData.selectavailableTests, (err1) => {
+    if (err1 != null) return res.status(500).json({ message: "Failed to update Test To Take", error: err1 });
+  })
+
+GATHERING THE BILL FOR PATIENTS
+
+app.get("/get-files", (req, res) => {
+  const { name, phone } = req.query;
+
+  let sql = "SELECT Name, Phone_Number, Visted FROM general_patient WHERE 1=1";
+  const params = [];
+
+  if (name) {
+    sql += " AND Name LIKE ?";
+    params.push(`%${name}%`);
+  }
+
+  if (phone) {
+    sql += " AND Phone_Number LIKE ?";
+    params.push(`%${phone}%`);
+  }
+
+  db.query(sql, params, (err, result) => {
+    if (err) return res.status(500).json({ error: err });
+    return res.json(result);
+  });
+});
+ 
+DOWNLOADING THE PDF FOR THE PATIENT IN BACKEND API
+app.use('/files', express.static(path.join('bills')));
+
+// Download Bills API
+app.get('/downloadbill/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const safeFilename = path.basename(filename); // Prevents path traversal
+  const filePath = path.join(__dirname, 'bills', safeFilename);
+
+  res.download(filePath, safeFilename, (err) => {
+    if (err) {
+      console.error("Download error:", err.message);
+      res.status(404).json({ err: err.message });
+    }
+  });
+});
+
+FRONT_END FOR BILLING HISTORY
+
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+const BillingHistory = () => {
+  const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [nameFilter, setNameFilter] = useState("");
+  const [phoneFilter, setPhoneFilter] = useState("")
+  const itemsPerPage = 25;
+
+  const getData = async () => {
+    try {
+        const params = {};
+      if (nameFilter) params.name = nameFilter;
+      if (phoneFilter) params.phone = phoneFilter;
+
+      const res = await axios.get("http://localhost:5000/get-files", { params });
+    //   setApi(res.data);
+    //   const res = await axios.get("http://localhost:5000/get-files");
+      const reversed = res.data.reverse(); // latest first
+      setData(reversed);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentData = data.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (pageNum) => {
+    setCurrentPage(pageNum);
+  };
+
+  const handleSearch = () => {
+    getData(); // Fetch with filters
+  }
+  const Download=(phonenumber,visted)=>{
+
+  }
+  return (
+    <>
+      <h2>Billing History (Page {currentPage})</h2>
+      <div style={{ marginBottom: "1rem" }}>
+        <input
+          type="text"
+          placeholder="Search by Name"
+          value={nameFilter}
+          onChange={(e) => {setNameFilter(e.target.value);getData()}}
+        />
+        <input
+          type="text"
+          placeholder="Search by Phone"
+          value={phoneFilter}
+          onChange={(e) => {setPhoneFilter(e.target.value);getData()}}
+        />
+        <button onClick={handleSearch}>Search</button>
+      </div>
+      <table border="1" cellPadding="5" cellSpacing="0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th>Visited</th>
+            <th>Download</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentData.map((item, index) => (
+            <tr key={index}>
+              <td>{item.Name}</td>
+              <td>{item.Phone_Number}</td>
+              <td>{item.Visted}</td>
+              <td>
+                <a href={`http://localhost:5000/downloadbill/${item.Phone_Number}_${item.Visted}.pdf`} download>
+                  <button >Download</button>
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Pagination Controls */}
+      <div style={{ marginTop: "10px" }}>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => handlePageChange(i + 1)}
+            style={{
+              margin: "2px",
+              fontWeight: currentPage === i + 1 ? "bold" : "normal",
+            }}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+};
+
+export default BillingHistory;
+
+CHANGED BILLING HISTORY FOR FILTERATAION
+
+import { useEffect, useState } from "react";
+import axios from "axios";
+import './AdminFollow.css';
+import 'react-datepicker/dist/react-datepicker.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import myImage from './AmirthaLogo.png';
+
+const BillingHistory = () => {
+    const [data, setData] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [nameFilter, setNameFilter] = useState("");
+    const [phoneFilter, setPhoneFilter] = useState("");
+    const [visitFilter, setVisitFilter] = useState("");
+
+    const itemsPerPage = 25;
+
+    const getData = async () => {
+        try {
+            const params = {};
+            if (nameFilter.trim()) params.full_name = nameFilter.trim();
+            if (phoneFilter.trim()) params.Phone_number = phoneFilter.trim();
+            if (visitFilter.trim()) params.visted = visitFilter.trim();
+
+            const res = await axios.get("http://localhost:5000/get-files", { params });
+            const reversed = res.data.reverse(); // latest first
+            setData(reversed);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    // 🔁 Debounced Filtering Effect
+    useEffect(() => {
+        const delay = setTimeout(() => {
+            setCurrentPage(1); // reset to first page
+            getData();
+        }, 400); // Debounce delay
+
+        return () => clearTimeout(delay); // Clear previous timeout
+    }, [nameFilter, phoneFilter, visitFilter]); // re-run on input change
+
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentData = data.slice(startIndex, startIndex + itemsPerPage);
+
+    const handlePageChange = (pageNum) => {
+        setCurrentPage(pageNum);
+    };
+const handleClear=()=>{
+    setNameFilter("")
+    setPhoneFilter("")
+    setVisitFilter("")
+}
+    return (
+        <>
+            <div className='admin-header'>
+                <img src={myImage} alt="My Image" className="admin-panel-image" />
+            </div>
+            <div className="centered">
+                <h1 className='vp'>
+                    <span></span>
+                </h1>
+                <div className='inbody'>
+                    <h2>Billing History (Page {currentPage})</h2>
+                    <div className='inbtn'>
+                        <div>
+                            <label className='intext'>Patient Name:</label>
+                            <input
+                                className="input_AdminFollow"
+                                type="text"
+                                placeholder="Search by Name"
+                                value={nameFilter}
+                                onChange={(e) => setNameFilter(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className='intext'>Phone Number:</label>
+                            <input
+                                className="input_AdminFollow"
+                                type="text"
+                                placeholder="Search by Phone Number"
+                                value={phoneFilter}
+                                onChange={(e) => setPhoneFilter(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className='intext'>Patient Visit:</label>
+                            <input
+                                className="input_AdminFollow"
+                                type="text"
+                                placeholder="Search by Visited"
+                                value={visitFilter}
+                                onChange={(e) => setVisitFilter(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <div className="button-row">
+                        <button className='inlabel Afollowbuttonsearchblack' onClick={() => { handleClear(); }}>
+                            Clear
+                        </button>
+                        {/* <button className='inlabel Afollowbuttonsearchblack' onClick={() => { handleSearch(); }}>
+                            Apply
+                        </button> */}
+                    </div>
+                </div>
+            </div>
+            <div className="container-fluid">
+                <div className="table-responsive">
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone Number</th>
+                                <th>Visited</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {currentData.map((item, index) => (
+                                <tr key={index}>
+                                    <td>{item.full_name}</td>
+                                    <td>{item.Phone_number}</td>
+                                    <td>{item.Visted}</td>
+                                    <td>
+                                        <a
+                                            href={`http://localhost:5000/downloadbill/${item.Phone_number}_${item.Visted}.pdf`}
+                                            download
+                                        >
+                                            <button>Download</button>
+                                        </a>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {/* Pagination Controls */}
+            <div style={{ marginTop: "10px" }}>
+                {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => handlePageChange(i + 1)}
+                        style={{
+                            margin: "2px",
+                            fontWeight: currentPage === i + 1 ? "bold" : "normal",
+                        }}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
+            </div>
+
+        </>
+    );
+};
+
+export default BillingHistory;
+
+ADDED THE VISIT FOR FILTERING IN BACKEND
+
+app.get("/get-files", (req, res) => {
+  const { full_name, Phone_number,visted } = req.query;
+
+  let sql = "SELECT full_name, Phone_number, Visted FROM patients WHERE status='billingcompleted'";
+  const params = [];
+
+  if (full_name) {
+    sql += " AND full_name LIKE ?";
+    params.push(`%${full_name}%`);
+  }
+
+  if (Phone_number) {
+    sql += " AND Phone_number LIKE ?";
+    params.push(`%${Phone_number}%`);
+  }
+  if(visted){
+    sql+="AND visted LIKE ?"
+    params.push(`%${visted}%`)
+  }
+
+  db.query(sql, params, (err, result) => {
+    if (err) return res.status(500).json({ error: err });
+    return res.json(result);
+  });
+});
+
+CODE EDTED FOR THE TOTAL AND FILTER FOR THE TOTAL
+app.get('/total_bill_amount', (req, res) => {
+  const { full_name, Phone_number, visted } = req.query;
+  console.log(Phone_number)
+  let sql = `
+    SELECT SUM(b.total_price) AS total_completed_billing_amount 
+    FROM billing_headers b 
+    JOIN patients p ON b.phone_number = p.phone_number 
+      AND b.visit_number = p.visted 
+      AND p.full_name = b.user_name 
+    WHERE p.status = 'billingcompleted'
+  `;
+  const params = [];
+  if (full_name) {
+    sql += " AND p.full_name = ?";
+    params.push(full_name);
+  }
+  if (Phone_number) {
+    sql += " AND p.phone_number = ?";
+    params.push(Phone_number);
+  }
+  if (visted) {
+    sql += " AND b.visit_number = ?";
+    params.push(visted);
+  }
+
+  db.query(sql, params, (err, result) => {
+    if (err) return res.status(500).json({ error: err });
+    return res.status(200).json({ result });
+  });
+});
+
+FRONT-END VALIDATION FOR TOTAL
+
+const total = await axios.get(`http://localhost:5000/total_bill_amount`, { params })
+            console.log(total.data.result[0].total_completed_billing_amount)
+            setTotal(total.data.result[0].total_completed_billing_amount)
+
+<div>
+                            <input
+                                className="input_AdminFollow"
+                                type="text"
+                                placeholder="Search by Visited"
+                                value={visitFilter}
+                                onChange={(e) => setVisitFilter(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <p>Total:{total}/-</p>
+                        </div>
+
+ADDED A END-POINT TO ADD DENTAL
+EDITED THE UPDATE-DATAS FOR THE DENTAL
+const deleteSql_for_dental = `DELETE FROM dental_records WHERE Name = ? AND Phone_Number = ? AND Visit = ?`
+    db.query(deleteSql_for_dental, [identifiers.Name, identifiers.Phone_number, identifiers.Visit], err => {
+      if (err) return res.status(500).json({ err: err })
+      const dental = req.body.formData.tooth;
+      // Ensure keys are 1 to 32
+      if (!dental || typeof dental !== 'object') {
+        return res.status(400).json({ error: "Invalid dental data" });
+      }
+
+      const keysArray = Object.keys(dental).sort((a, b) => a - b);
+      const valuesArray = keysArray.map((key) => dental[key]);
+
+      // Include Name, Phone, Visit in the final keys and values "Name", "Phone_Number", "Visit",
+      const allKeys = [ ...keysArray.map(k => `\`${k}\``)];
+      // identifiers.Name, identifiers.Phone_number, identifiers.Visit,
+      const allValues = [ ...valuesArray];
+
+      const placeholders = allValues.map(() => "?").join(", ");
+      const sql = `INSERT INTO dental_records (${allKeys.join(", ")}) VALUES (${placeholders})`;
+      console.log(req.body.formData.tooth)
+      db.query(sql, allValues, (err, result) => {
+        if (err) {
+          console.error("DB Insert Error:", err);
+          return res.status(500).json({ error: "Database insert failed" });
+        }
+        res.status(200).json({ message: "Dental record inserted successfully", id: result });
+      });
+    })
+CREATED A END-POINT FOR DENTAL ADD DATA
+app.post("/add-dental", (req, res) => {
+  const { dental, encodedName, encodedPhone, encodedVisit } = req.body;
+  console.log(req.body);
+
+  if (!dental || typeof dental !== 'object') {
+    return res.status(400).json({ error: "Invalid dental data" });
+  }
+
+  const keysArray = Object.keys(dental).sort((a, b) => a - b);
+  const valuesArray = keysArray.map((key) => dental[key]);
+
+  // Include Name, Phone, Visit in the final keys and values
+  const allKeys = ["Name", "Phone_Number", "Visit", ...keysArray.map(k => `\`${k}\``)];
+  const allValues = [encodedName, encodedPhone, encodedVisit, ...valuesArray];
+
+  const placeholders = allValues.map(() => "?").join(", ");
+  const sql = `INSERT INTO dental_records (${allKeys.join(", ")}) VALUES (${placeholders})`;
+
+  db.query(sql, allValues, (err, result) => {
+    if (err) {
+      console.error("DB Insert Error:", err);
+      return res.status(500).json({ error: "Database insert failed" });
+    }
+    res.status(200).json({ message: "Dental record inserted successfully", id: result });
+  });
+})
+REMOVED MPPING FOR ADMINFORMIN AND OUT , PATIENTFORM ---> setdental(data.dental)
+
+<tr>
+                            {[
+                              18, 17, 16, 15, 14, 13, 12, 11,
+                              21, 22, 23, 24, 25, 26, 27, 28
+                            ].map((toothNumber,index) => (
+                              <td
+                                key={toothNumber}
+                                className={`dental-tooth-cell ${dental[toothNumber] ? 'has-value' : ''}`}
+                                onClick={() => setSelectedTooth(toothNumber)}
+                              >
+                                <div className="tooth-number">{toothNumber}</div>
+                                <div className="tooth-condition">
+                                  {dental[toothNumber] || "Select"}
+                                </div>
+                              </td>
+                            ))}
+                          </tr>
+                          <tr>
+                            {[
+                              48, 47, 46, 45, 44, 43, 42, 41,
+                              31, 32, 33, 34, 35, 36, 37, 38
+                            ].map((toothNumber) => (
+                              <td
+                                key={toothNumber}
+                                className={`dental-tooth-cell ${dental[toothNumber] ? 'has-value' : ''}`}
+                                onClick={() => setSelectedTooth(toothNumber)}
+                              >
+                                <div className="tooth-number">{toothNumber}</div>
+                                <div className="tooth-condition">
+                                  {dental[toothNumber] || "Select"}
+                                </div>
+                              </td>
+                            ))}
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    {selectedTooth && (
+                      <div className="dental-input-overlay">
+                        <label>Tooth {selectedTooth}</label>
+                        <div className="dental-listbox">
+                          {dentalOptions.length > 0 ? (
+                            <>
+                              {dentalOptions.map((option, index) => (
+                                <div
+                                  key={index}
+                                  className={`dental-listbox-item ${dental[selectedTooth] === conditionMap[option] ? 'selected' : ''}`}
+                                  onClick={() => handledental(option, selectedTooth)}
+                                >
+                                  {option}
+                                </div>
+                              ))}
+                            </>
+                          ) : (
+                            <div className="dental-listbox-item disabled">
+                              No dental values available
+                            </div>
+                          )}
+
+const handledental = (value, toothNumber) => {
+    setdental((prev) => ({
+      ...prev,
+      [toothNumber]: value
+    }));
+    setSelectedTooth(null);
+  };

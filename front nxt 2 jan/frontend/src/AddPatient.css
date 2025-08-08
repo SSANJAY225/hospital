@@ -1,0 +1,304 @@
+/* NewPatientForm.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* Reset default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.patient-registration-page {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: 'Roboto', sans-serif;
+  background-color: #ffffff;
+  color: #333333;
+  line-height: 1.6;
+  padding: 2rem;
+}
+
+.patient-registration-container {
+  max-width: 1000px;
+  width: 100%;
+  padding: 2.5rem;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.patient-registration-form video {
+  display: block !important;
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid #e1e5eb;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.patient-registration-form button {
+  margin-top: 0.75rem;
+}
+
+/* Form header */
+.registration-form-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e1e5eb;
+}
+
+.registration-form-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.registration-form-header p {
+  font-size: 1rem;
+  color: #7f8c8d;
+}
+
+/* Form styles */
+.patient-registration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* Form grid for inputs */
+.registration-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+}
+
+/* Form field styles */
+.registration-form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+}
+
+.registration-form-field label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.6rem;
+  color: #4a5568;
+}
+
+.registration-form-field input,
+.registration-form-field select {
+  padding: 0.8rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.registration-form-field input:focus,
+.registration-form-field select:focus {
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+  outline: none;
+}
+
+/* Radio group */
+.registration-radio-group {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.registration-radio-group label {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #4a5568;
+  cursor: pointer;
+}
+
+.registration-radio-group input[type="radio"] {
+  margin-right: 0.5rem;
+  accent-color: #4299e1;
+}
+
+/* Checkbox group */
+.registration-services-field {
+  grid-column: span 3;
+  background-color: #fcf8f8;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.registration-checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.registration-checkbox-group label {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #4a5568;
+  cursor: pointer;
+}
+
+.registration-checkbox-group input[type="checkbox"] {
+  margin-right: 0.5rem;
+  accent-color: #4299e1;
+}
+
+/* File input */
+.registration-form-field input[type="file"] {
+  padding: 0.5rem 0;
+  background-color: transparent;
+  border: none;
+}
+
+/* Camera buttons */
+.camera-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.camera-button {
+  padding: 0.6rem 1.2rem;
+  background-color: #000000;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.camera-button:hover {
+  background-color: #2f2f2f;
+}
+
+.camera-button.secondary {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.camera-button.secondary:hover {
+  background-color: #cbd5e0;
+}
+
+/* Photo preview */
+.photo-preview-container {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.photo-preview {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Submit button */
+.registration-submit-btn {
+  padding: 0.9rem 2.5rem;
+  background-color: #bc171b;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: center;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.registration-submit-btn:hover {
+  background-color: #9c1417;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.registration-submit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .registration-form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .registration-services-field {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .patient-registration-page {
+    padding: 1.5rem;
+  }
+
+  .patient-registration-container {
+    padding: 2rem;
+  }
+
+  .registration-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .registration-services-field {
+    grid-column: span 1;
+  }
+
+  .registration-form-header h2 {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .patient-registration-page {
+    padding: 1rem;
+  }
+
+  .patient-registration-container {
+    padding: 1.5rem;
+  }
+
+  .registration-form-field label {
+    font-size: 0.9rem;
+  }
+
+  .registration-form-field input,
+  .registration-form-field select {
+    font-size: 0.9rem;
+    padding: 0.7rem;
+  }
+
+  .registration-radio-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .registration-submit-btn {  
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    width: 100%;
+  }
+}

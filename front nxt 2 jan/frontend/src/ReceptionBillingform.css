@@ -1,0 +1,446 @@
+/* Reset and Base Styles */
+
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #ffffff;
+  color: #000000;
+  line-height: 1.6;
+}
+
+/* Container */
+.billing-form-container {
+  width: 90%;
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ffcccc;
+}
+
+/* Title */
+.title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #ff3333;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Billing Header */
+.billing-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #ffe6e6;
+  border-radius: 8px;
+  border: 1px solid #ff9999;
+}
+
+.header-left,
+.header-right {
+  flex: 1;
+}
+
+.header-right {
+  text-align: right;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.info-label {
+  font-weight: 600;
+  width: 120px;
+  color: #333333;
+  font-size: 1.2rem;
+}
+
+.info-value {
+  flex: 1;
+  color: #000000;
+  font-size: 1.2rem;
+}
+
+.responsive-input,
+.responsive-input[type="text"],
+.responsive-input[type="number"],
+.responsive-input[type="date"],
+select.responsive-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ff9999;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  color: #000000;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.responsive-input:focus,
+select.responsive-input:focus {
+  outline: none;
+  border-color: #ff3333;
+  box-shadow: 0 0 0 3px rgba(255, 51, 51, 0.2);
+}
+
+.responsive-input[readonly] {
+  background-color: #ffe6e6;
+  cursor: not-allowed;
+  color: #666666;
+}
+
+/* Billing Details */
+.billing-details {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #ffe6e6;
+  border-radius: 8px;
+  border: 1px solid #ff9999;
+}
+
+.details-left,
+.details-right {
+  flex: 1;
+}
+
+.details-right {
+  text-align: right;
+}
+
+/* Services Table */
+.services-container {
+  width: 100%;
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+
+.services-table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  background-color: #fff;
+  border: 1px solid #ff9999;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.services-table th,
+.services-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ffcccc;
+  font-size: 1.2rem;
+  white-space: nowrap;
+}
+
+.services-table th:nth-child(1),
+.services-table td:nth-child(1) {
+  width: 5%;
+}
+
+.services-table th:nth-child(2),
+.services-table td:nth-child(2) {
+  width: 25%;
+}
+
+.services-table th:nth-child(3),
+.services-table td:nth-child(3) {
+  width: 25%;
+}
+
+.services-table th:nth-child(4),
+.services-table td:nth-child(4) {
+  width: 15%;
+}
+
+.services-table th:nth-child(5),
+.services-table td:nth-child(5) {
+  width: 15%;
+}
+
+.services-table th:nth-child(6),
+.services-table td:nth-child(6) {
+  width: 15%;
+}
+
+.services-table th {
+  background-color: #ffcccc;
+  font-weight: 700;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.services-table tbody tr:nth-child(even) {
+  background-color: #fff0f0;
+}
+
+.services-table td input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ff9999;
+  border-radius: 4px;
+  font-size: 1.2rem;
+}
+
+.services-table td input:focus {
+  outline: none;
+  border-color: #ff3333;
+  box-shadow: 0 0 0 3px rgba(255, 51, 51, 0.2);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+/* Buttons */
+.button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+}
+
+.buttonred {
+  background-color: #ff3333;
+  color: #ffffff;
+}
+
+.buttonred:hover {
+  background-color: #cc0000;
+}
+
+.button.blue {
+  background-color: #3182ce;
+  color: white;
+}
+
+.button.blue:hover {
+  background-color: #2b6cb0;
+}
+
+.button.edit {
+  background-color: #ff9999;
+  color: #000000;
+}
+
+.button.edit:hover {
+  background-color: #ff6666;
+}
+
+.button.save-service {
+  background-color: #ff6666;
+  color: #ffffff;
+}
+
+.button.save-service:hover {
+  background-color: #ff3333;
+}
+
+/* Custom Edit and Delete Buttons */
+.custom-edit-button {
+  padding: 0.4rem 1.2rem;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: #52cc33;
+  color: #ffffff;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-transform: uppercase;
+}
+
+.custom-edit-button:hover {
+  background-color: #7ee066;
+  transform: translateY(-2px);
+}
+
+.custom-delete-button {
+  padding: 0.4rem 1.2rem;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: #bc171b;
+  color: #ffffff;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-transform: uppercase;
+}
+
+.custom-delete-button:hover {
+  background-color: #e06666;
+  transform: translateY(-2px);
+}
+
+/* New Unique Save Billing Button */
+.save-billing-button {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 600;
+  background-color: #bc171b;
+  color: #ffffff;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  text-transform: uppercase;
+}
+
+.save-billing-button:hover {
+  background-color: #9c1417;
+  transform: translateY(-2px);
+}
+
+/* Billing Financial Adjustments */
+.billing-financial-adjustments {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #ffe6e6;
+  border-radius: 8px;
+  border: 1px solid #ff9999;
+}
+
+.financial-left {
+  flex: 1;
+}
+
+/* Billing Footer */
+.billing-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #ffe6e6;
+  border-radius: 8px;
+  border: 1px solid #ff9999;
+}
+
+.footer-left,
+.footer-right {
+  flex: 1;
+}
+
+.footer-right {
+  text-align: right;
+}
+
+.total-price {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #bc171b;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .billing-form-container {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .billing-header,
+  .billing-details,
+  .billing-financial-adjustments,
+  .billing-footer {
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .header-right,
+  .details-right,
+  .footer-right {
+    text-align: left;
+    margin-top: 1rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .info-label {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .services-table th,
+  .services-table td {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+
+  .custom-edit-button,
+  .custom-delete-button {
+    padding: 0.3rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .save-billing-button {
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .total-price {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-edit-button,
+  .custom-delete-button {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.7rem;
+  }
+
+  .save-billing-button {
+    padding: 0.4rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}

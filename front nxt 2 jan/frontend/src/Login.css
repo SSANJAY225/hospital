@@ -1,0 +1,177 @@
+/* Amrithaa Hospitals Login - Responsive Design */
+.login-page-container {
+  min-height: 100vh;
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.login-main-card {
+  width: 95%;
+  max-width: 800px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  padding: 5%;
+  transition: all 0.3s ease;
+  margin: 20px 0;
+}
+
+.login-brand-section {
+  text-align: center;
+  margin-bottom: 5%;
+}
+
+.login-brand-logo {
+  height: auto;
+  max-height: 150px;
+  width: auto;
+  max-width: 80%;
+  margin-bottom: 5%;
+}
+
+.login-brand-title {
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 800;
+  color: #bc171b;
+  margin-bottom: 2%;
+  letter-spacing: 1px;
+}
+
+.login-brand-subtitle {
+  font-size: clamp(16px, 3vw, 22px);
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 8%;
+}
+
+.login-form-group {
+  margin-bottom: 8%;
+}
+
+.login-form-label {
+  display: block;
+  font-size: clamp(14px, 3vw, 18px);
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 3%;
+}
+
+.login-form-input {
+  width: 100%;
+  padding: 4% 5%;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: clamp(14px, 3vw, 18px);
+  transition: all 0.2s ease;
+  background-color: #f8fafc;
+}
+
+.login-form-input:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+  background-color: white;
+}
+
+.login-suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 2% 0 0;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-suggestion-item {
+  padding: 3% 5%;
+  font-size: clamp(14px, 3vw, 16px);
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-suggestion-item:hover {
+  background-color: #ebf4ff;
+}
+
+.login-error-message {
+  color: #e53e3e;
+  font-size: clamp(12px, 2.5vw, 14px);
+  margin-top: 2%;
+  display: block;
+}
+
+.login-submit-button {
+  width: 100%;
+  padding: 4%;
+  background: #bc171b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: clamp(16px, 4vw, 22px);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8%;
+}
+
+.login-submit-button:hover {
+  background: #9e1215;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(188, 23, 27, 0.3);
+}
+
+.login-submit-button:active {
+  transform: translateY(0);
+}
+
+/* Specific mobile adjustments */
+@media (max-width: 480px) {
+  .login-main-card {
+    padding: 8%;
+    width: 90%;
+    border-radius: 15px;
+  }
+  
+  .login-brand-logo {
+    max-height: 120px;
+    margin-bottom: 8%;
+  }
+  
+  .login-brand-title {
+    margin-bottom: 4%;
+  }
+  
+  .login-brand-subtitle {
+    margin-bottom: 10%;
+  }
+  
+  .login-form-group {
+    margin-bottom: 10%;
+  }
+  
+  .login-form-input {
+    padding: 5% 6%;
+  }
+  
+  .login-submit-button {
+    padding: 5%;
+    margin-top: 10%;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-brand-logo {
+    max-height: 100px;
+  }
+  
+  .login-form-input,
+  .login-suggestion-item {
+    padding: 6% 7%;
+  }
+}

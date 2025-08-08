@@ -1,0 +1,938 @@
+/* General Styles */
+body {
+  background-color: white !important;
+  color: black;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Main Layout */
+.main {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  background-color: #fff;
+}
+
+.maincontent {
+  flex-grow: 1;
+  padding: 15px;
+}
+
+/* View Menu Container */
+.view-container {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  padding: 15px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.view-toggle {
+  display: block;
+  padding: 10px 15px;
+  background-color: #bc171b;
+  color: white;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.view-toggle:hover {
+  background-color: #b52b27;
+}
+
+.view-menu {
+  list-style: none;
+  padding: 10px 0;
+  margin: 0;
+  background: #fff;
+  border-radius: 5px;
+}
+
+.view-menu li {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 14px;
+}
+
+.view-menu li:hover {
+  background: #bc171b;
+  color: white;
+  border-radius: 5px;
+}
+
+/* Scrollable Container */
+.scrollable-container {
+  height: 80vh;
+  overflow-y: auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+/* User Details */
+.user-details-container {
+  display: flex;
+  flex-direction: column; /* Stack image and info vertically */
+  align-items: center; /* Center all children horizontally */
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  width: 100%; /* Ensure it spans the container */
+  margin-left: auto; /* Center the container horizontally */
+  margin-right: auto; /* Center the container horizontally */
+}
+
+.user-image {
+  margin-bottom: 15px; /* Space between image and info */
+}
+
+/* Responsive Image Box */
+.responsive-image-box {
+  width: 150px; /* Fixed width for consistency */
+  height: 150px; /* Fixed height for consistency */
+  overflow: hidden; /* Hide overflow if image exceeds box */
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+
+.responsive-image-box img {
+  width: 100%; /* Image fills the box width */
+  height: 100%; /* Image fills the box height */
+  object-fit: cover; /* Ensures image covers the box without distortion */
+  object-position: center; /* Centers the image */
+}
+
+.user-image .image-placeholder {
+  width: 150px;
+  height: 150px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  font-size: 14px;
+  color: #666;
+}
+
+.user-info {
+  width: 100%; /* Full width for centering */
+  display: flex;
+  flex-direction: column; /* Stack rows vertically */
+  align-items: center; /* Center rows horizontally */
+  color: #000;
+}
+
+.info-row {
+  display: flex;
+  justify-content: center; /* Center the label-value pair */
+  align-items: center; /* Vertically center the text */
+  width: 100%; /* Full width of the parent */
+  max-width: 250px; /* Reduced to match screenshot's compact layout */
+  margin: 5px 0; /* Vertical spacing between rows */
+  text-align: center; /* Ensure text is centered */
+}
+
+.info-label {
+  font-weight: bold;
+  flex: 0 0 35%; /* Adjusted width for labels to match screenshot */
+  text-align: right; /* Align label text to the right */
+  padding-right: 8px; /* Reduced space between label and value */
+}
+
+.info-value {
+  flex: 0 0 65%; /* Adjusted width for values to match screenshot */
+  text-align: left; /* Align value text to the left */
+}
+
+/* Section Container */
+.section-container {
+  margin-bottom: 20px;
+}
+
+.vitals-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.vitals-container li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.vitals-container img {
+  margin-left: 10px;
+  border: 1px solid #ccc;
+}
+
+.section-header {
+  background-color: #bc171b;
+  color: white;
+  padding: 10px;
+  border-radius: 5px 5px 0 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.section-toggle {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.vitals-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 0 0 8px 8px;
+  border: 1px solid #ddd;
+  border-top: none;
+}
+
+.vitals-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.vitals-column label {
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+}
+
+.vitals-column input,
+.vitals-column textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+  max-width: 200px;
+  box-sizing: border-box;
+}
+
+/* History Section */
+.history-section h5 {
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+table {
+  font-family: Arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  margin: 20px 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+td, th {
+  border: 1px solid #ddd;
+  text-align: left;
+  padding: 10px;
+  font-size: 14px;
+}
+
+th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+/* Button Container */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.buttonblack, .buttonred, .buttongrey, .buttondelete {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  margin: 5px;
+}
+
+/* Button Panel */
+.button-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Custom Tab Button */
+.custom-tab-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  background-color: #ddd;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 4px;
+  min-width: 40px;
+  max-width: 60px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.custom-tab-button:hover {
+  background-color: #bbb;
+  color: #000;
+}
+
+.custom-tab-button.active {
+  background-color: #fff;
+  color: #bc171b;
+  border: 1px solid #bc171b;
+  font-weight: bold;
+}
+
+/* Button Styles */
+.buttonblack { background-color: #000; color: white; }
+.buttonblack:hover { background-color: #333; }
+.buttonred { background-color: #bc171b; color: white; }
+.buttonred:hover { background-color: #b52b27; }
+.buttongrey { background-color: #888; color: white; }
+.buttongrey:hover { background-color: #666; }
+.buttondelete { background-color: #e74c3c; color: white; }
+.buttondelete:hover { background-color: #c0392b; }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .user-details-container {
+    align-items: center; /* Maintain center alignment */
+  }
+
+  .responsive-image-box,
+  .user-image .image-placeholder {
+    margin-bottom: 10px;
+  }
+
+  .info-row {
+    flex-direction: row; /* Keep label and value side by side */
+  }
+
+  .vitals-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .button-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .buttonblack, .buttonred, .buttongrey {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  .info-row {
+    flex-direction: column; /* Stack label and value on very small screens */
+    text-align: center;
+  }
+
+  .info-label,
+  .info-value {
+    flex: none; /* Reset flex for stacking */
+    width: 100%; /* Full width for both */
+  }
+
+  .info-label {
+    margin-bottom: 2px; /* Small space between label and value */
+    text-align: center; /* Center label text */
+    padding-right: 0; /* Remove padding for centering */
+  }
+
+  .info-value {
+    text-align: center; /* Center value text */
+  }
+}
+/* Tab Button Container */
+.tab-button-container {
+  display: flex;
+  flex-wrap: wrap; /* Allows tabs to wrap if there are too many */
+  gap: 2px; /* Small gap between tabs */
+  padding: 8px 0; /* Increased padding for better spacing */
+  background-color: #f5f5f5; /* Light gray background like Chrome */
+  border-bottom: 1px solid #ccc; /* Bottom border to separate tabs from content */
+  justify-content: flex-start; /* Align tabs to the left */
+  margin-bottom: 15px; /* Add gap between tabs and section headers */
+}
+
+/* Custom Tab Button */
+.custom-tab-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center; /* Center the text */
+  padding: 10px 24px; /* Increased padding for longer tabs */
+  font-size: 14px;
+  font-weight: normal; /* Less bold for a cleaner look */
+  color: #333;
+  background-color: #e0e0e0; /* Default tab background */
+  border: 1px solid #ccc; /* Subtle border */
+  border-bottom: none; /* Remove bottom border to blend with container */
+  border-radius: 8px 8px 0 0; /* Larger rounded top corners like Chrome tabs */
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  margin: 0; /* Remove margin to align tabs tightly */
+  min-width: 50px; /* Increased minimum width */
+  text-align: center;
+  white-space: nowrap;
+  position: relative; /* For active tab styling */
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.custom-tab-button:hover {
+  background-color: #d0d0d0; /* Slightly darker on hover */
+  color: #000;
+}
+
+.custom-tab-button.active {
+  background-color: #fff; /* White background for active tab */
+  color: #bc171b; /* Red text for active tab */
+  border: 1px solid #ccc; /* Full border except bottom */
+  border-bottom: 1px solid #fff; /* Overlap container border */
+  font-weight: bold; /* Bold text for active tab */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
+  z-index: 1; /* Ensure active tab is above others */
+}
+
+/* Section Container and Header Adjustments */
+.section-container {
+  margin-bottom: 10px; /* Ensure consistent spacing between sections */
+  margin-top: 0; /* Remove any default top margin to control gap */
+}
+
+.section-header {
+  background-color: #bc171b;
+  color: white;
+  padding: 12px 15px; /* Increased padding for better appearance */
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 0; /* Ensure no unwanted top margin */
+}
+
+.section-toggle {
+  font-weight: bold;
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .tab-button-container {
+    justify-content: center; /* Center tabs on smaller screens */
+    margin-bottom: 10px; /* Adjust gap on smaller screens */
+  }
+
+  .custom-tab-button {
+    padding: 8px 18px; /* Slightly smaller padding */
+    font-size: 12px; /* Smaller font */
+    min-width: 40px; /* Adjusted minimum width */
+  }
+
+  .section-header {
+    padding: 10px 15px; /* Adjusted padding for smaller screens */
+  }
+}
+
+@media (max-width: 600px) {
+  .custom-tab-button {
+    padding: 6px 14px; /* Further reduced padding */
+    min-width: 35px; /* Smaller minimum width */
+  }
+
+  .tab-button-container {
+    margin-bottom: 8px; /* Smaller gap on very small screens */
+  }
+}
+/* Add to your CSS file */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .prescription-print, .prescription-print * {
+    visibility: visible;
+  }
+  .prescription-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    padding: 20px;
+    font-family: Arial;
+  }
+}
+.local-examination-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+/* File Cards Container */
+.file-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+/* File Card */
+.file-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.file-card:hover {
+  transform: translateY(-5px);
+}
+
+/* File Card Image */
+.file-card-image {
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.file-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures image covers the area without distortion */
+  object-position: center; /* Centers the image */
+  cursor: pointer;
+}
+
+/* File Card Info */
+.file-card-info {
+  padding: 10px;
+  width: 100%;
+}
+
+.file-card-info p {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #333;
+  word-break: break-all; /* Ensures long file names wrap */
+}
+
+.file-card-info button {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Modal File Name */
+.modal-file-name {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.modal-file-name p {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Modal Image Container */
+.modal-image-container {
+  max-width: 100%;
+  max-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Modal Image */
+.modal-image {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain; /* Ensures full image is visible without cropping */
+  border-radius: 4px;
+}
+
+/* Modal Buttons */
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.modal-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.close-button {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.close-button:hover {
+  background-color: #c0392b;
+}
+
+.modal-button:not(.close-button) {
+  background-color: #000;
+  color: white;
+}
+
+.modal-button:not(.close-button):hover {
+  background-color: #333;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .file-cards-container {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .file-card-image {
+    height: 120px;
+  }
+
+  .modal-content {
+    max-width: 95%;
+    padding: 15px;
+  }
+
+  .modal-image {
+    max-height: 50vh;
+  }
+}
+
+@media (max-width: 600px) {
+  .file-cards-container {
+    grid-template-columns: 1fr;
+  }
+
+  .file-card {
+    max-width: 250px;
+    margin: 0 auto;
+  }
+
+  .file-card-image {
+    height: 100px;
+  }
+
+  .modal-button {
+    padding: 8px 15px;
+    font-size: 12px;
+  }
+}
+.dental-vitals-container {
+  padding: 10px;
+}
+
+.dental-chart-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.dental-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 600px;
+}
+
+.dental-tooth-cell {
+  border: 1px solid #ccc;
+  padding: 5px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dental-tooth-cell:hover {
+  background-color: #f0f0f0;
+}
+
+.dental-tooth-cell.has-value {
+  background-color: #e0f7fa;
+}
+
+.tooth-number {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.tooth-condition {
+  font-size: 12px;
+  color: #333;
+  min-height: 20px;
+}
+
+.dental-input-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  max-width: 300px;
+  width: 100%;
+  text-align: center;
+}
+
+.dental-listbox {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 10px 0;
+  background-color: #fff; /* Ensure the listbox has a consistent white background */
+}
+
+.dental-listbox-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  background-color: #fff; /* Default white background for all items */
+  color: #333; /* Consistent text color */
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.dental-listbox-item:hover {
+  background-color: #f0f0f0; /* Light grey on hover for all items */
+  color: #000;
+}
+
+.dental-listbox-item.selected {
+  background-color: #bc171b; /* Use your theme's red for selected items */
+  color: white; /* White text for selected items */
+  font-weight: bold; /* Optional: Make selected item stand out */
+}
+
+.dental-listbox-item.disabled {
+  cursor: not-allowed;
+  color: #999;
+  background-color: #f9f9f9; /* Slightly different for disabled items */
+}
+
+@media (max-width: 768px) {
+  .dental-tooth-cell {
+    padding: 3px;
+  }
+  .tooth-number {
+    font-size: 12px;
+  }
+  .tooth-condition {
+    font-size: 10px;
+  }
+}
+.dental-listbox {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 10px 0;
+  background-color: #fff;
+  scrollbar-width: thin;
+  scrollbar-color: #bc171b #f0f0f0;
+}
+
+.dental-listbox::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dental-listbox::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.dental-listbox::-webkit-scrollbar-thumb {
+  background: #bc171b;
+  border-radius: 4px;
+}
+
+.dental-listbox::-webkit-scrollbar-thumb:hover {
+  background: #b52b27;
+}
+
+.dental-listbox-item {
+  padding: 12px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+  color: #333;
+  transition: background-color 0.2s, color 0.2s;
+  outline: none;
+}
+
+.dental-listbox-item:hover {
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+.dental-listbox-item.selected {
+  background-color: #bc171b;
+  color: white;
+  font-weight: bold;
+}
+
+.dental-listbox-item:focus {
+  outline: 2px solid #bc171b;
+  outline-offset: -2px;
+}
+
+.dental-listbox-item:last-child {
+  border-bottom: none;
+}
+
+.dental-listbox-item.disabled {
+  cursor: not-allowed;
+  color: #999;
+  background-color: #f9f9f9;
+}
+
+/* Existing styles remain unchanged, adding new styles for dental section */
+.dental-tooth-cell {
+  border: 1px solid #ccc;
+  padding: 5px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dental-tooth-cell.has-value {
+  background-color: #e6f3ff;
+  border-color: #007bff;
+}
+
+.dental-tooth-cell:hover {
+  background-color: #f8f9fa;
+}
+
+.dental-listbox-item {
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dental-listbox-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dental-listbox-item.selected {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+.dental-listbox {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.dental-input-overlay {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 15px;
+  margin-top: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
