@@ -202,7 +202,7 @@ function NurseFollow() {
       const queryString = new URLSearchParams(queryParams).toString();
       const queryStringCount = new URLSearchParams(queryParamsCount).toString();
 
-      const response = await axios.get(`http://localhost:5000/api/fetch-patients-receptionbilling?${queryString}`);
+      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-receptionbilling?${queryString}`);
       const sortedPatients = response.data.sort((a, b) => b.id - a.id); // Sort in descending order
 
       setBusinesses(sortedPatients); // Update state with fetched patients

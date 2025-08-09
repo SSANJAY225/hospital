@@ -82,7 +82,7 @@ function ManageTiming() {
   useEffect(() => {
     const fetchTimings = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/timing');
+        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/timing');
         setTimings(response.data);
       } catch (error) {
         console.error('Error fetching timings:', error);
@@ -100,7 +100,7 @@ function ManageTiming() {
 
   const handleUpdateTiming = async () => {
     try {
-      await axios.put(`http://localhost:5000/timing/${selectedTiming.id}`, {
+      await axios.put(`https://amrithaahospitals.visualplanetserver.in/timing/${selectedTiming.id}`, {
         timing_text: newTimingText,
       });
       console.log('Timing updated successfully');
@@ -137,7 +137,7 @@ function ManageTiming() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:5000/timing/${timing.id}`);
+          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/timing/${timing.id}`);
           console.log('Timing deleted successfully');
           refreshTimings();
           Swal.fire('Deleted!', 'Timing deleted successfully!', 'success');
@@ -153,7 +153,7 @@ function ManageTiming() {
 
   const refreshTimings = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/timing');
+      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/timing');
       setTimings(response.data);
     } catch (error) {
       console.error('Error fetching timings:', error);
