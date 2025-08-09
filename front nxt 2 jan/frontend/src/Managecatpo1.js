@@ -91,7 +91,7 @@ function ManageVitals() {
 
   const fetchColumns = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/column-vitals');
+      const response = await axios.get('http://localhost:5000/column-vitals');
       console.log('Fetched columns:', response.data); // Debug log
       setColumns(response.data);
     } catch (error) {
@@ -121,7 +121,7 @@ function ManageVitals() {
       return;
     }
     try {
-      await axios.post('https://amrithaahospitals.visualplanetserver.in/addvitals', {
+      await axios.post('http://localhost:5000/addvitals', {
         vitals: newColumnName,
       });
       await fetchColumns();
@@ -152,7 +152,7 @@ function ManageVitals() {
       return;
     }
     try {
-      await axios.put(`https://amrithaahospitals.visualplanetserver.in/editvitasl/${selectedColumn}`, {
+      await axios.put(`http://localhost:5000/editvitasl/${selectedColumn}`, {
         newName:newColumnName,
       });
       await fetchColumns();
@@ -192,7 +192,7 @@ function ManageVitals() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/api/delete-column/${column}`);
+          await axios.delete(`http://localhost:5000/api/delete-column/${column}`);
           await fetchColumns();
           Swal.fire({
             icon: 'success',

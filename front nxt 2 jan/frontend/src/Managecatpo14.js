@@ -89,7 +89,7 @@ function Managecatpo14() {
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/services');
+      const response = await axios.get('http://localhost:5000/services');
       setServices(response.data);
     } catch (error) {
       console.error('Error fetching services:', error.response?.data?.message || error.message);
@@ -118,7 +118,7 @@ function Managecatpo14() {
       return;
     }
     try {
-      await axios.post('https://amrithaahospitals.visualplanetserver.in/services', {
+      await axios.post('http://localhost:5000/services', {
         service_name: newServiceName,
       });
       await fetchServices();
@@ -149,7 +149,7 @@ function Managecatpo14() {
       return;
     }
     try {
-      await axios.put(`https://amrithaahospitals.visualplanetserver.in/services/${selectedService.id}`, {
+      await axios.put(`http://localhost:5000/services/${selectedService.id}`, {
         service_name: newServiceName,
       });
       await fetchServices();
@@ -184,7 +184,7 @@ function Managecatpo14() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/services/${service.id}`);
+          await axios.delete(`http://localhost:5000/services/${service.id}`);
           await fetchServices();
           Swal.fire({
             icon: 'success',

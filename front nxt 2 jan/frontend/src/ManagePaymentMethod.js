@@ -90,7 +90,7 @@ function ManagePaymentMethod() {
 
   const fetchDoctorEntries = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-paymentMethod');
+      const response = await axios.get('http://localhost:5000/get-paymentMethod');
       console.log(response)
       setDoctors(response.data);
     } catch (error) {
@@ -120,7 +120,7 @@ function ManagePaymentMethod() {
       return;
     }
     try {
-      await axios.post('https://amrithaahospitals.visualplanetserver.in/doctors_names', {
+      await axios.post('http://localhost:5000/doctors_names', {
         name: newDoctorName,
       });
       await fetchDoctorEntries();
@@ -151,7 +151,7 @@ function ManagePaymentMethod() {
       return;
     }
     try {
-      await axios.put(`https://amrithaahospitals.visualplanetserver.in/update-PaymentMethod/${selectedDoctor.payment_id}`, {
+      await axios.put(`http://localhost:5000/update-PaymentMethod/${selectedDoctor.payment_id}`, {
         method: newDoctorName,
       });
       await fetchDoctorEntries();
@@ -186,7 +186,7 @@ function ManagePaymentMethod() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/delete-paymentMethod/${doctor.payment_id}`);
+          await axios.delete(`http://localhost:5000/delete-paymentMethod/${doctor.payment_id}`);
           console.log(doctor.payment_id)
           await fetchDoctorEntries();
           Swal.fire({

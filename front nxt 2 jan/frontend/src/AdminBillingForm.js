@@ -36,7 +36,8 @@ const AdminBillingForm = () => {
   const [membershipOffer, setMembershipOffer] = useState(0);
   const [optpaymnetmethod, setoptpaymentmethod] = useState([])
   const [apiData, setApiData] = useState({})
-  // const []
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  
   const inputRefs = useRef([]);
 
   const getUrlParams = () => {
@@ -54,6 +55,7 @@ const AdminBillingForm = () => {
       phonenumber: searchParams.get('phonenumber') || ''
     };
   };
+
   const generateBillId = (params) => {
     const locationCode = params.belongedlocation
       ? params.belongedlocation.slice(0, 3).toUpperCase()
@@ -71,7 +73,7 @@ const AdminBillingForm = () => {
 
   const fetchMembershipTypes = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/membership-types');
+      const response = await axios.get('http://localhost:5000/api/membership-types');
       console.log('Membership Types Response:', response.data);
       setMembershipTypes(response.data);
     } catch (error) {
@@ -79,29 +81,100 @@ const AdminBillingForm = () => {
       setMembershipTypes([]);
     }
   };
+
   const fetchPaymentMethod = async () => {
     try {
-      const res = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-paymentMethod')
-      // console.log(res.data.map((i)=>i.method))
-      setoptpaymentmethod(res.data)
-      console.log(optpaymnetmethod)
+      const res = await axios.get('http://localhost:5000/get-paymentMethod')
+      setoptpaymentmethod(res.data);
+      console.log('Payment methods loaded:', res.data);
     } catch (e) {
       console.log(e)
     }
   }
+
+  const fetchapidata = async () => {
+    try {
+      const searchParams = new URLSearchParams(location.search);
+      const user = searchParams.get('user')
+      const visit = searchParams.get('visit')
+      const phonenumber = searchParams.get('phonenumber')
+      
+      if (!user || !visit || !phonenumber) {
+        console.log('Missing required parameters for API call');
+        setIsDataLoaded(true);
+        return;
+      }
+
+      console.log('Fetching API data with params:', { user, visit, phonenumber });
+      
+      const req = await axios.get(`http://localhost:5000/get_billing/${phonenumber}/${visit}/${user}`)
+      const api = req.data;
+      
+      console.log("API response:", api);
+      
+      // Set all the data at once to avoid timing issues
+      setApiData(api);
+      
+      // Set individual state values from API data with proper type conversion
+      if (api.discount !== undefined) setOverallDiscount(parseFloat(api.discount) || 0);
+      if (api.membership_type) setSelectedMembership(api.membership_type);
+      if (api.membership_offer !== undefined) setMembershipOffer(parseFloat(api.membership_offer) || 0);
+      if (api.membership_price !== undefined) setMembershipPrice(parseFloat(api.membership_price) || 0);
+      if (api.reference) setReference(api.reference);
+      if (api.payment_method) setPaymentMode(api.payment_method);
+      if (api.review_date) setReviewDate(api.review_date);
+      if (api.id) setBillId(api.id);
+
+      // Handle services data
+      if (api.service && Array.isArray(api.service)) {
+        const updatedServiceArray = api.service.map(({ service_name, price, discount, detail, ...rest }) => ({
+          ...rest,
+          service: service_name || '',
+          price: parseFloat(price) || 0,
+          discount: parseFloat(discount) || 0,
+          detail: detail || '',
+          isEditing: false
+        }));
+        console.log("Processed services:", updatedServiceArray);
+        setServices(updatedServiceArray);
+      }
+      
+      setIsDataLoaded(true);
+      
+    } catch (err) {
+      console.log('Error fetching API data:', err);
+      setIsDataLoaded(true);
+    }
+  };
+
+  // Initial data loading
   useEffect(() => {
     const params = getUrlParams();
     setUrlParams(params);
-    const newBillId = generateBillId(params);
-    setBillId(newBillId);
-    fetchPaymentMethod()
+    
+    // Only generate new bill ID if not loading existing data
+    const searchParams = new URLSearchParams(location.search);
+    const hasExistingData = searchParams.get('user') && searchParams.get('visit') && searchParams.get('phonenumber');
+    
+    if (!hasExistingData) {
+      const newBillId = generateBillId(params);
+      setBillId(newBillId);
+    }
+    
+    // Load static data
+    fetchPaymentMethod();
+    fetchMembershipTypes();
+    
     if (params.memberType && params.memberType !== 'null' && params.memberType !== 'undefined') {
       setSelectedMembership(params.memberType);
     }
+    
     if (params.businessName && params.visited) {
       fetchImage(params.businessName, params.visited);
     }
-    fetchMembershipTypes();
+    
+    // Load API data
+    fetchapidata();
   }, [location]);
 
   useEffect(() => {
@@ -124,13 +197,12 @@ const AdminBillingForm = () => {
     const totalWithMembership = totalWithOverallDiscount + (parseFloat(membershipPrice) || 0);
     const finalTotal = totalWithMembership - Math.min(totalWithMembership, parseFloat(membershipOffer) || 0);
 
-    // console.log('Calculating Total:', { subtotal, totalWithOverallDiscount, membershipPrice, totalWithMembership, membershipOffer, finalTotal });
     setTotalPrice(Math.max(finalTotal, 0).toFixed(2));
   }, [services, overallDiscount, membershipPrice, membershipOffer]);
 
   const fetchImage = async (phoneNumber, visited) => {
     try {
-      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/user-photo`, {
+      const response = await axios.get(`http://localhost:5000/api/user-photo`, {
         params: { phoneNumber, visited },
       });
       setImageUrl(response.data.imageUrl);
@@ -200,15 +272,12 @@ const AdminBillingForm = () => {
   };
 
   const toggleEdit = (index) => {
-    // const newServices = [...services];
-    // newServices[index].isEditing = true;
     const item = services[index];
     document.querySelector('input[placeholder="Particular"]').value = item.service
-    document.querySelector('input[placeholder="Details"]').value = item.detail|| '-'
+    document.querySelector('input[placeholder="Details"]').value = item.detail || '-'
     document.querySelector('input[placeholder="Amount"]').value = item.price
-    document.querySelector('input[placeholder="Discount"]').value=item.discount
-    setServices(services.filter((entry)=>entry !== item))
-    // setServices(newServices);
+    document.querySelector('input[placeholder="Discount"]').value = item.discount
+    setServices(services.filter((entry) => entry !== item))
   };
 
   const saveServiceRow = (index) => {
@@ -294,42 +363,6 @@ const AdminBillingForm = () => {
     return d.toISOString().slice(0, 19).replace('T', ' ');
   };
 
-  const fetchapidata = async () => {
-    try {
-      const searchParams = new URLSearchParams(location.search);
-      const user = searchParams.get('user')
-      const visit = searchParams.get('visit')
-      const phonenumber = searchParams.get('phonenumber')
-      const req = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get_billing/${phonenumber}/${visit}/${user}`)
-      const api = req.data
-      setApiData(req.data)
-      setOverallDiscount(apiData.discount)
-      setSelectedMembership(apiData.member_type)
-      setReference(apiData.reference)
-      // const withoutService = Object.fromEntries(
-      //   Object.entries(api).filter(([key, _]) => key !== 'service')
-      // );
-      // setApiData(withoutService)
-      console.log("api data",apiData)
-      setPaymentMode(apiData.payment_method)
-      const WithService = Object.fromEntries(
-        Object.entries(api).filter(([key, _]) => key === 'service')
-      )
-      const updatedServiceArray = WithService.service?.map(({ service_name, ...rest }) => ({
-        ...rest,
-        // isEditing: false,
-        service: service_name
-      })) || [];
-      // console.log("service", updatedServiceArray)
-      setServices(updatedServiceArray)
-    } catch (err) {
-      console.log(err)
-    }
-  }
-  useEffect(() => {
-    fetchapidata()
-    // console.log(apiData)
-  }, [])
   const generatePDF = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -358,13 +391,13 @@ const AdminBillingForm = () => {
     addLine();
 
     addText('Patient Details', 10, 14, true);
-    addText(`Name: ${urlParams.name || 'N/A'}`, 10);
-    addText(`Phone Number: ${urlParams.businessName || 'N/A'}`, 10);
-    addText(`Visit Number: ${urlParams.visited || 'N/A'}`, 10);
-    addText(`Doctor: ${urlParams.doctorname || 'N/A'}`, 10);
-    addText(`Nurse: ${urlParams.nursename || 'N/A'}`, 10);
+    addText(`Name: ${urlParams.name || apiData.user_name || 'N/A'}`, 10);
+    addText(`Phone Number: ${urlParams.businessName || apiData.phone_number || 'N/A'}`, 10);
+    addText(`Visit Number: ${urlParams.visited || apiData.visit_number || 'N/A'}`, 10);
+    addText(`Doctor: ${urlParams.doctorname || apiData.doctorname || 'N/A'}`, 10);
+    addText(`Nurse: ${urlParams.nursename || apiData.nurse_name || 'N/A'}`, 10);
     addText(`Location: ${urlParams.belongedlocation || 'N/A'}`, 10);
-    addText(`Member ID: ${urlParams.id || 'N/A'}`, 10);
+    addText(`Member ID: ${urlParams.id || apiData.user_id || 'N/A'}`, 10);
     addLine();
 
     addText('Services', 10, 14, true);
@@ -445,7 +478,7 @@ const AdminBillingForm = () => {
     addText(`Review Date: ${reviewDate || 'N/A'}`, 10);
 
     const pdfData = doc.output('datauristring').split(',')[1];
-    const filename = `${urlParams.businessName || 'unknown'}_${urlParams.visited || 'unknown'}.pdf`;
+    const filename = `${urlParams.businessName || apiData.phone_number || 'unknown'}_${urlParams.visited || apiData.visit_number || 'unknown'}.pdf`;
 
     doc.save(filename);
 
@@ -476,47 +509,51 @@ const AdminBillingForm = () => {
       )
       .map(({ service, price, detail, discount }) => ({
         service: service.trim(),
-        price: parseFloat(price).toFixed(2),
+        price: (parseFloat(price) || 0).toFixed(2),
         details: detail || '',
         discount: parseFloat(discount) || 0,
       }));
 
+    // Ensure all numeric values are properly converted
+    const safeMembershipPrice = parseFloat(membershipPrice) || 0;
+    const safeMembershipOffer = parseFloat(membershipOffer) || 0;
+    const safeOverallDiscount = parseFloat(overallDiscount) || 0;
+
     const billingData = {
-      userId: urlParams.id,
-      userName: urlParams.name,
-      phoneNumber: urlParams.phonenumber,
-      visitNumber: urlParams.visited,
-      nurseName: urlParams.nursename,
-      doctorName: urlParams.doctorname,
+      userId: urlParams.id || apiData.user_id,
+      userName: urlParams.name || apiData.user_name,
+      phoneNumber: urlParams.phonenumber || apiData.phone_number,
+      visitNumber: urlParams.visited || apiData.visit_number,
+      nurseName: urlParams.nursename || apiData.nurse_name,
+      doctorName: urlParams.doctorname || apiData.doctorname,
       billId,
       paymentMode,
       reviewDate,
       reference,
       membershipType: selectedMembership,
-      membershipPrice: membershipPrice.toFixed(2),
-      membershipOffer: parseFloat(membershipOffer).toFixed(2),
+      membershipPrice: safeMembershipPrice.toFixed(2),
+      membershipOffer: safeMembershipOffer.toFixed(2),
       services: validServices,
       totalPrice,
-      overallDiscount: parseFloat(overallDiscount) || 0,
+      overallDiscount: safeOverallDiscount,
       date: formatDateToMySQL(new Date()),
     };
 
     try {
-      const billingResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/save-billing', billingData);
-
+      const billingResponse = await axios.put('http://localhost:5000/api/update_billing', billingData);
       if (!billingResponse.data.success) {
         throw new Error('Failed to save billing');
       }
 
       if (selectedMembership && selectedMembership !== urlParams.memberType) {
         const membershipUpdateData = {
-          id: urlParams.id,
-          phoneNumber: urlParams.businessName,
-          visited: urlParams.visited,
+          id: urlParams.id || apiData.user_id,
+          phoneNumber: urlParams.businessName || apiData.phone_number,
+          visited: urlParams.visited || apiData.visit_number,
           membership: selectedMembership,
         };
 
-        const membershipResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/Update-membership', membershipUpdateData);
+        const membershipResponse = await axios.post('http://localhost:5000/api/Update-membership', membershipUpdateData);
 
         if (!membershipResponse.data.success) {
           console.error('Failed to update membership:', membershipResponse.data.message);
@@ -530,13 +567,13 @@ const AdminBillingForm = () => {
           console.log('Membership updated successfully:', selectedMembership);
         }
       }
-
+      
       const { pdfData, filename } = generatePDF();
-      const pdfResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/save-bill-pdf', {
+      const pdfResponse = await axios.post('http://localhost:5000/api/save-bill-pdf', {
         pdfData,
         filename,
-        userId: urlParams.id,
-        visitNumber: urlParams.visited,
+        userId: urlParams.id || apiData.user_id,
+        visitNumber: urlParams.visited || apiData.visit_number,
       }, {
         headers: { 'Content-Type': 'application/json' },
       });
@@ -559,7 +596,9 @@ const AdminBillingForm = () => {
         text: 'The billing information has been saved successfully, and the bill has been downloaded and stored.',
         confirmButtonText: 'OK',
       });
-      navigate(`/ReceptionBillingFollowup?loginlocation=${urlParams.loginLocation}&franchiselocation=${urlParams.belongedlocation}`, { replace: true });
+      
+      // navigate(`/ReceptionBillingFollowup?loginlocation=${urlParams.loginLocation}&franchiselocation=${urlParams.belongedlocation}`, { replace: true });
+      
     } catch (error) {
       console.error('Error:', error);
       await Swal.fire({
@@ -574,6 +613,17 @@ const AdminBillingForm = () => {
   const currentDate = new Date().toISOString().split('T')[0];
   const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+  // Show loading state while data is being fetched
+  if (!isDataLoaded) {
+    return (
+      <div className="billing-form-container">
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <p>Loading billing data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="billing-form-container">
@@ -586,7 +636,7 @@ const AdminBillingForm = () => {
               <span className="info-label">Bill ID:</span>
               <input
                 type="text"
-                value={apiData.id}
+                value={billId || apiData.id || ''}
                 readOnly
                 className="responsive-input"
               />
@@ -602,10 +652,6 @@ const AdminBillingForm = () => {
                 {optpaymnetmethod.map((itm) =>
                   <option key={itm.payment_id} value={itm.method}>{itm.method}</option>
                 )}
-                {/* <option value="">Select Payment Mode</option>
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-                <option value="Online">Online</option> */}
               </select>
             </div>
           </div>
@@ -636,15 +682,15 @@ const AdminBillingForm = () => {
           <div className="details-left">
             <div className="info-row">
               <span className="info-label">Doctor:</span>
-              <span className="info-value">{apiData.doctorname}</span>
+              <span className="info-value">{apiData.doctorname || urlParams.doctorname}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Nurse:</span>
-              <span className="info-value">{apiData.nurse_name}</span>
+              <span className="info-value">{apiData.nurse_name || urlParams.nursename}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Member:</span>
-              <span className="info-value">{apiData.user_id}</span>
+              <span className="info-value">{apiData.user_id || urlParams.id}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Location:</span>
@@ -654,15 +700,15 @@ const AdminBillingForm = () => {
           <div className="details-right">
             <div className="info-row">
               <span className="info-label">Name:</span>
-              <span className="info-value">{apiData.user_name}</span>
+              <span className="info-value">{apiData.user_name || urlParams.name}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Visited:</span>
-              <span className="info-value">{apiData.visit_number}</span>
+              <span className="info-value">{apiData.visit_number || urlParams.visited}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Number:</span>
-              <span className="info-value">{apiData.phone_number}</span>
+              <span className="info-value">{apiData.phone_number || urlParams.businessName}</span>
             </div>
           </div>
         </div>
@@ -682,44 +728,30 @@ const AdminBillingForm = () => {
             </thead>
             <tbody>
               {services.map((service, index) => (
-                <>
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>
-                      {service.service}
-                    </td>
-                    <td>
-                      {service.detail || '-'}
-                    </td>
-                    <td>
-                      ₹{parseFloat(service.price).toFixed(2)}
-                    </td>
-                    <td>
-                      ₹{parseFloat(service.discount || 0).toFixed(2)}
-                    </td>
-                    <td>
-                      <div className="action-buttons">
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{service.service}</td>
+                  <td>{service.detail || '-'}</td>
+                  <td>₹{parseFloat(service.price).toFixed(2)}</td>
+                  <td>₹{parseFloat(service.discount || 0).toFixed(2)}</td>
+                  <td>
+                    <div className="action-buttons">
+                      <button
+                        className="custom-edit-button"
+                        onClick={() => toggleEdit(index)}>
+                        Edit
+                      </button>
+                      {!service.isEditing && services.length > 1 && (
                         <button
-                          className="custom-edit-button"
-                          onClick={() => toggleEdit(index)}>
-                          Edit
+                          className="custom-delete-button"
+                          onClick={() => removeServiceRow(index)}
+                        >
+                          Delete
                         </button>
-                        {!service.isEditing && (
-                          <>
-                            {services.length > 1 && (
-                              <button
-                                className="custom-delete-button"
-                                onClick={() => removeServiceRow(index)}
-                              >
-                                Delete
-                              </button>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
               ))}
               <tr>
                 <td>{services.length + 1}</td>
@@ -727,11 +759,7 @@ const AdminBillingForm = () => {
                   <input
                     type="text"
                     placeholder="Particular"
-                    // value={service.service}
-                    // onChange={(e) => handleServiceChange(index, 'service', e.target.value)}
-                    // onKeyDown={(e) => handleKeyDown(e, index, 'service')}
                     className="responsive-input"
-                    // ref={inputRefs.current[index]?.service}
                     onClick={(e) => e.target.focus()}
                   />
                 </td>
@@ -739,41 +767,67 @@ const AdminBillingForm = () => {
                   <input
                     type="text"
                     placeholder="Details"
-                    // value={service.detail || ''}
-                    // onChange={(e) => handleServiceChange(index, 'detail', e.target.value)}
-                    // onKeyDown={(e) => handleKeyDown(e, index, 'detail')}
                     className="responsive-input"
-                    // ref={inputRefs.current[index]?.detail}
                   />
                 </td>
                 <td>
                   <input
                     type="number"
                     placeholder="Amount"
-                    // value={service.price}
-                    // onChange={(e) => handleServiceChange(index, 'price', e.target.value)}
-                    // onKeyDown={(e) => handleKeyDown(e, index, 'price')}
                     className="responsive-input"
                     step="0.01"
                     min="0"
-                    // ref={inputRefs.current[index]?.price}
                   />
                 </td>
                 <td>
                   <input
                     type="number"
                     placeholder="Discount"
-                    // value={service.discount}
-                    // onChange={(e) => handleServiceChange(index, 'discount', e.target.value)}
-                    // onKeyDown={(e) => handleKeyDown(e, , 'discount')}
                     className="responsive-input"
                     step="0.01"
                     min="0"
-                    // ref={inputRefs.current[index]?.discount}
                   />
                 </td>
+                <td>
+                  <button
+                    className="custom-edit-button"
+                    onClick={() => {
+                      const particular = document.querySelector('input[placeholder="Particular"]').value;
+                      const details = document.querySelector('input[placeholder="Details"]').value;
+                      const amount = document.querySelector('input[placeholder="Amount"]').value;
+                      const discount = document.querySelector('input[placeholder="Discount"]').value;
+                      
+                      if (!particular.trim() || !amount || parseFloat(amount) <= 0) {
+                        Swal.fire({
+                          icon: 'error',
+                          title: 'Invalid Input',
+                          text: 'Please enter valid service name and amount.',
+                          confirmButtonText: 'OK',
+                        });
+                        return;
+                      }
+                      
+                      const newService = {
+                        service: particular.trim(),
+                        detail: details || '',
+                        price: parseFloat(amount),
+                        discount: parseFloat(discount) || 0,
+                        isEditing: false
+                      };
+                      
+                      setServices([...services, newService]);
+                      
+                      // Clear the input fields
+                      document.querySelector('input[placeholder="Particular"]').value = '';
+                      document.querySelector('input[placeholder="Details"]').value = '';
+                      document.querySelector('input[placeholder="Amount"]').value = '';
+                      document.querySelector('input[placeholder="Discount"]').value = '';
+                    }}
+                  >
+                    Add
+                  </button>
+                </td>
               </tr>
-
             </tbody>
           </table>
         </div>

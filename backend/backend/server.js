@@ -5010,6 +5010,323 @@ app.put('/update-PaymentMethod/:id',(req,res) => {
     });
   });
 });
+app.put('/api/update_billing', (req, res) => {
+  console.log('Request body:', req.body);
+  
+  const {
+    userId,
+    userName,
+    phoneNumber,
+    visitNumber,
+    nurseName,
+    doctorName,
+    billId,
+    paymentMode,
+    reviewDate,
+    reference,
+    membershipType,
+    membershipPrice,
+    membershipOffer,
+    services,
+    totalPrice,
+    overallDiscount,
+    date
+  } = req.body;
+
+  // Validation: Check if required fields are provided
+  if (!billId) {
+    return res.status(400).json({
+      success: false,
+      message: 'Bill ID is required for update'
+    });
+  }
+
+  // Build dynamic SQL query for billing table update
+  const updateFields = [];
+  const updateValues = [];
+
+  if (userId !== undefined) {
+    updateFields.push('user_id = ?');
+    updateValues.push(userId);
+  }
+  
+  if (userName !== undefined) {
+    updateFields.push('user_name = ?');
+    updateValues.push(userName);
+  }
+  
+  if (phoneNumber !== undefined) {
+    updateFields.push('phone_number = ?');
+    updateValues.push(phoneNumber);
+  }
+  
+  if (visitNumber !== undefined) {
+    updateFields.push('visit_number = ?');
+    updateValues.push(visitNumber);
+  }
+  
+  if (nurseName !== undefined) {
+    updateFields.push('nurse_name = ?');
+    updateValues.push(nurseName);
+  }
+  
+  if (totalPrice !== undefined) {
+    updateFields.push('total_price = ?');
+    updateValues.push(parseFloat(totalPrice) || 0);
+  }
+  
+  if (date !== undefined) {
+    updateFields.push('billing_date = ?');
+    updateValues.push(date);
+  }
+  
+  if (paymentMode !== undefined) {
+    updateFields.push('payment_method = ?');
+    updateValues.push(paymentMode || null);
+  }
+  
+  if (membershipType !== undefined) {
+    updateFields.push('membership_type = ?');
+    updateValues.push(membershipType || null);
+  }
+  
+  if (reference !== undefined) {
+    updateFields.push('reference = ?');
+    updateValues.push(reference || null);
+  }
+  
+  if (overallDiscount !== undefined) {
+    updateFields.push('discount = ?');
+    updateValues.push(parseInt(overallDiscount) || null);
+  }
+  
+  if (membershipOffer !== undefined) {
+    updateFields.push('membership_offer = ?');
+    updateValues.push(membershipOffer || null);
+  }
+  
+  if (membershipPrice !== undefined) {
+    updateFields.push('membership_price = ?');
+    updateValues.push(membershipPrice || null);
+  }
+  
+  if(reviewDate !== undefined) {
+    updateFields.push('review_date = ?');
+    updateValues.push(reviewDate);
+  }
+
+  // Check if there are fields to update
+  if (updateFields.length === 0 && !services) {
+    return res.status(400).json({
+      success: false,
+      message: 'No fields provided for update'
+    });
+  }
+
+  // Start a database transaction for updating both billing and services
+  db.beginTransaction((transErr) => {
+    if (transErr) {
+      console.error('Transaction start error:', transErr);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to start database transaction',
+        error: transErr.message
+      });
+    }
+
+    // Function to handle rollback and error response
+    const handleError = (error, message) => {
+      db.rollback(() => {
+        console.error(message, error);
+        res.status(500).json({
+          success: false,
+          message: message,
+          error: error.message
+        });
+      });
+    };
+
+    // Update billing table if there are fields to update
+    const updateBillingTable = (callback) => {
+      if (updateFields.length === 0) {
+        return callback(null, { affectedRows: 0 });
+      }
+
+      updateValues.push(billId);
+      const billingUpdateSql = `
+        UPDATE billing_headers 
+        SET ${updateFields.join(', ')} 
+        WHERE id = ?
+      `;
+
+      console.log('Billing Update SQL:', billingUpdateSql);
+      console.log('Billing Values:', updateValues);
+
+      db.query(billingUpdateSql, updateValues, callback);
+    };
+
+    // Update services table
+    const updateServicesTable = (callback) => {
+      if (!services || !Array.isArray(services) || services.length === 0) {
+        return callback(null, { affectedRows: 0 });
+      }
+
+      // First, delete existing services for this bill
+      const deleteServicesSql = 'DELETE FROM billing_details WHERE billing_id = ?';
+      
+      db.query(deleteServicesSql, [billId], (deleteErr, deleteResults) => {
+        if (deleteErr) {
+          return callback(deleteErr);
+        }
+
+        console.log(`Deleted ${deleteResults.affectedRows} existing services`);
+
+        // Method 1: Bulk insert with proper VALUES syntax
+        if (services.length === 1) {
+          // Single service insert
+          const insertServiceSql = `
+            INSERT INTO billing_details 
+            (billing_id, service_name, detail, price, discount) 
+            VALUES (?, ?, ?, ?, ?)
+          `;
+
+          const service = services[0];
+          const serviceValues = [
+            billId,
+            service.service || '',
+            service.details || service.detail || '',
+            parseFloat(service.price) || 0,
+            parseFloat(service.discount) || 0
+          ];
+
+          console.log('Single Service Insert SQL:', insertServiceSql);
+          console.log('Single Service Values:', serviceValues);
+
+          db.query(insertServiceSql, serviceValues, callback);
+        } else {
+          // Multiple services bulk insert
+          const placeholders = services.map(() => '(?, ?, ?, ?, ?)').join(', ');
+          const insertServicesSql = `
+            INSERT INTO billing_details 
+            (billing_id, service_name, detail, price, discount) 
+            VALUES ${placeholders}
+          `;
+
+          // Flatten the values array
+          const serviceValues = [];
+          services.forEach(service => {
+            serviceValues.push(
+              billId,
+              service.service || '',
+              service.details || service.detail || '',
+              parseFloat(service.price) || 0,
+              parseFloat(service.discount) || 0
+            );
+          });
+
+          console.log('Multiple Services Insert SQL:', insertServicesSql);
+          console.log('Multiple Services Values:', serviceValues);
+
+          db.query(insertServicesSql, serviceValues, callback);
+        }
+      });
+    };
+
+    // Alternative method: Insert services one by one (more reliable)
+    const updateServicesTableOneByOne = (callback) => {
+      if (!services || !Array.isArray(services) || services.length === 0) {
+        return callback(null, { affectedRows: 0 });
+      }
+
+      // First, delete existing services for this bill
+      const deleteServicesSql = 'DELETE FROM billing_details WHERE billing_id = ?';
+      
+      db.query(deleteServicesSql, [billId], (deleteErr, deleteResults) => {
+        if (deleteErr) {
+          return callback(deleteErr);
+        }
+
+        console.log(`Deleted ${deleteResults.affectedRows} existing services`);
+
+        // Insert services one by one
+        let insertedCount = 0;
+        let hasError = false;
+
+        if (services.length === 0) {
+          return callback(null, { affectedRows: 0 });
+        }
+
+        const insertServiceSql = `
+          INSERT INTO billing_details 
+          (billing_id, service_name, detail, price, discount) 
+          VALUES (?, ?, ?, ?, ?)
+        `;
+
+        services.forEach((service, index) => {
+          if (hasError) return;
+
+          const serviceValues = [
+            billId,
+            service.service || '',
+            service.details || service.detail || '',
+            parseFloat(service.price) || 0,
+            parseFloat(service.discount) || 0
+          ];
+
+          console.log(`Inserting service ${index + 1}:`, serviceValues);
+
+          db.query(insertServiceSql, serviceValues, (insertErr, insertResult) => {
+            if (insertErr && !hasError) {
+              hasError = true;
+              return callback(insertErr);
+            }
+
+            insertedCount++;
+            console.log(`Service ${index + 1} inserted successfully`);
+
+            // Check if all services have been processed
+            if (insertedCount === services.length && !hasError) {
+              callback(null, { affectedRows: insertedCount });
+            }
+          });
+        });
+      });
+    };
+
+    // Execute billing table update
+    updateBillingTable((billingErr, billingResults) => {
+      if (billingErr) {
+        return handleError(billingErr, 'Error updating billing table');
+      }
+
+      console.log('Billing table updated successfully');
+
+      // Execute services table update (use the one-by-one method for reliability)
+      updateServicesTableOneByOne((servicesErr, servicesResults) => {
+        if (servicesErr) {
+          return handleError(servicesErr, 'Error updating services table');
+        }
+
+        console.log('Services updated successfully');
+
+        // Commit the transaction
+        db.commit((commitErr) => {
+          if (commitErr) {
+            return handleError(commitErr, 'Error committing transaction');
+          }
+
+          console.log('Update successful - transaction committed');
+          res.status(200).json({
+            success: true,
+            message: 'Billing record and services updated successfully',
+            billingAffectedRows: billingResults.affectedRows,
+            servicesUpdated: services ? services.length : 0
+          });
+        });
+      });
+    });
+  });
+});
 
 // Start the server
 const PORT = process.env.PORT || 5000;

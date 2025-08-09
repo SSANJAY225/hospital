@@ -89,7 +89,7 @@ function Managecatpo15() {
 
   const fetchROAEntries = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/roa');
+      const response = await axios.get('http://localhost:5000/roa');
       setROAEntries(response.data);
     } catch (error) {
       console.error('Error fetching ROA entries:', error.response?.data?.message || error.message);
@@ -118,7 +118,7 @@ function Managecatpo15() {
       return;
     }
     try {
-      await axios.post('https://amrithaahospitals.visualplanetserver.in/roa', {
+      await axios.post('http://localhost:5000/roa', {
         name: newROAName,
       });
       await fetchROAEntries();
@@ -149,7 +149,7 @@ function Managecatpo15() {
       return;
     }
     try {
-      await axios.put(`https://amrithaahospitals.visualplanetserver.in/roa/${selectedROA.id}`, {
+      await axios.put(`http://localhost:5000/roa/${selectedROA.id}`, {
         name: newROAName,
       });
       await fetchROAEntries();
@@ -184,7 +184,7 @@ function Managecatpo15() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/roa/${roa.id}`);
+          await axios.delete(`http://localhost:5000/roa/${roa.id}`);
           await fetchROAEntries();
           Swal.fire({
             icon: 'success',
