@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 let file = 0
 const [, , srcDir] = process.argv;
-const targetUrl = 'http://localhost:5000';
-const newUrl = 'http://localhost:5000';
+const targetUrl = 'https://amrithaahospitals.visualplanetserver.in';
+const newUrl = 'https://amrithaahospitals.visualplanetserver.in';
 
 if (!srcDir) {
   console.error("Usage: node replace-url.js <src-folder>");

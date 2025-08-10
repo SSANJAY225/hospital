@@ -30,8 +30,8 @@ const BillingHistory = () => {
                 const role = decoded.roll;
                 console.log(role);
                 let link = ''
-                if (role === 'admin') { link = "http://localhost:5000/get-adminfiles" }
-                else { link = "http://localhost:5000/get-files" }
+                if (role === 'admin') { link = "https://amrithaahospitals.visualplanetserver.in/get-adminfiles" }
+                else { link = "https://amrithaahospitals.visualplanetserver.in/get-files" }
                 const res = await axios.get(link)
                 const reversed = res.data.reverse();
                 setData(reversed);
@@ -231,7 +231,7 @@ const BillingHistory = () => {
                                     <td>{item.Visted}</td>
                                     <td>₹{parseFloat(item.total_price || 0).toFixed(2)}</td>
                                     <td>
-                                        <a href={`http://localhost:5000/downloadbill/${item.Phone_number}_${item.Visted}.pdf`}
+                                        <a href={`https://amrithaahospitals.visualplanetserver.in/downloadbill/${item.Phone_number}_${item.Visted}.pdf`}
                                         // download
                                         >
                                             <button>Download</button>

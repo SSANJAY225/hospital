@@ -82,7 +82,7 @@ function ManageDosage() {
   useEffect(() => {
     const fetchDosages = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/dosage');
+        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/dosage');
         setDosages(response.data);
       } catch (error) {
         console.error('Error fetching dosages:', error);
@@ -100,7 +100,7 @@ function ManageDosage() {
 
   const handleUpdateDosage = async () => {
     try {
-      await axios.put(`http://localhost:5000/dosage/${selectedDosage.id}`, {
+      await axios.put(`https://amrithaahospitals.visualplanetserver.in/dosage/${selectedDosage.id}`, {
         dosage_text: newDosageText,
       });
       console.log('Dosage updated successfully');
@@ -137,7 +137,7 @@ function ManageDosage() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:5000/dosage/${dosage.id}`);
+          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/dosage/${dosage.id}`);
           console.log('Dosage deleted successfully');
           refreshDosages();
           Swal.fire('Deleted!', 'Dosage deleted successfully!', 'success');
@@ -153,7 +153,7 @@ function ManageDosage() {
 
   const refreshDosages = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/dosage');
+      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/dosage');
       setDosages(response.data);
     } catch (error) {
       console.error('Error fetching dosages:', error);
