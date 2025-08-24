@@ -20,7 +20,10 @@ body {
   height: 100vh;
   background-color: #fff;
 }
-
+.buttonedit{
+ background-color: #888;
+ color: white;
+}
 .maincontent {
   flex-grow: 1;
   padding: 15px;
@@ -147,12 +150,12 @@ body {
 }
 
 .btngreen {
-  background-color: #28a745;
+  background-color: #888;
   color: white;
 }
 
 .btngreen:hover {
-  background-color: #218838;
+  background-color: #889;
 }
 
 .btndelete {

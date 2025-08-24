@@ -72,7 +72,7 @@ function Login() {
     setErrors(Validation(values));
 
     axios
-      .post('http://localhost:5000/login', values)
+      .post('https://amrithaahospitals.visualplanetserver.in/login', values)
       .then((res) => {
         if (res.data.success) {
           const franchiselocation = res.data.franchiselocation;

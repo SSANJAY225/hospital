@@ -182,7 +182,7 @@ const PatientForm = () => {
   // Fetch user image
   const fetchImage = async (phoneNumber, visited) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/user-photo`, {
+      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/user-photo`, {
         params: { phoneNumber, visited },
       });
       setImageUrl(response.data.imageUrl);
@@ -195,7 +195,7 @@ const PatientForm = () => {
   // Fetch vitals input fields
   const fetchvitalsinput = async () => {
     try {
-      const response = await fetch('http://localhost:5000/column-vitals', {
+      const response = await fetch('https://amrithaahospitals.visualplanetserver.in/column-vitals', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -212,7 +212,7 @@ const PatientForm = () => {
   // Fetch data from API
   const apifetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/get-data', {
+      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-data', {
         params: {
           businessname: urlParams.businessName,
           name: urlParams.name,
@@ -222,7 +222,7 @@ const PatientForm = () => {
       const data = response.data;
       setapidata(data);
 
-      const visit = await axios.get('http://localhost:5000/get-visited', {
+      const visit = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-visited', {
         params: {
           phone_number: urlParams.businessName,
           full_name: urlParams.name,
@@ -230,7 +230,7 @@ const PatientForm = () => {
       });
       setVisitedCount(visit.data);
 
-      const res = await axios.get(`http://localhost:5000/getvitals/${urlParams.name}/${urlParams.visited}/${urlParams.businessName}`);
+      const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/getvitals/${urlParams.name}/${urlParams.visited}/${urlParams.businessName}`);
       setVitals(res.data[0] || {});
 
       if (data.patient?.length > 0) {
@@ -264,12 +264,12 @@ const PatientForm = () => {
       setselectsystematic(convertArrayToCheckboxState(data.sysexam_forms));
       setselectavailableTests(convertArrayToCheckboxState(data.testtotake));
 
-      const fileResponse = await axios.get(`http://localhost:5000/files/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`);
+      const fileResponse = await axios.get(`https://amrithaahospitals.visualplanetserver.in/files/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`);
       if (fileResponse.data.files) {
         setUploadedFiles(fileResponse.data.files);
       }
 
-      const dentalResponse = await axios.get(`http://localhost:5000/getdental/${urlParams.name}/${urlParams.visited}/${urlParams.businessName}`);
+      const dentalResponse = await axios.get(`https://amrithaahospitals.visualplanetserver.in/getdental/${urlParams.name}/${urlParams.visited}/${urlParams.businessName}`);
       setdental(dentalResponse.data.result[0] || {});
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -297,9 +297,9 @@ const PatientForm = () => {
 
   useEffect(() => {
     fetchvitalsinput();
-    fetchData('http://localhost:5000/api/onexamination', setOnExamination);
-    fetchData('http://localhost:5000/api/onsystem', setOnSystem);
-    fetchData('http://localhost:5000/api/tests', setavalableTests);
+    fetchData('https://amrithaahospitals.visualplanetserver.in/api/onexamination', setOnExamination);
+    fetchData('https://amrithaahospitals.visualplanetserver.in/api/onsystem', setOnSystem);
+    fetchData('https://amrithaahospitals.visualplanetserver.in/api/tests', setavalableTests);
   }, []);
 
   useEffect(() => {
@@ -434,7 +434,7 @@ const PatientForm = () => {
     };
 
     try {
-      await axios.delete('http://localhost:5000/delete-records', {
+      await axios.delete('https://amrithaahospitals.visualplanetserver.in/delete-records', {
         params: {
           businessname: urlParams.businessName,
           name: urlParams.name,
@@ -442,8 +442,8 @@ const PatientForm = () => {
         },
       });
 
-      await axios.delete(`http://localhost:5000/deletedental/${urlParams.name}/${urlParams.visited}/${urlParams.businessName}`);
-      await axios.post(`http://localhost:5000/adddental/${urlParams.name}/${urlParams.visited}/${urlParams.businessName}`, dental);
+      await axios.delete(`https://amrithaahospitals.visualplanetserver.in/deletedental/${urlParams.name}/${urlParams.visited}/${urlParams.businessName}`);
+      await axios.post(`https://amrithaahospitals.visualplanetserver.in/adddental/${urlParams.name}/${urlParams.visited}/${urlParams.businessName}`, dental);
 
       formData.vitals.Phone_number = urlParams.businessName;
       formData.vitals.Name = urlParams.name;
@@ -458,9 +458,9 @@ const PatientForm = () => {
       };
 
       const updatedFormData = replaceSpacesInKeys(formData.vitals);
-      await axios.put(`http://localhost:5000/update-vitals/${urlParams.name}/${urlParams.visited}/${urlParams.businessName}`, updatedFormData);
+      await axios.put(`https://amrithaahospitals.visualplanetserver.in/update-vitals/${urlParams.name}/${urlParams.visited}/${urlParams.businessName}`, updatedFormData);
 
-      const response = await fetch('http://localhost:5000/save-data', {
+      const response = await fetch('https://amrithaahospitals.visualplanetserver.in/save-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -476,7 +476,7 @@ const PatientForm = () => {
 
         try {
           const fileUploadResponse = await axios.post(
-            `http://localhost:5000/upload/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`,
+            `https://amrithaahospitals.visualplanetserver.in/upload/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`,
             fileData,
             { headers: { 'Content-Type': 'multipart/form-data' } }
           );
@@ -503,7 +503,7 @@ const PatientForm = () => {
         confirmButtonText: 'OK',
       });
 
-      const fileResponse = await axios.get(`http://localhost:5000/files/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`);
+      const fileResponse = await axios.get(`https://amrithaahospitals.visualplanetserver.in/files/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`);
       if (fileResponse.data.files) {
         setUploadedFiles(fileResponse.data.files);
       }
@@ -997,14 +997,14 @@ const PatientForm = () => {
                         <p>{uploadedFiles[currentImageIndex].File_Name}</p>
                       </div>
                       <img
-                        src={`http://localhost:5000/${uploadedFiles[currentImageIndex].FilePath}`}
+                        src={`https://amrithaahospitals.visualplanetserver.in/${uploadedFiles[currentImageIndex].FilePath}`}
                         alt={uploadedFiles[currentImageIndex].File_Name}
                         className="modal-image"
                         onError={(e) => {
                           console.error('Error loading image:', e.target.src);
                           e.target.src = 'https://via.placeholder.com/150?text=Image+Not+Found';
                         }}
-                        onLoad={() => console.log('Image loaded successfully:', `http://localhost:5000/${uploadedFiles[currentImageIndex].FilePath}`)}
+                        onLoad={() => console.log('Image loaded successfully:', `https://amrithaahospitals.visualplanetserver.in/${uploadedFiles[currentImageIndex].FilePath}`)}
                       />
                     </>
                   ) : (

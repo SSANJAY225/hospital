@@ -78,7 +78,7 @@ function Managecatpo12() {
   useEffect(() => {
     const fetchVaccines = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/getRoA');
+        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/getRoA');
         setVaccines(response.data);
         console.log(response.data)
       } catch (error) {
@@ -98,7 +98,7 @@ function Managecatpo12() {
   const handleUpdateVaccine = async () => {
     try {
         console.log(newVaccineText)
-      await axios.put(`http://localhost:5000/updateRoA/${selectedVaccine}`, {
+      await axios.put(`https://amrithaahospitals.visualplanetserver.in/updateRoA/${selectedVaccine}`, {
         newName: newVaccineText,
       });
       setSelectedVaccine(null);
@@ -135,7 +135,7 @@ function Managecatpo12() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:5000/deleteRoA/${vaccine}`);
+          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/deleteRoA/${vaccine}`);
           console.log('Vaccine deleted successfully');
           refreshVaccines();
           Swal.fire('Deleted!', 'Vaccine deleted successfully!', 'success');
@@ -152,7 +152,7 @@ function Managecatpo12() {
   // Refresh vaccines after adding, editing, or deleting
   const refreshVaccines = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/getRoA');
+      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/getRoA');
       setVaccines(response.data);
     } catch (error) {
       console.error('Error fetching vaccines:', error);

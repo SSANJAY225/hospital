@@ -47,7 +47,8 @@ import PatientForm from './PatientsForm.js';
 import Visited from './Visited.js'
 import NurseDash from './NurseDash.js';
 import NurseFollow from './NurseFollow.js';
-import Createusers from './Createusers.js'; import ReceptionBillingform from './ReceptionBillingform';
+import Createusers from './Createusers.js'; 
+import ReceptionBillingform from './ReceptionBillingform';
 import AddPatientsadmin from './AddPatientsadmin.js'
 import PatientsFollowUpIn from './PatientsFollowUpIn.js'
 import PatientsFollowUpOut from './PatientsFollowUpOut.js'

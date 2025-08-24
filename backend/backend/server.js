@@ -385,7 +385,7 @@ app.put("/editvitasl/:name", (req, res) => {
   const { name } = req.params;
   let { newName } = req.body;
   // newName = newName.replace(/\s+/g, "_");
-  const sql = `ALTER TABLE Vitals CHANGE COLUMN ${name} ${newName} VARCHAR(225)`
+  const sql = `ALTER TABLE vitals CHANGE COLUMN ${name} ${newName} VARCHAR(225)`
   db.query(sql, (err, result) => {
     if (err) {
       console.error("Error changing column:", err);
@@ -401,7 +401,7 @@ app.delete("/api/delete-column/:columnName", (req, res) => {
   if (!columnName) {
     return res.status(400).json({ message: "Column name is required" });
   }
-  const sql = `ALTER TABLE Vitals DROP COLUMN \`${columnName}\``;
+  const sql = `ALTER TABLE vitals DROP COLUMN \`${columnName}\``;
   db.query(sql, (err, result) => {
     if (err) {
       console.error("Error deleting column:", err);
@@ -2701,8 +2701,10 @@ app.post("/api/save-billing", (req, res) => {
       discount,
       membership_offer,
       membership_type,
-      membership_price
-    ) VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?)
+      membership_price,
+      review_date,
+      doctor_name,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?)
   `;
 
   const insertHeaderValues = [
@@ -2720,7 +2722,9 @@ app.post("/api/save-billing", (req, res) => {
     billingData.overallDiscount,
     billingData.membershipOffer||'',
     billingData.membershipType||'',
-    billingData.membershipPrice||''
+    billingData.membershipPrice||'',
+    billingData.reviewDate||'',
+    billingData.doctorName||''
   ];
 
   db.query(insertHeaderSql, insertHeaderValues, (err, result) => {
@@ -2855,7 +2859,7 @@ app.post('/api/update-membership', (req, res) => {
 });
 
 app.get('/api/membership-types', (req, res) => {
-  db.query('SELECT membership_type, price FROM Memberships', (error, results) => {
+  db.query('SELECT membership_type, price FROM memberships', (error, results) => {
     if (error) throw error;
     res.json(results);
   });
@@ -4009,7 +4013,7 @@ app.get("/getservices", (req, res) => {
 
 // GET all membership entries
 app.get('/memberships', (req, res) => {
-  const sql = 'SELECT * FROM Memberships';
+  const sql = 'SELECT * FROM memberships';
   db.query(sql, (err, results) => {
     if (err) {
       console.error('Error fetching membership entries:', err);
@@ -4033,7 +4037,7 @@ app.post('/memberships', (req, res) => {
     return res.status(400).json({ message: 'Price must be a valid non-negative number or null' });
   }
 
-  const sql = 'INSERT INTO Memberships (membership_type, price) VALUES (?, ?)';
+  const sql = 'INSERT INTO memberships (membership_type, price) VALUES (?, ?)';
   db.query(sql, [membership_type, price], (err, result) => {
     if (err) {
       console.error('Error adding membership entry:', err);
@@ -4059,7 +4063,7 @@ app.put('/memberships/:membership_type', (req, res) => {
     return res.status(400).json({ message: 'Price must be a valid non-negative number or null' });
   }
 
-  const sql = 'UPDATE Memberships SET membership_type = ?, price = ? WHERE membership_type = ?';
+  const sql = 'UPDATE memberships SET membership_type = ?, price = ? WHERE membership_type = ?';
   db.query(sql, [membership_type, price, oldMembershipType], (err, result) => {
     if (err) {
       console.error('Error updating membership entry:', err);
@@ -4083,7 +4087,7 @@ app.delete('/memberships/:membership_type', (req, res) => {
     return res.status(400).json({ message: 'Membership type must be a valid string' });
   }
 
-  const sql = 'DELETE FROM Memberships WHERE membership_type = ?';
+  const sql = 'DELETE FROM memberships WHERE membership_type = ?';
   db.query(sql, [membership_type], (err, result) => {
     if (err) {
       console.error('Error deleting membership entry:', err);
@@ -4114,7 +4118,7 @@ app.post("/addMemberships", (req, res) => {
     return res.status(400).json({ error: 'Price must be a valid number' });
   }
 
-  const sql = 'INSERT INTO Memberships (membership_type, price) VALUES (?, ?)';
+  const sql = 'INSERT INTO memberships (membership_type, price) VALUES (?, ?)';
   db.query(sql, [membership_type, parsedPrice], (err, results) => {
     if (err) {
       console.error('Database error:', err);

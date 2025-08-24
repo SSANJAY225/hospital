@@ -227,12 +227,12 @@ select.responsive-input:focus {
 }
 
 .buttonred {
-  background-color: #ff3333;
+  background-color: #e74c3c;
   color: #ffffff;
 }
 
 .buttonred:hover {
-  background-color: #cc0000;
+  background-color: #e74c3c;
 }
 
 .button.blue {

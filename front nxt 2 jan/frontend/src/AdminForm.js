@@ -310,7 +310,7 @@ const AdminFormIn = () => {
   const [vitalsinput, setvitalsinput] = useState({});
   const fetchvitalsinput = async () => {
     try {
-      const response = await fetch('http://localhost:5000/column-vitals', {
+      const response = await fetch('https://amrithaahospitals.visualplanetserver.in/column-vitals', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -331,7 +331,7 @@ const AdminFormIn = () => {
 
   const fetchImage = async (phoneNumber, visited) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/user-photo`, {
+      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/user-photo`, {
         params: { phoneNumber, visited },
       });
       setImageUrl(response.data.imageUrl);
@@ -415,7 +415,7 @@ const AdminFormIn = () => {
 
   const fetchNurseSuggestions = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/doctor-suggestions');
+      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions');
       setNurseSuggestions(response.data);
     } catch (error) {
       console.error('Error fetching doctor suggestions:', error);
@@ -426,7 +426,7 @@ const AdminFormIn = () => {
   const handleAddNurseName = async (name) => {
     if (name.trim() === '') return;
     try {
-      await axios.post('http://localhost:5000/addDoctorName', { doctorName: name });
+      await axios.post('https://amrithaahospitals.visualplanetserver.in/addDoctorName', { doctorName: name });
       setDoctorName(name);
       setIsNurseModalOpen(false);
       fetchNurseSuggestions();
@@ -474,7 +474,7 @@ const AdminFormIn = () => {
 
   const fetchDentalOptions = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/dental-suggestions');
+      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/dental-suggestions');
       setDentalOptions(response.data);
     } catch (error) {
       console.error('Error fetching dental options:', error);
@@ -539,7 +539,7 @@ const AdminFormIn = () => {
     console.log("Testtotake->", selectavailableTests)
     try {
       // Save general form data
-      const response = await fetch("http://localhost:5000/save-data", {
+      const response = await fetch("https://amrithaahospitals.visualplanetserver.in/save-data", {
         method: "POST",
         body: formData,
       });
@@ -560,16 +560,16 @@ const AdminFormIn = () => {
         });
         const dentalData = { dental: JSON.stringify(Object.fromEntries(dentalSequentialArray.map((value, i) => [i + 1, value]))) };
         console.log("Sending dental data:", {
-          url: `http://localhost:5000/adddental/${encodedName}/${encodedVisit}/${encodedPhone}`,
+          url: `https://amrithaahospitals.visualplanetserver.in/adddental/${encodedName}/${encodedVisit}/${encodedPhone}`,
           body: dental
         });
         // console.log(dental)
         // const den = await axios.post(
-        //   `http://localhost:5000/adddental/${encodedName}/${encodedVisit}/${encodedPhone}`,
+        //   `https://amrithaahospitals.visualplanetserver.in/adddental/${encodedName}/${encodedVisit}/${encodedPhone}`,
         //   dental
         // );
         // console.log("Dental data response:", den.data);
-        const d = await axios.post('http://localhost:5000/add-dental', { encodedName, encodedPhone, encodedVisit, dental })
+        const d = await axios.post('https://amrithaahospitals.visualplanetserver.in/add-dental', { encodedName, encodedPhone, encodedVisit, dental })
         console.log(d)
       }
 
@@ -578,7 +578,7 @@ const AdminFormIn = () => {
       multipleFiles.forEach((file) => fileData.append("upload", file));
       if (multipleFiles.length > 0) {
         const fileUploadResponse = await axios.post(
-          `http://localhost:5000/upload/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`,
+          `https://amrithaahospitals.visualplanetserver.in/upload/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`,
           fileData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -605,7 +605,7 @@ const AdminFormIn = () => {
   const handleSendToBill = async () => {
     const urlParams = getUrlParams();
     try {
-      const response = await axios.post('http://localhost:5000/update-status', {
+      const response = await axios.post('https://amrithaahospitals.visualplanetserver.in/update-status', {
         name: urlParams.name,
         businessName: urlParams.businessName,
         visited: urlParams.visited || 0,
@@ -634,7 +634,7 @@ const AdminFormIn = () => {
   const fetchDoctorSuggestions = async (term) => {
     if (term.length > 0) {
       try {
-        const response = await axios.get('http://localhost:5000/api/doctor-suggestions', {
+        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
           params: { term }
         });
         setDoctorSuggestions(response.data);
@@ -726,37 +726,37 @@ const AdminFormIn = () => {
   const handleDosageChange = (e) => {
     const value = e.target.value;
     settreatmentdosage(value);
-    fetchSuggestions(value, 'http://localhost:5000/api/dosage-suggestions', setDosageSuggestions);
+    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/dosage-suggestions', setDosageSuggestions);
   };
 
   const handleroa = (e) => {
     const value = e.target.value;
     settreatmentrout(value);
-    fetchSuggestions(value, 'http://localhost:5000/api/roa-suggestions', setRoaSuggestion);
+    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/roa-suggestions', setRoaSuggestion);
   };
 
   const handlePriscriptionDosageChange = (e) => {
     const value = e.target.value;
     setDosage(value);
-    fetchSuggestions(value, 'http://localhost:5000/api/dosage-suggestions', setPrescriptiondosagesuggestion);
+    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/dosage-suggestions', setPrescriptiondosagesuggestion);
   };
 
   const handleTiming = (e) => {
     const value = e.target.value;
     setTiming(value);
-    fetchSuggestions(value, 'http://localhost:5000/api/timing-suggestions', settimingSuggestions);
+    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/timing-suggestions', settimingSuggestions);
   };
 
   const handleDuration = (e) => {
     const value = e.target.value;
     setDuration(value);
-    fetchSuggestions(value, 'http://localhost:5000/api/duration-suggestions', setdurationsuggestions);
+    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/duration-suggestions', setdurationsuggestions);
   };
 
   const handleAdvicegiven = (e) => {
     const value = e.target.value;
     setadvicegiven(value);
-    fetchSuggestions(value, 'http://localhost:5000/api/advicegiven-suggestions', setadvicegivenSuggestions);
+    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/advicegiven-suggestions', setadvicegivenSuggestions);
   };
 
   const handleEditPrescription = (index) => {
@@ -779,9 +779,9 @@ const AdminFormIn = () => {
   };
 
   useEffect(() => {
-    fetchData('http://localhost:5000/api/onexamination', setOnExamination);
-    fetchData('http://localhost:5000/api/onsystem', setOnSystem);
-    fetchData('http://localhost:5000/api/tests', setavalableTests);
+    fetchData('https://amrithaahospitals.visualplanetserver.in/api/onexamination', setOnExamination);
+    fetchData('https://amrithaahospitals.visualplanetserver.in/api/onsystem', setOnSystem);
+    fetchData('https://amrithaahospitals.visualplanetserver.in/api/tests', setavalableTests);
   }, []);
 
   useEffect(() => {
@@ -790,8 +790,8 @@ const AdminFormIn = () => {
   const fetchvitalvalue = async () => {
     try {
       const search = new URLSearchParams(location.search);
-      const res = await axios.get(`http://localhost:5000/getvitals/${search.get("name")}/${search.get("visited")}/${search.get("businessname")}`);
-      const vit = await axios.get(`http://localhost:5000/column-vitals`)
+      const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/getvitals/${search.get("name")}/${search.get("visited")}/${search.get("businessname")}`);
+      const vit = await axios.get(`https://amrithaahospitals.visualplanetserver.in/column-vitals`)
       const vitaldata = {}
       vit.data.forEach((itm) => {
         vitaldata[itm] = " ";
@@ -803,7 +803,7 @@ const AdminFormIn = () => {
         console.log("if data",vitaldata)
       }
       
-      const maj = await axios.get(`http://localhost:5000/get-major/${search.get("name")}/${search.get("visited")}/${search.get("businessname")}`);
+      const maj = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-major/${search.get("name")}/${search.get("visited")}/${search.get("businessname")}`);
       setMajorComplaints(maj.data[0]?.Major_Complaints || "");
     } catch (error) {
       console.error("Error fetching vital values:", error);
@@ -825,7 +825,7 @@ const AdminFormIn = () => {
     console.log('Treatment name input:', value);
     fetchSuggestions(
       value,
-      'http://localhost:5000/api/treatment-name-suggestions',
+      'https://amrithaahospitals.visualplanetserver.in/api/treatment-name-suggestions',
       settreatmentgivennameSuggestions
     );
   };
@@ -833,7 +833,7 @@ const AdminFormIn = () => {
   const handleMedicineChange = (e) => {
     const value = e.target.value;
     setMedicine(value);
-    fetchSuggestions(value, 'http://localhost:5000/api/drugs-suggestions', setMedicineSuggestions);
+    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/drugs-suggestions', setMedicineSuggestions);
   };
 
   const handleMultipleFilesChange = (e) => {
