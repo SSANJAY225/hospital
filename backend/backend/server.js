@@ -346,8 +346,7 @@ app.post("/addvitals", (req, res) => {
     return res.status(400).json({ message: "Vitals field is required" });
   }
 
-  vitals = vitals.replace(/\s+/g, "_");
-  const sql = `ALTER TABLE vitals ADD COLUMN ${vitals} VARCHAR(255)`;
+  const sql = `ALTER TABLE vitals ADD COLUMN \`${vitals}\` VARCHAR(255)`;
 
   db.query(sql, (err, result) => {
     if (err) {
@@ -385,7 +384,7 @@ app.get("/column-vitals", (req, res) => {
 app.put("/editvitasl/:name", (req, res) => {
   const { name } = req.params;
   let { newName } = req.body;
-  newName = newName.replace(/\s+/g, "_");
+  // newName = newName.replace(/\s+/g, "_");
   const sql = `ALTER TABLE Vitals CHANGE COLUMN ${name} ${newName} VARCHAR(225)`
   db.query(sql, (err, result) => {
     if (err) {
@@ -398,7 +397,7 @@ app.put("/editvitasl/:name", (req, res) => {
 // Delete column name
 app.delete("/api/delete-column/:columnName", (req, res) => {
   let { columnName } = req.params;
-  columnName = columnName.replace(" ", "_")
+  // columnName = columnName.replace(" ", "_")
   if (!columnName) {
     return res.status(400).json({ message: "Column name is required" });
   }
@@ -693,10 +692,8 @@ app.get("/getvitals/:Name/:Visit/:Phone_number", (req, res) => {
       console.log(query)
       return res.status(500).json({ error: err.message });
     }
-
     // List of columns to ignore
     const ignoredColumns = ["Name", "Visit", "Phone_number"];
-
     // Function to format keys and remove ignored columns
     const formatKeys = (obj) => {
       return Object.fromEntries(
@@ -4619,12 +4616,13 @@ app.put("/update-datas", (req, res) => {
       updateValues.push(identifiers.Phone_number, identifiers.Visit);
 
       db.query(updateQuery, updateValues, (updateErr, updateResult) => {
+        console.log(updateQuery,updateValues)
         if (updateErr) {
           console.error("Update error:", updateErr);
           return res.status(500).json({ message: "Failed to update", error: updateErr });
         }
 
-        res.json({ message: "Record updated successfully" });
+        // res.status(200).json({ message: "Record updated successfully" });
         // return 0
       });
 
@@ -4691,7 +4689,7 @@ app.put("/update-datas", (req, res) => {
       item.duration
     ])
     db.query(insertsql_for_prescription, [values], (insertErr, result) => {
-      if (insertErr) return res.status(500).json({ error: insertErr });
+      if (insertErr) console.error({ error: insertErr });
       // return res.status(200).json({ message: "prescription data updated successfully.", inserted: result.affectedRows });
     });
   })
@@ -5263,7 +5261,6 @@ app.put('/api/update_billing', (req, res) => {
 
         services.forEach((service, index) => {
           if (hasError) return;
-
           const serviceValues = [
             billId,
             service.service || '',
@@ -5273,7 +5270,6 @@ app.put('/api/update_billing', (req, res) => {
           ];
 
           console.log(`Inserting service ${index + 1}:`, serviceValues);
-
           db.query(insertServiceSql, serviceValues, (insertErr, insertResult) => {
             if (insertErr && !hasError) {
               hasError = true;

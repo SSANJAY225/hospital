@@ -84,7 +84,7 @@ function ManageExaminations() {
   useEffect(() => {
     const fetchExaminations = async () => {
       try {
-        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/examinations');
+        const response = await axios.get('http://localhost:5000/examinations');
         setExaminations(response.data);
       } catch (error) {
         console.error('Error fetching examinations:', error);
@@ -102,7 +102,7 @@ function ManageExaminations() {
 
   const handleUpdateExamination = async () => {
     try {
-      await axios.put(`https://amrithaahospitals.visualplanetserver.in/examinations/${selectedExamination.id}`, {
+      await axios.put(`http://localhost:5000/examinations/${selectedExamination.id}`, {
         examination_text: newExaminationText,
       });
       console.log('Examination updated successfully');
@@ -139,7 +139,7 @@ function ManageExaminations() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/examinations/${examination.id}`);
+          await axios.delete(`http://localhost:5000/examinations/${examination.id}`);
           console.log('Examination deleted successfully');
           refreshExaminations();
           Swal.fire('Deleted!', 'Examination deleted successfully!', 'success');
@@ -155,7 +155,7 @@ function ManageExaminations() {
 
   const refreshExaminations = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/examinations');
+      const response = await axios.get('http://localhost:5000/examinations');
       setExaminations(response.data);
     } catch (error) {
       console.error('Error fetching examinations:', error);
@@ -177,7 +177,7 @@ function ManageExaminations() {
       return;
     }
     try {
-      await axios.post('https://amrithaahospitals.visualplanetserver.in/addExamination', {
+      await axios.post('http://localhost:5000/addExamination', {
         examination: newExaminationText,
       });
       await refreshExaminations();

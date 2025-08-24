@@ -80,7 +80,7 @@ function Managecatpo13() {
   useEffect(() => {
     const fetchTreatments = async () => {
       try {
-        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/dental');
+        const response = await axios.get('http://localhost:5000/dental');
         setTreatments(response.data); // Use the response data directly
       } catch (error) {
         console.error('Error fetching treatments:', error);
@@ -98,7 +98,7 @@ function Managecatpo13() {
 
   const handleUpdateTreatment = async () => {
     try {
-      await axios.put(`https://amrithaahospitals.visualplanetserver.in/dental/${selectedTreatment.id}`, {
+      await axios.put(`http://localhost:5000/dental/${selectedTreatment.id}`, {
         treatment_name: newTreatmentName, // Backend expects dental_text in the payload
       });
       refreshTreatments();
@@ -122,7 +122,7 @@ function Managecatpo13() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/dental/${treatment.id}`);
+          await axios.delete(`http://localhost:5000/dental/${treatment.id}`);
           refreshTreatments();
           Swal.fire('Deleted!', 'Treatment deleted successfully!', 'success');
         } catch (error) {
@@ -135,7 +135,7 @@ function Managecatpo13() {
 
   const refreshTreatments = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/dental');
+      const response = await axios.get('http://localhost:5000/dental');
       setTreatments(response.data); // Use the response data directly
     } catch (error) {
       console.error('Error fetching treatments:', error);

@@ -178,15 +178,15 @@ const AdminFormOut = () => {
     fetchVitalValue();
     setUrlParams(getUrlParams());
     fetchDentalOptions();
-    fetchData('https://amrithaahospitals.visualplanetserver.in/api/onexamination', setOnExamination);
-    fetchData('https://amrithaahospitals.visualplanetserver.in/api/onsystem', setOnSystem);
-    fetchData('https://amrithaahospitals.visualplanetserver.in/api/tests', setAvailableTests);
+    fetchData('http://localhost:5000/api/onexamination', setOnExamination);
+    fetchData('http://localhost:5000/api/onsystem', setOnSystem);
+    fetchData('http://localhost:5000/api/tests', setAvailableTests);
   }, [location]);
 
   // Fetch vitals input fields
   const fetchVitalsInput = async () => {
     try {
-      const response = await fetch('https://amrithaahospitals.visualplanetserver.in/column-vitals', {
+      const response = await fetch('http://localhost:5000/column-vitals', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -203,29 +203,29 @@ const AdminFormOut = () => {
   const fetchVitalValue = async () => {
     try {
       const search = new URLSearchParams(location.search);
-      const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/getvitals/${search.get("name")}/${search.get("visited")}/${search.get("businessname")}`);
-      console.log("vital input--->",res)
-      if (res.data.length!=0) {
+      const res = await axios.get(`http://localhost:5000/getvitals/${search.get("name")}/${search.get("visited")}/${search.get("businessname")}`);
+      console.log("vital input--->", res)
+      if (res.data.length != 0) {
         setVitals(res.data[0]);
-        console.log("vitals check=>>>>",res.data.length)
-      }else{
-        const vit=await axios.get(`https://amrithaahospitals.visualplanetserver.in/column-vitals`)
+        console.log("vitals check=>>>>", res.data.length)
+      } else {
+        const vit = await axios.get(`http://localhost:5000/column-vitals`)
         const result = Object.fromEntries(vit.data.map(key => [key, ""]));
         setVitals(result);
-        console.log("else",vit.data)
+        console.log("else", vit.data)
       }
-      const maj = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-major/${search.get("name")}/${search.get("visited")}/${search.get("businessname")}`);
+      const maj = await axios.get(`http://localhost:5000/get-major/${search.get("name")}/${search.get("visited")}/${search.get("businessname")}`);
       setMajorComplaints(maj.data[0]?.Major_Complaints || "");
     } catch (error) {
       console.error("Error fetching vital values:", error);
     }
   };
 
-  
+
   // Fetch dental condition options
   const fetchDentalOptions = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/dental-suggestions');
+      const response = await axios.get('http://localhost:5000/api/dental-suggestions');
       setDentalOptions(response.data);
     } catch (error) {
       console.error('Error fetching dental options:', error);
@@ -242,7 +242,7 @@ const AdminFormOut = () => {
 
   const fetchImage = async (phoneNumber, visited) => {
     try {
-      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/user-photo`, {
+      const response = await axios.get(`http://localhost:5000/api/user-photo`, {
         params: { phoneNumber, visited },
       });
       setImageUrl(response.data.imageUrl);
@@ -254,26 +254,26 @@ const AdminFormOut = () => {
 
 
 
-const handleTestCheckboxChange = (field, isChecked) => {
-  setSelectavailableTests(prev => 
-    isChecked 
-      ? [...prev, field] 
-      : prev.filter(item => item !== field))
-};
+  const handleTestCheckboxChange = (field, isChecked) => {
+    setSelectavailableTests(prev =>
+      isChecked
+        ? [...prev, field]
+        : prev.filter(item => item !== field))
+  };
 
-const handleExaminationCheckboxChange = (field, isChecked) => {
-  setSelectonexamination(prev => 
-    isChecked 
-      ? [...prev, field] 
-      : prev.filter(item => item !== field))
-};
+  const handleExaminationCheckboxChange = (field, isChecked) => {
+    setSelectonexamination(prev =>
+      isChecked
+        ? [...prev, field]
+        : prev.filter(item => item !== field))
+  };
 
-const handleSystematicCheckboxChange = (field, isChecked) => {
-  setSelectsystematic(prev => 
-    isChecked 
-      ? [...prev, field] 
-      : prev.filter(item => item !== field))
-};
+  const handleSystematicCheckboxChange = (field, isChecked) => {
+    setSelectsystematic(prev =>
+      isChecked
+        ? [...prev, field]
+        : prev.filter(item => item !== field))
+  };
 
 
   // Handle dental chart image load
@@ -331,7 +331,7 @@ const handleSystematicCheckboxChange = (field, isChecked) => {
 
   // Handle dental condition selection
   const handleDental = (value, toothNumber) => {
-    
+
     setDental((prev) => ({
       ...prev,
       [toothNumber]: value,
@@ -372,7 +372,7 @@ const handleSystematicCheckboxChange = (field, isChecked) => {
     setTreatmentgivenname(value);
     fetchSuggestions(
       value,
-      'https://amrithaahospitals.visualplanetserver.in/api/treatment-name-suggestions',
+      'http://localhost:5000/api/treatment-name-suggestions',
       setTreatmentgivennameSuggestions
     );
   };
@@ -380,43 +380,43 @@ const handleSystematicCheckboxChange = (field, isChecked) => {
   const handleMedicineChange = (e) => {
     const value = e.target.value;
     setMedicine(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/drugs-suggestions', setMedicineSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/drugs-suggestions', setMedicineSuggestions);
   };
 
   const handleDosageChange = (e) => {
     const value = e.target.value;
     setTreatmentdosage(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/dosage-suggestions', setDosageSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/dosage-suggestions', setDosageSuggestions);
   };
 
   const handleRoa = (e) => {
     const value = e.target.value;
     setTreatmentrout(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/roa-suggestions', setRoaSuggestion);
+    fetchSuggestions(value, 'http://localhost:5000/api/roa-suggestions', setRoaSuggestion);
   };
 
   const handlePrescriptionDosageChange = (e) => {
     const value = e.target.value;
     setDosage(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/dosage-suggestions', setPrescriptiondosagesuggestion);
+    fetchSuggestions(value, 'http://localhost:5000/api/dosage-suggestions', setPrescriptiondosagesuggestion);
   };
 
   const handleTiming = (e) => {
     const value = e.target.value;
     setTiming(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/timing-suggestions', setTimingSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/timing-suggestions', setTimingSuggestions);
   };
 
   const handleDuration = (e) => {
     const value = e.target.value;
     setDuration(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/duration-suggestions', setDurationsuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/duration-suggestions', setDurationsuggestions);
   };
 
   const handleAdvicegiven = (e) => {
     const value = e.target.value;
     setAdvicegiven(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/advicegiven-suggestions', setAdvicegivenSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/advicegiven-suggestions', setAdvicegivenSuggestions);
   };
 
   // Handle history
@@ -557,7 +557,7 @@ const handleSystematicCheckboxChange = (field, isChecked) => {
   const fetchNurseSuggestions = async () => {
     try {
       console.log("Fetching doctors for location:", urlParams.franchiselocation);
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
+      const response = await axios.get('http://localhost:5000/api/doctor-suggestions', {
         params: { franchiselocation: urlParams.franchiselocation }
       });
       console.log("API Response:", response.data);
@@ -571,9 +571,9 @@ const handleSystematicCheckboxChange = (field, isChecked) => {
   const handleAddNurseName = async (name) => {
     if (name.trim() === '') return;
     try {
-      await axios.post('https://amrithaahospitals.visualplanetserver.in/addDoctorName', { 
+      await axios.post('http://localhost:5000/addDoctorName', {
         doctorName: name,
-        location: urlParams.franchiselocation 
+        location: urlParams.franchiselocation
       });
       setDoctorName(name);
       setIsNurseModalOpen(false);
@@ -595,10 +595,10 @@ const handleSystematicCheckboxChange = (field, isChecked) => {
 
   const fetchDoctorSuggestions = async (term) => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
-        params: { 
+      const response = await axios.get('http://localhost:5000/api/doctor-suggestions', {
+        params: {
           term,
-          franchiselocation: urlParams.franchiselocation 
+          franchiselocation: urlParams.franchiselocation
         }
       });
       setDoctorSuggestions(response.data);
@@ -778,7 +778,7 @@ const handleSystematicCheckboxChange = (field, isChecked) => {
       return;
     }
     try {
-      await axios.post('https://amrithaahospitals.visualplanetserver.in/addDoctorName', {
+      await axios.post('http://localhost:5000/addDoctorName', {
         doctorName: name,
         location: urlParams.franchiselocation // Include location from urlParams
       });
@@ -795,127 +795,127 @@ const handleSystematicCheckboxChange = (field, isChecked) => {
     }
   };
 
-  
-// Handle form submission
-const handleSubmit = async () => {
-  const { name, businessName, visited } = urlParams;
-  const hasDentalData = Object.values(dental).some(value => value !== "");
-  const formData = new FormData();
-  formData.append("dignosis", dignosis);
-  formData.append("majorComplaints", majorComplaints);
-  formData.append("followupdate", followupdate);
-  formData.append("advicegiven", advicegiven);
-  formData.append("local", local);
-  formData.append("name", name);
-  formData.append("businessName", businessName);
-  formData.append("visited", visited || 0);
-  formData.append("doctorName", doctorName);
 
-  // Append vitals
-  Object.entries(vitals).forEach(([key, value]) => {
-    formData.append(`vitals[${key}]`, value);
-  });
+  // Handle form submission
+  const handleSubmit = async () => {
+    const { name, businessName, visited } = urlParams;
+    const hasDentalData = Object.values(dental).some(value => value !== "");
+    const formData = new FormData();
+    formData.append("dignosis", dignosis);
+    formData.append("majorComplaints", majorComplaints);
+    formData.append("followupdate", followupdate);
+    formData.append("advicegiven", advicegiven);
+    formData.append("local", local);
+    formData.append("name", name);
+    formData.append("businessName", businessName);
+    formData.append("visited", visited || 0);
+    formData.append("doctorName", doctorName);
 
-  // Append selected tests
-  const selectedTests = Object.entries(selectavailableTests)
-    .filter(([key, value]) => value)
-    .map(([key]) => key);
-  console.log('Selected Tests:', selectedTests);
-  selectedTests.forEach((test) => formData.append("selectavailableTests[]", test));
-
-  // Append selected on examination fields
-  const selectedOnExamination = Object.entries(selectonexamination)
-    .filter(([key, value]) => value)
-    .map(([key]) => key);
-  console.log('Selected On Examination:', selectedOnExamination);
-  selectedOnExamination.forEach((field) => formData.append("selectonexamination[]", field));
-
-  // Append selected systematic examination fields
-  const selectedSystematic = Object.entries(selectsystematic)
-    .filter(([key, value]) => value)
-    .map(([key]) => key);
-  console.log('Selected Systematic Examination:', selectedSystematic);
-  selectedSystematic.forEach((field) => formData.append("selectsystematic[]", field));
-
-  // Append history arrays
-  familyHistory.forEach((item) => formData.append("familyHistory[]", item));
-  birthHistory.forEach((item) => formData.append("birthHistory[]", item));
-  surgicalHistory.forEach((item) => formData.append("surgicalHistory[]", item));
-  otherHistory.forEach((item) => formData.append("otherHistory[]", item));
-
-  // Append treatment
-  treatment.forEach((t, index) => {
-    formData.append(`treatment[${index}][treatmentgivenname]`, t.treatmentgivenname);
-    formData.append(`treatment[${index}][treatmentdosage]`, t.treatmentdosage);
-    formData.append(`treatment[${index}][treatmentrout]`, t.treatmentrout);
-  });
-
-  // Append prescription
-  prescription.forEach((p, index) => {
-    formData.append(`prescription[${index}][medicine]`, p.medicine);
-    formData.append(`prescription[${index}][dosage]`, p.dosage);
-    formData.append(`prescription[${index}][timing]`, p.timing);
-    formData.append(`prescription[${index}][duration]`, p.duration);
-  });
-
-  try {
-    // Save general form data
-    const response = await fetch("https://amrithaahospitals.visualplanetserver.in/save-data", {
-      method: "POST",
-      body: formData,
+    // Append vitals
+    Object.entries(vitals).forEach(([key, value]) => {
+      formData.append(`vitals[${key}]`, value);
     });
-    const data = await response.json();
-    console.log("Form data response:", data);
 
-    // Save dental data
-    if (hasDentalData) {
-      const encodedName = encodeURIComponent(name);
-      const encodedVisit = encodeURIComponent(visited);
-      const encodedPhone = encodeURIComponent(businessName);
-      console.log("Dental data to be sent:", dental);
-      const dentalData = { dental: JSON.stringify(dental) };
-      const den = await axios.post(
-        `https://amrithaahospitals.visualplanetserver.in/adddental/${encodedName}/${encodedVisit}/${encodedPhone}`,
-        dentalData,
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-      console.log("Dental data response:", den.data);
+    // Append selected tests
+    const selectedTests = Object.entries(selectavailableTests)
+      .filter(([key, value]) => value)
+      .map(([key]) => key);
+    console.log('Selected Tests:', selectedTests);
+    selectedTests.forEach((test) => formData.append("selectavailableTests[]", test));
+
+    // Append selected on examination fields
+    const selectedOnExamination = Object.entries(selectonexamination)
+      .filter(([key, value]) => value)
+      .map(([key]) => key);
+    console.log('Selected On Examination:', selectedOnExamination);
+    selectedOnExamination.forEach((field) => formData.append("selectonexamination[]", field));
+
+    // Append selected systematic examination fields
+    const selectedSystematic = Object.entries(selectsystematic)
+      .filter(([key, value]) => value)
+      .map(([key]) => key);
+    console.log('Selected Systematic Examination:', selectedSystematic);
+    selectedSystematic.forEach((field) => formData.append("selectsystematic[]", field));
+
+    // Append history arrays
+    familyHistory.forEach((item) => formData.append("familyHistory[]", item));
+    birthHistory.forEach((item) => formData.append("birthHistory[]", item));
+    surgicalHistory.forEach((item) => formData.append("surgicalHistory[]", item));
+    otherHistory.forEach((item) => formData.append("otherHistory[]", item));
+
+    // Append treatment
+    treatment.forEach((t, index) => {
+      formData.append(`treatment[${index}][treatmentgivenname]`, t.treatmentgivenname);
+      formData.append(`treatment[${index}][treatmentdosage]`, t.treatmentdosage);
+      formData.append(`treatment[${index}][treatmentrout]`, t.treatmentrout);
+    });
+
+    // Append prescription
+    prescription.forEach((p, index) => {
+      formData.append(`prescription[${index}][medicine]`, p.medicine);
+      formData.append(`prescription[${index}][dosage]`, p.dosage);
+      formData.append(`prescription[${index}][timing]`, p.timing);
+      formData.append(`prescription[${index}][duration]`, p.duration);
+    });
+
+    try {
+      // Save general form data
+      const response = await fetch("http://localhost:5000/save-data", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      console.log("Form data response:", data);
+
+      // Save dental data
+      if (hasDentalData) {
+        const encodedName = encodeURIComponent(name);
+        const encodedVisit = encodeURIComponent(visited);
+        const encodedPhone = encodeURIComponent(businessName);
+        console.log("Dental data to be sent:", dental);
+        const dentalData = { dental: JSON.stringify(dental) };
+        const den = await axios.post(
+          `http://localhost:5000/adddental/${encodedName}/${encodedVisit}/${encodedPhone}`,
+          dentalData,
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+        console.log("Dental data response:", den.data);
+      }
+
+      // Upload files
+      const fileData = new FormData();
+      multipleFiles.forEach((file) => fileData.append("upload", file));
+      if (multipleFiles.length > 0) {
+        const fileUploadResponse = await axios.post(
+          `http://localhost:5000/upload/${businessName}/${visited}/${name}`,
+          fileData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        console.log("Uploaded Files:", fileUploadResponse.data.filePaths);
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Patient data and files uploaded successfully.",
+        confirmButtonText: "OK",
+      });
+    } catch (error) {
+      console.error("Error:", error.response?.data?.message || error.message);
+      Swal.fire({
+        icon: "error",
+        title: "An Error Occurred!",
+        text: "Something went wrong while saving the data. Please try again.",
+        confirmButtonText: "OK",
+      });
     }
-
-    // Upload files
-    const fileData = new FormData();
-    multipleFiles.forEach((file) => fileData.append("upload", file));
-    if (multipleFiles.length > 0) {
-      const fileUploadResponse = await axios.post(
-        `https://amrithaahospitals.visualplanetserver.in/upload/${businessName}/${visited}/${name}`,
-        fileData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      console.log("Uploaded Files:", fileUploadResponse.data.filePaths);
-    }
-
-    Swal.fire({
-      icon: "success",
-      title: "Success!",
-      text: "Patient data and files uploaded successfully.",
-      confirmButtonText: "OK",
-    });
-  } catch (error) {
-    console.error("Error:", error.response?.data?.message || error.message);
-    Swal.fire({
-      icon: "error",
-      title: "An Error Occurred!",
-      text: "Something went wrong while saving the data. Please try again.",
-      confirmButtonText: "OK",
-    });
-  }
-};
+  };
 
   // Send to bill
   const handleSendToBill = async () => {
     const { name, businessName, visited, loginLocation, franchiselocation } = urlParams;
     try {
-      const response =  await axios.post('https://amrithaahospitals.visualplanetserver.in/update-status', {
+      const response = await axios.post('http://localhost:5000/update-status', {
         name,
         businessName,
         visited: visited || 0,
@@ -1021,64 +1021,64 @@ const handleSubmit = async () => {
               </div>
             </div>
             {isNurseModalOpen && (
-  <div className="nurse-input-overlay">
-    <label>Select Doctor Name</label>
-    <div className="nurse-listbox">
-      {nurseSuggestions === null ? (
-        <div className="nurse-listbox-item">Loading doctors...</div>
-      ) : nurseSuggestions.length > 0 ? (
-        nurseSuggestions.map((doctor, index) => (
-          <div
-            key={index}
-            className={`nurse-listbox-item ${doctorName === doctor ? 'selected' : ''}`}
-            onClick={() => {
-              setDoctorName(doctor);
-              setIsNurseModalOpen(false);
-            }}
-          >
-            {doctor}
-          </div>
-        ))
-      ) : (
-        <div className="nurse-listbox-item disabled">
-          {urlParams.franchiselocation 
-            ? `No doctors available for ${urlParams.franchiselocation}`
-            : 'No location specified'}
-        </div>
-      )}
-    </div>
-    <div>
-      <label>Add New Doctor</label>
-      <input
-        type="text"
-        value={newNurseName}
-        onChange={(e) => setNewNurseName(e.target.value)}
-        placeholder="Enter doctor name"
-        className="responsive-input"
-      />
-    </div>
-    <div className="modal-buttons">
-      <button
-        className="buttonred responsive-button"
-        onClick={() => {
-          if (newNurseName) handleAddDoctorName(newNurseName);
-          setNewNurseName('');
-        }}
-      >
-        Add New Doctor
-      </button>
-      <button
-        className="buttonblack responsive-button"
-        onClick={() => {
-          setIsNurseModalOpen(false);
-          setNewNurseName('');
-        }}
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
+              <div className="nurse-input-overlay">
+                <label>Select Doctor Name</label>
+                <div className="nurse-listbox">
+                  {nurseSuggestions === null ? (
+                    <div className="nurse-listbox-item">Loading doctors...</div>
+                  ) : nurseSuggestions.length > 0 ? (
+                    nurseSuggestions.map((doctor, index) => (
+                      <div
+                        key={index}
+                        className={`nurse-listbox-item ${doctorName === doctor ? 'selected' : ''}`}
+                        onClick={() => {
+                          setDoctorName(doctor);
+                          setIsNurseModalOpen(false);
+                        }}
+                      >
+                        {doctor}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="nurse-listbox-item disabled">
+                      {urlParams.franchiselocation
+                        ? `No doctors available for ${urlParams.franchiselocation}`
+                        : 'No location specified'}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label>Add New Doctor</label>
+                  <input
+                    type="text"
+                    value={newNurseName}
+                    onChange={(e) => setNewNurseName(e.target.value)}
+                    placeholder="Enter doctor name"
+                    className="responsive-input"
+                  />
+                </div>
+                <div className="modal-buttons">
+                  <button
+                    className="buttonred responsive-button"
+                    onClick={() => {
+                      if (newNurseName) handleAddDoctorName(newNurseName);
+                      setNewNurseName('');
+                    }}
+                  >
+                    Add New Doctor
+                  </button>
+                  <button
+                    className="buttonblack responsive-button"
+                    onClick={() => {
+                      setIsNurseModalOpen(false);
+                      setNewNurseName('');
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
             {viewState.vitals && (
               <div className="section-container">
                 <div className="section-header" onClick={() => toggleSection("vitals")}>
@@ -1368,60 +1368,60 @@ const handleSubmit = async () => {
                   <div className="vitals-container">
                     <div className="examination-section">
                       <h5>On Examination</h5>
-{onexamination.map((field, index) => (
-  <div className="checkbox-item" key={index}>
-    <input
-      type="checkbox"
-      className="checkbox-input"
-      checked={selectonexamination[field] === 1}
-      onChange={(e) => {
-        setSelectonexamination(prev => ({
-          ...prev,
-          [field]: e.target.checked ? 1 : 0
-        }));
-      }}
-    />
-    <label>{field}</label>
-  </div>
-))}
+                      {onexamination.map((field, index) => (
+                        <div className="checkbox-item" key={index}>
+                          <input
+                            type="checkbox"
+                            className="checkbox-input"
+                            checked={selectonexamination[field] === 1}
+                            onChange={(e) => {
+                              setSelectonexamination(prev => ({
+                                ...prev,
+                                [field]: e.target.checked ? 1 : 0
+                              }));
+                            }}
+                          />
+                          <label>{field}</label>
+                        </div>
+                      ))}
                     </div>
                     <div className="examination-section">
                       <h5>Systemic Examination</h5>
-{onsystem.map((field, index) => (
-  <div className="checkbox-item" key={index}>
-    <input
-      type="checkbox"
-      className="checkbox-input"
-      checked={selectsystematic[field] === 1}
-      onChange={(e) => {
-        setSelectsystematic(prev => ({
-          ...prev,
-          [field]: e.target.checked ? 1 : 0
-        }));
-      }}
-    />
-    <label>{field}</label>
-  </div>
-))}
+                      {onsystem.map((field, index) => (
+                        <div className="checkbox-item" key={index}>
+                          <input
+                            type="checkbox"
+                            className="checkbox-input"
+                            checked={selectsystematic[field] === 1}
+                            onChange={(e) => {
+                              setSelectsystematic(prev => ({
+                                ...prev,
+                                [field]: e.target.checked ? 1 : 0
+                              }));
+                            }}
+                          />
+                          <label>{field}</label>
+                        </div>
+                      ))}
                     </div>
                     <div className="examination-section">
                       <h5>Test to Take</h5>
-{availableTests.map((field, index) => (
-  <div className="checkbox-item" key={index}>
-    <input
-      type="checkbox"
-      className="checkbox-input"
-      checked={selectavailableTests[field] === 1}
-      onChange={(e) => {
-        setSelectavailableTests(prev => ({
-          ...prev,
-          [field]: e.target.checked ? 1 : 0
-        }));
-      }}
-    />
-    <label>{field}</label>
-  </div>
-))}
+                      {availableTests.map((field, index) => (
+                        <div className="checkbox-item" key={index}>
+                          <input
+                            type="checkbox"
+                            className="checkbox-input"
+                            checked={selectavailableTests[field] === 1}
+                            onChange={(e) => {
+                              setSelectavailableTests(prev => ({
+                                ...prev,
+                                [field]: e.target.checked ? 1 : 0
+                              }));
+                            }}
+                          />
+                          <label>{field}</label>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
