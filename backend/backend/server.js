@@ -2703,7 +2703,7 @@ app.post("/api/save-billing", (req, res) => {
       membership_type,
       membership_price,
       review_date,
-      doctor_name,
+      doctor_name
     ) VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?)
   `;
 
@@ -3433,13 +3433,9 @@ app.post('/save-data', uploadfiles.array('uploadfiles', 10), (req, res) => {
   });
 });
 
-app.post(
-  "/save-data-update",
-  uploadfiles.array("uploadfiles", 10),
-  async (req, res) => {
+app.post("/save-data-update",uploadfiles.array("uploadfiles", 10),async (req, res) => {
     const formData = req.body;
     console.log("Received formData:", formData);
-
     // 1. Validate required fields
     const requiredFields = ["name", "businessName", "visited"];
     const missingFields = requiredFields.filter((field) => !formData[field]);
@@ -3449,7 +3445,6 @@ app.post(
         message: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
-
     // Validate data types
     if (isNaN(parseInt(formData.visited))) {
       return res.status(400).json({
@@ -3946,12 +3941,13 @@ app.post("/save-data-nurse", (req, res) => {
   }
 
   // Insert into general_patient table
-  const insertSql = `INSERT INTO general_patient (Name, Phone_Number, visted, Major_Complaints) VALUES (?, ?, ?, ?)`;
+  const insertSql = `INSERT INTO general_patient (Name, Phone_Number, visted, Major_Complaints, belongedlocation) VALUES (?, ?, ?, ?, ?)`;
   const insertValues = [
     formData.name,
     phoneNumber,
     visited,
     formData.majorComplaints || null,
+    formData.location
   ];
 
   db.query(insertSql, insertValues, (err, result) => {
@@ -4998,7 +4994,16 @@ app.put('/update-PaymentMethod/:id',(req,res) => {
 
     const out = result[result.length - 1]; // last record
     const billingId = out.id;
-
+    let location=''
+    const sql='SELECT belongedlocation FROM general_patient WHERE Name=? AND Phone_Number=? AND Visted=?'
+    db.query(sql,[user_name,phone_number,visit_number],(err,result)=>{
+      if(err) {
+        console.log(err);
+        return res.status(500).json(err)
+      }
+      location=result[result.length-1].belongedlocation
+      console.log("resultsssssss=sssss",location)
+    })
     const servicesql = 'SELECT * FROM billing_details WHERE billing_id = ?';
     db.query(servicesql, [billingId], (err, result2) => {
       if (err) {
@@ -5007,6 +5012,7 @@ app.put('/update-PaymentMethod/:id',(req,res) => {
       }
 
       out.service = result2; // attach service details
+      out.location=location
       return res.status(200).json(out); // respond AFTER both queries complete
     });
   });

@@ -443,7 +443,7 @@ const ReceptionBillingform = () => {
       phoneNumber: urlParams.businessName,
       visitNumber: urlParams.visited,
       nurseName: urlParams.nursename,
-      doctorName: urlParams.doctorname,
+      doctorName: "",
       billId,
       paymentMode,
       reviewDate,
@@ -458,8 +458,8 @@ const ReceptionBillingform = () => {
     };
 
     try {
-      const billingResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/save-billing', billingData);
       console.log(billingData)
+      const billingResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/save-billing', billingData);
       if (!billingResponse.data.success) {
         throw new Error('Failed to save billing');
       }

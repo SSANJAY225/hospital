@@ -682,7 +682,7 @@ const AdminBillingForm = () => {
           <div className="details-left">
             <div className="info-row">
               <span className="info-label">Doctor:</span>
-              <span className="info-value">{apiData.doctorname || urlParams.doctorname}</span>
+              <span className="info-value">{apiData.doctor_name || urlParams.doctorname}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Nurse:</span>
@@ -694,7 +694,7 @@ const AdminBillingForm = () => {
             </div>
             <div className="info-row">
               <span className="info-label">Location:</span>
-              <span className="info-value">{urlParams.belongedlocation}</span>
+              <span className="info-value">{apiData.location||urlParams.belongedlocation}</span>
             </div>
           </div>
           <div className="details-right">

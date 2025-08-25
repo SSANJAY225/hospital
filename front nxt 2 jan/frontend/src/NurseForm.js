@@ -252,6 +252,8 @@ const NurseForm = () => {
       }
   
       formData.Phone_number = urlParams.businessName;
+      console.log(urlParams.franchiselocation)
+      formData.location=urlParams.franchiselocation;
       console.log("Nurse Form Data to Send:", formData);
       const response = await axios.post(
         'https://amrithaahospitals.visualplanetserver.in/save-data-nurse',
