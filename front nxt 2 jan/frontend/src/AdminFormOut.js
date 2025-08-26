@@ -857,7 +857,7 @@ const AdminFormOut = () => {
       formData.append(`prescription[${index}][timing]`, p.timing);
       formData.append(`prescription[${index}][duration]`, p.duration);
     });
-
+    console.log("data sent to save-data",formData.doctorName)
     try {
       // Save general form data
       const response = await fetch("https://amrithaahospitals.visualplanetserver.in/save-data", {
@@ -913,6 +913,7 @@ const AdminFormOut = () => {
 
   // Send to bill
   const handleSendToBill = async () => {
+    handleSubmit();
     const { name, businessName, visited, loginLocation, franchiselocation } = urlParams;
     try {
       const response = await axios.post('https://amrithaahospitals.visualplanetserver.in/update-status', {

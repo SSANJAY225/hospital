@@ -127,7 +127,7 @@ function NurseFollow() {
 
   const filterRef = useRef(null);
 
-  const handleBusinessClick = (business) => {
+  const handleBusinessClick = async (business) => {
     const businessname = encodeURIComponent(business.phone_number);
     const doctorName = encodeURIComponent(business.doctorname);
     const nurseName = encodeURIComponent(business.nursename);
@@ -136,7 +136,9 @@ function NurseFollow() {
     const name = encodeURIComponent(business.full_name)
     const visited = encodeURIComponent(business.visted)
     const id = encodeURIComponent(business.id);
-    navigate(`/ReceptionBillingform?loginlocation=${username}&businessname=${businessname}&name=${name}&id=${id}&visited=${visited}&doctorname=${doctorName}&nursename=${nurseName}&MemberType=${MemberType}&belongedlocation=${belongedlocation}`);
+    const req=await axios.get(`https://amrithaahospitals.visualplanetserver.in/billingdoc/${businessname}/${name}/${visited}`)
+    console.log(req.data)
+    navigate(`/ReceptionBillingform?loginlocation=${username}&businessname=${businessname}&name=${name}&id=${id}&visited=${visited}&doctorname=${req.data}&nursename=${nurseName}&MemberType=${MemberType}&belongedlocation=${belongedlocation}`);
     setSelectedBusiness(business);
   };
 

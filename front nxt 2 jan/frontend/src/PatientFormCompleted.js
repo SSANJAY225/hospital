@@ -143,6 +143,7 @@ const PatientFormCompleted = () => {
 
   // Send to bill
   const handleSendToBill = async () => {
+    handleSubmit()
     const { name, businessName, visited, loginLocation, franchiselocation } = urlParams;
     try {
       const response = await axios.post('https://amrithaahospitals.visualplanetserver.in/update-status', {

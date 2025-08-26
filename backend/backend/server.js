@@ -3947,7 +3947,7 @@ app.post("/save-data-nurse", (req, res) => {
     phoneNumber,
     visited,
     formData.majorComplaints || null,
-    formData.location
+    formData.location,
   ];
 
   db.query(insertSql, insertValues, (err, result) => {
@@ -4795,17 +4795,17 @@ app.get("/get-adminfiles", (req, res) => {
   });
 });
 
-app.get("/get-files", (req, res) => {
+app.get("/get-files",isauth, (req, res) => {
   const { full_name, Phone_number, visted, from_date, to_date } = req.query;
-
+  console.log("request---->",req)
   let sql = `
     SELECT p.full_name, p.Phone_number, p.Visted, bh.total_price 
     FROM patients p 
     JOIN billing_headers bh 
     ON p.Phone_number = bh.Phone_number AND p.Visted = bh.visit_number 
-    WHERE p.status = 'billingcompleted'
+    WHERE p.status = 'billingcompleted'AND p.belongedlocation=?
   `;
-  const params = [];
+  const params = [req.user.frachiselocation];
 
   if (full_name) {
     sql += " AND p.full_name LIKE ?";
@@ -4831,7 +4831,7 @@ app.get("/get-files", (req, res) => {
     sql += " AND bh.billing_date <= ?";
     params.push(to_date);
   }
-
+  console.log("parameter------>",params)
   db.query(sql, params, (err, result) => {
     if (err) return res.status(500).json({ error: err });
     return res.json(result);
@@ -5332,6 +5332,17 @@ app.put('/api/update_billing', (req, res) => {
     });
   });
 });
+
+app.get("/billingdoc/:number/:name/:visited",(req,res)=>{
+  console.log(req.params)
+  const {number,name,visited}=req.params
+  const sql='select doctor_name FROM general_patient WHERE Phone_Number=? And Name=? AND Visted=?'
+  db.query(sql,[number,name,visited],(err,result)=>{
+    if(err) return res.status(400).json(err)
+    console.log(result[result.length-1].doctor_name)
+    return res.status(200).json(result[result.length-1].doctor_name)
+  })
+})
 
 // Start the server
 const PORT = process.env.PORT || 5000;

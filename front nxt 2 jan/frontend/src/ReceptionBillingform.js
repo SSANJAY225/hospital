@@ -443,7 +443,7 @@ const ReceptionBillingform = () => {
       phoneNumber: urlParams.businessName,
       visitNumber: urlParams.visited,
       nurseName: urlParams.nursename,
-      doctorName: "",
+      doctorName: urlParams.doctorname,
       billId,
       paymentMode,
       reviewDate,
@@ -463,7 +463,6 @@ const ReceptionBillingform = () => {
       if (!billingResponse.data.success) {
         throw new Error('Failed to save billing');
       }
-
       if (selectedMembership && selectedMembership !== urlParams.memberType) {
         const membershipUpdateData = {
           id: urlParams.id,
@@ -471,9 +470,7 @@ const ReceptionBillingform = () => {
           visited: urlParams.visited,
           membership: selectedMembership,
         };
-
-        const membershipResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/Update-membership', membershipUpdateData);
-
+        const membershipResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/Update-membership', membershipUpdateData)
         if (!membershipResponse.data.success) {
           console.error('Failed to update membership:', membershipResponse.data.message);
           await Swal.fire({

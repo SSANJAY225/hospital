@@ -32,7 +32,7 @@ const BillingHistory = () => {
                 let link = ''
                 if (role === 'admin') { link = "https://amrithaahospitals.visualplanetserver.in/get-adminfiles" }
                 else { link = "https://amrithaahospitals.visualplanetserver.in/get-files" }
-                const res = await axios.get(link)
+                const res = await axios.get(link,{headers:{Authorization:`Bearer ${token}`}})
                 const reversed = res.data.reverse();
                 setData(reversed);
                 setFilteredData(reversed); // Initially set filteredData to all data
