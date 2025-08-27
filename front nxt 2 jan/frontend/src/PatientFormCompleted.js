@@ -734,20 +734,20 @@ const PatientFormCompleted = () => {
     const username = urlParams.locaationlogin;
     const businessname = urlParams.businessName;
     const name = urlParams.name;
-    navigate(`navigate(/patientdetails?loginlocation=${username}&businessname=${businessname}&name=${name}&visited=${i}&id=${urlParams.id}&doctorname=${urlParams.doctorname}&nursename=${urlParams.nursename}`);
+    navigate(`/PatientFormCompleted?loginlocation=${username}&businessname=${businessname}&name=${name}&visited=${i}&id=${urlParams.id}&doctorname=${urlParams.doctorname}&nursename=${urlParams.nursename}`);
   };
 
   const TabButton = ({ visitedCount, handlevisitedpage }) => {
     return (
       <div className="tab-button-container">
-        {Array.from({ length: visitedCount }, (_, i) => (
-          <button
-            onClick={() => handlevisitedpage(i + 1)}
-            className={`custom-tab-button ${urlParams.visited == i + 1 ? 'active' : ''}`}
-            key={i + 1}
-          >
-            {i + 1}
-          </button>
+        {Array.from({ length: visitedCount }, (_, i) => visitedCount - i).map((num) => (
+        <button
+          onClick={() => handlevisitedpage(num)}
+          className={`custom-tab-button ${urlParams.visited == num ? 'active' : ''}`}
+          key={num}
+        >
+          {num}
+        </button>
         ))}
       </div>
     );
