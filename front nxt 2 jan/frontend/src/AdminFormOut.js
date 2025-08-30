@@ -71,6 +71,10 @@ const AdminFormOut = () => {
   });
 
   // State for all input fields
+  const [familyHistoryInput, setFamilyHistoryInput] = useState("");
+  const [birthHistoryInput, setBirthHistoryInput] = useState("");
+  const [surgicalHistoryInput, setSurgicalHistoryInput] = useState("");
+  const [otherHistoryInput, setOtherHistoryInput] = useState("");
   const [toothPositions, setToothPositions] = useState([]);
   const [majorComplaints, setMajorComplaints] = useState('');
   const [familyHistory, setFamilyHistory] = useState([]);
@@ -797,7 +801,33 @@ const AdminFormOut = () => {
 
 
   // Handle form submission
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const finalFamilyHistory = familyHistoryInput.trim()!== ""
+    ? [...familyHistory, familyHistoryInput.trim()]
+    : [...familyHistory];
+
+  const finalBirthHistory = birthHistoryInput.trim()!== ""
+    ? [...birthHistory, birthHistoryInput.trim()]
+    : [...birthHistory];
+
+  const finalSurgicalHistory = surgicalHistoryInput.trim()!== ""
+    ? [...surgicalHistory, surgicalHistoryInput.trim()]
+    : [...surgicalHistory];
+
+  const finalOtherHistory = otherHistoryInput.trim()!== ""
+    ? [...otherHistory, otherHistoryInput.trim()]
+    : [...otherHistory];
+    // setFamilyHistoryInput("");
+    // setBirthHistoryInput("");
+    // setSurgicalHistoryInput("");
+    // setOtherHistoryInput("");
+    // setTimeout(() => {
+      console.log("Family History:", finalFamilyHistory)
+      console.log("Birth History:", finalBirthHistory);
+      console.log("Surgical History:", surgicalHistory);
+      console.log("Other History:", otherHistory);
+    // }, 5000);
     const { name, businessName, visited } = urlParams;
     const hasDentalData = Object.values(dental).some(value => value !== "");
     const formData = new FormData();
@@ -810,7 +840,7 @@ const AdminFormOut = () => {
     formData.append("businessName", businessName);
     formData.append("visited", visited || 0);
     formData.append("doctorName", doctorName);
-
+    console.log(finalFamilyHistory, otherHistory, surgicalHistory, finalBirthHistory)
     // Append vitals
     Object.entries(vitals).forEach(([key, value]) => {
       formData.append(`vitals[${key}]`, value);
@@ -838,10 +868,10 @@ const AdminFormOut = () => {
     selectedSystematic.forEach((field) => formData.append("selectsystematic[]", field));
 
     // Append history arrays
-    familyHistory.forEach((item) => formData.append("familyHistory[]", item));
-    birthHistory.forEach((item) => formData.append("birthHistory[]", item));
-    surgicalHistory.forEach((item) => formData.append("surgicalHistory[]", item));
-    otherHistory.forEach((item) => formData.append("otherHistory[]", item));
+    finalFamilyHistory.forEach((item) => formData.append("familyHistory[]", item));
+    finalBirthHistory.forEach((item) => formData.append("birthHistory[]", item));
+    finalSurgicalHistory.forEach((item) => formData.append("surgicalHistory[]", item));
+    finalOtherHistory.forEach((item) => formData.append("otherHistory[]", item));
 
     // Append treatment
     treatment.forEach((t, index) => {
@@ -857,7 +887,7 @@ const AdminFormOut = () => {
       formData.append(`prescription[${index}][timing]`, p.timing);
       formData.append(`prescription[${index}][duration]`, p.duration);
     });
-    console.log("data sent to save-data",formData.doctorName)
+    console.log("data sent to save-data", formData.doctorName)
     try {
       // Save general form data
       const response = await fetch("https://amrithaahospitals.visualplanetserver.in/save-data", {
@@ -1137,11 +1167,16 @@ const AdminFormOut = () => {
                         </tbody>
                       </table>
                       <textarea
+                        value={familyHistoryInput}
+                        name="familyHistoryInput"
                         placeholder="Add Family History"
+                        onChange={(e) => setFamilyHistoryInput(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleAddHistoryItem(e.target.value, familyHistory, setFamilyHistory);
-                            e.target.value = "";
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleAddHistoryItem(familyHistoryInput, familyHistory, setFamilyHistory);
+                            setFamilyHistoryInput("")
+                            e.target.value = ""
                           }
                         }}
                         className="responsive-input"
@@ -1171,11 +1206,15 @@ const AdminFormOut = () => {
                         </tbody>
                       </table>
                       <textarea
+                        name="birthHistoryInput"
                         placeholder="Add Birth History"
+                        value={birthHistoryInput}
+                        onChange={(e) => setBirthHistoryInput(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            handleAddHistoryItem(e.target.value, birthHistory, setBirthHistory);
-                            e.target.value = "";
+                            handleAddHistoryItem(birthHistoryInput, birthHistory, setBirthHistory);
+                            setBirthHistoryInput("")
+                            e.target.value = ""
                           }
                         }}
                         className="responsive-input"
@@ -1205,15 +1244,19 @@ const AdminFormOut = () => {
                         </tbody>
                       </table>
                       <textarea
+                        name="surgicalHistoryInput"
                         placeholder="Add Surgical History"
+                        value={surgicalHistoryInput}
+                        onChange={(e) => setSurgicalHistoryInput(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             handleAddHistoryItem(
-                              e.target.value,
+                              surgicalHistoryInput,
                               surgicalHistory,
                               setSurgicalHistory
                             );
-                            e.target.value = "";
+                            setSurgicalHistoryInput("")
+                            e.target.value = ""
                           }
                         }}
                         className="responsive-input"
@@ -1243,11 +1286,15 @@ const AdminFormOut = () => {
                         </tbody>
                       </table>
                       <textarea
+                        name="anyOtherHistoryInput"
                         placeholder="Add Other History"
+                        value={otherHistoryInput}
+                        onChange={(e) => setOtherHistoryInput(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            handleAddHistoryItem(e.target.value, otherHistory, setOtherHistory);
-                            e.target.value = "";
+                            handleAddHistoryItem(otherHistoryInput, otherHistory, setOtherHistory);
+                            otherHistoryInput("")
+                            e.target.value = ""
                           }
                         }}
                         className="responsive-input"

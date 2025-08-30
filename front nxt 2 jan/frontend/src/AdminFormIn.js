@@ -71,6 +71,10 @@ const AdminFormOut = () => {
   });
 
   // State for all input fields
+  const [familyHistoryInput, setFamilyHistoryInput] = useState("");
+  const [birthHistoryInput, setBirthHistoryInput] = useState("");
+  const [surgicalHistoryInput, setSurgicalHistoryInput] = useState("");
+  const [otherHistoryInput, setOtherHistoryInput] = useState("");
   const [toothPositions, setToothPositions] = useState([]);
   const [majorComplaints, setMajorComplaints] = useState('');
   const [familyHistory, setFamilyHistory] = useState([]);
@@ -182,7 +186,7 @@ const AdminFormOut = () => {
     fetchData('https://amrithaahospitals.visualplanetserver.in/api/onexamination', setOnExamination);
     fetchData('https://amrithaahospitals.visualplanetserver.in/api/onsystem', setOnSystem);
     fetchData('https://amrithaahospitals.visualplanetserver.in/api/tests', setAvailableTests);
-    fetchData('https://amrithaahospitals.visualplanetserver.in/column-vitals',setvitalinput)
+    fetchData('https://amrithaahospitals.visualplanetserver.in/column-vitals', setvitalinput)
   }, [location]);
 
   // Fetch vitals input fields
@@ -206,15 +210,15 @@ const AdminFormOut = () => {
     try {
       const search = new URLSearchParams(location.search);
       const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/getvitals/${search.get("name")}/${search.get("visited")}/${search.get("businessname")}`);
-      console.log("vital input--->",res)
-      if (res.data.length!=0) {
+      console.log("vital input--->", res)
+      if (res.data.length != 0) {
         setVitals(res.data[0]);
-        console.log("vitals check=>>>>",res.data.length)
-      }else{
-        const vit=await axios.get(`https://amrithaahospitals.visualplanetserver.in/column-vitals`)
+        console.log("vitals check=>>>>", res.data.length)
+      } else {
+        const vit = await axios.get(`https://amrithaahospitals.visualplanetserver.in/column-vitals`)
         const result = Object.fromEntries(vit.data.map(key => [key, ""]));
         setVitals(result);
-        console.log("else",vit.data)
+        console.log("else", vit.data)
       }
       const maj = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-major/${search.get("name")}/${search.get("visited")}/${search.get("businessname")}`);
       setMajorComplaints(maj.data[0]?.Major_Complaints || "");
@@ -798,7 +802,23 @@ const AdminFormOut = () => {
 
 
   // Handle form submission
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const finalFamilyHistory = familyHistoryInput.trim() !== ""
+      ? [...familyHistory, familyHistoryInput.trim()]
+      : [...familyHistory];
+
+    const finalBirthHistory = birthHistoryInput.trim() !== ""
+      ? [...birthHistory, birthHistoryInput.trim()]
+      : [...birthHistory];
+
+    const finalSurgicalHistory = surgicalHistoryInput.trim() !== ""
+      ? [...surgicalHistory, surgicalHistoryInput.trim()]
+      : [...surgicalHistory];
+
+    const finalOtherHistory = otherHistoryInput.trim() !== ""
+      ? [...otherHistory, otherHistoryInput.trim()]
+      : [...otherHistory];
     const { name, businessName, visited } = urlParams;
     const hasDentalData = Object.values(dental).some(value => value !== "");
     const formData = new FormData();
@@ -811,14 +831,14 @@ const AdminFormOut = () => {
     formData.append("businessName", businessName);
     formData.append("visited", visited || 0);
     formData.append("doctorName", doctorName);
-    vitals["Name"]=name
-    vitals["Phone_number"]=businessName
-    vitals["Visit"]=visited
+    vitals["Name"] = name
+    vitals["Phone_number"] = businessName
+    vitals["Visit"] = visited
     // Append vitals
     Object.entries(vitals).forEach(([key, value]) => {
       formData.append(`vitals[${key}]`, value);
     });
-    console.log("vitals--->",vitals)
+    console.log("vitals--->", vitals)
     // Append selected tests
     const selectedTests = Object.entries(selectavailableTests)
       .filter(([key, value]) => value)
@@ -841,10 +861,10 @@ const AdminFormOut = () => {
     selectedSystematic.forEach((field) => formData.append("selectsystematic[]", field));
 
     // Append history arrays
-    familyHistory.forEach((item) => formData.append("familyHistory[]", item));
-    birthHistory.forEach((item) => formData.append("birthHistory[]", item));
-    surgicalHistory.forEach((item) => formData.append("surgicalHistory[]", item));
-    otherHistory.forEach((item) => formData.append("otherHistory[]", item));
+    finalFamilyHistory.forEach((item) => formData.append("familyHistory[]", item));
+    finalBirthHistory.forEach((item) => formData.append("birthHistory[]", item));
+    finalSurgicalHistory.forEach((item) => formData.append("surgicalHistory[]", item));
+    finalOtherHistory.forEach((item) => formData.append("otherHistory[]", item));
 
     // Append treatment
     treatment.forEach((t, index) => {
@@ -1105,7 +1125,7 @@ const AdminFormOut = () => {
                       ))
                     ) : (
                       <p>Data illa da daii</p>
-                      )}
+                    )}
                   </div>
                 )}
               </div>
@@ -1140,10 +1160,14 @@ const AdminFormOut = () => {
                       </table>
                       <textarea
                         placeholder="Add Family History"
+                        value={familyHistoryInput}
+                        onChange={(e) => setFamilyHistoryInput(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleAddHistoryItem(e.target.value, familyHistory, setFamilyHistory);
-                            e.target.value = "";
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleAddHistoryItem(familyHistoryInput, familyHistory, setFamilyHistory);
+                            setFamilyHistoryInput("")
+                            e.target.value = ""
                           }
                         }}
                         className="responsive-input"
@@ -1174,10 +1198,13 @@ const AdminFormOut = () => {
                       </table>
                       <textarea
                         placeholder="Add Birth History"
+                        value={birthHistoryInput}
+                        onChange={(e) => setBirthHistoryInput(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            handleAddHistoryItem(e.target.value, birthHistory, setBirthHistory);
-                            e.target.value = "";
+                            handleAddHistoryItem(birthHistoryInput, birthHistory, setBirthHistory);
+                            setBirthHistoryInput("")
+                            e.target.value = ""
                           }
                         }}
                         className="responsive-input"
@@ -1208,14 +1235,17 @@ const AdminFormOut = () => {
                       </table>
                       <textarea
                         placeholder="Add Surgical History"
+                        value={surgicalHistoryInput}
+                        onChange={(e) => setSurgicalHistoryInput(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             handleAddHistoryItem(
-                              e.target.value,
+                              surgicalHistoryInput,
                               surgicalHistory,
                               setSurgicalHistory
                             );
-                            e.target.value = "";
+                            setSurgicalHistoryInput("")
+                            e.target.value = ""
                           }
                         }}
                         className="responsive-input"
@@ -1246,10 +1276,13 @@ const AdminFormOut = () => {
                       </table>
                       <textarea
                         placeholder="Add Other History"
+                        value={otherHistoryInput}
+                        onChange={(e) => setOtherHistoryInput(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            handleAddHistoryItem(e.target.value, otherHistory, setOtherHistory);
-                            e.target.value = "";
+                            handleAddHistoryItem(otherHistoryInput, otherHistory, setOtherHistory);
+                            otherHistoryInput("")
+                            e.target.value = ""
                           }
                         }}
                         className="responsive-input"

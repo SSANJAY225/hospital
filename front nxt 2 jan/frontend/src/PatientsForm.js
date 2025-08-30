@@ -47,7 +47,10 @@ const PatientForm = () => {
     nursename: '',
     doctorname: '',
   });
-
+  const [familyHistoryInput, setFamilyHistoryInput] = useState("");
+  const [birthHistoryInput, setBirthHistoryInput] = useState("");
+  const [surgicalHistoryInput, setSurgicalHistoryInput] = useState("");
+  const [otherHistoryInput, setOtherHistoryInput] = useState("");
   const [majorComplaints, setMajorComplaints] = useState('');
   const [familyHistory, setFamilyHistory] = useState([]);
   const [birthHistory, setBirthHistory] = useState([]);
@@ -208,7 +211,7 @@ const PatientForm = () => {
         params: { phoneNumber, visited },
       });
       setImageUrl(response.data.imageUrl);
-      console.log("image",response.data.imageUrl)
+      console.log("image", response.data.imageUrl)
     } catch (error) {
       console.error('Error fetching image:', error);
       setImageUrl(null);
@@ -245,20 +248,20 @@ const PatientForm = () => {
           visited: searchParams.get('visited')
         }
       });
-      console.log("tofind->>",response.data)
+      console.log("tofind->>", response.data)
       const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/getvitals/${searchParams.get('name')}/${searchParams.get('visited')}/${searchParams.get('businessname')}`);
       // console.log({data:vitalinput,type:typeof vitalinput})
       const result = Object.fromEntries(vitalinput.map(key => [key, ""]))
       // console.log("for vitals->",res.data[res.data.length - 1] || result)
       // setVitals(res.data[res.data.length - 1] || result);
-      const vit=res.data
-      console.log("length=>",vit.length,"data",vit)
+      const vit = res.data
+      console.log("length=>", vit.length, "data", vit)
       if (vit.length == 0) {
         console.log("No visit data");
         fetchvitalsinput();
       } else {
         console.log("api vitals=>", res.data)
-        setVitals(res.data[res.data.length-1])
+        setVitals(res.data[res.data.length - 1])
       }
       const data = response.data;
       setapidata(data);
@@ -269,10 +272,10 @@ const PatientForm = () => {
           full_name: searchParams.get('name'),
         },
       });
-      
+
       setVisitedCount(visit.data);
       // Set vitals based on response or fallback res.data && res.data.length != 0 ? res.data[res.data.length - 1] :
-      
+
       setdental(data.dental)
       const transformed = {};
       Object.keys(data.dental).forEach((key) => {
@@ -460,7 +463,23 @@ const PatientForm = () => {
     };
   }, [stream]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const finalFamilyHistory = familyHistoryInput.trim() !== ""
+      ? [...familyHistory, familyHistoryInput.trim()]
+      : [...familyHistory];
+
+    const finalBirthHistory = birthHistoryInput.trim() !== ""
+      ? [...birthHistory, birthHistoryInput.trim()]
+      : [...birthHistory];
+
+    const finalSurgicalHistory = surgicalHistoryInput.trim() !== ""
+      ? [...surgicalHistory, surgicalHistoryInput.trim()]
+      : [...surgicalHistory];
+
+    const finalOtherHistory = otherHistoryInput.trim() !== ""
+      ? [...otherHistory, otherHistoryInput.trim()]
+      : [...otherHistory];
     // Transform checkbox states to arrays
     const onExaminationArray = Object.entries(selectonexamination)
       .filter(([_, value]) => value)
@@ -476,10 +495,10 @@ const PatientForm = () => {
       dignosis,
       vitals,
       majorComplaints,
-      familyHistory,
-      birthHistory,
-      surgicalHistory,
-      otherHistory,
+      finalFamilyHistory,
+      finalBirthHistory,
+      finalSurgicalHistory,
+      finalOtherHistory,
       selectavailableTests: testsArray, // Send array instead of object
       selectonexamination: onExaminationArray, // Send array
       selectsystematic: systematicArray, // Send array
@@ -697,14 +716,14 @@ const PatientForm = () => {
     }
   };
 
-  const 
-  handleEditTreatment = (index) => {
-    const item = treatment[index];
-    document.querySelector('input[placeholder="Name"]').value = item.treatmentgivenname
-    document.querySelector('input[placeholder="Dosage"]').value = item.treatmentdosage
-    document.querySelector('input[placeholder="Route of Administration"]').value = item.treatmentrout
-    handleDeleteHistory(treatment, settreatment, item);
-  };
+  const
+    handleEditTreatment = (index) => {
+      const item = treatment[index];
+      document.querySelector('input[placeholder="Name"]').value = item.treatmentgivenname
+      document.querySelector('input[placeholder="Dosage"]').value = item.treatmentdosage
+      document.querySelector('input[placeholder="Route of Administration"]').value = item.treatmentrout
+      handleDeleteHistory(treatment, settreatment, item);
+    };
 
   const handleEditPrescription = (index) => {
 
@@ -739,14 +758,14 @@ const PatientForm = () => {
     return (
       <div className="tab-button-container">
         {Array.from({ length: visitedCount }, (_, i) => visitedCount - i).map((num) => (
-        <button
-          onClick={() => handlevisitedpage(num)}
-          className={`custom-tab-button ${urlParams.visited == num ? 'active' : ''}`}
-          key={num}
-        >
-          {num}
-        </button>
-      ))}
+          <button
+            onClick={() => handlevisitedpage(num)}
+            className={`custom-tab-button ${urlParams.visited == num ? 'active' : ''}`}
+            key={num}
+          >
+            {num}
+          </button>
+        ))}
       </div>
     );
   };
@@ -940,8 +959,15 @@ const PatientForm = () => {
                     <input
                       type="text"
                       placeholder="Add Family History"
+                      value={familyHistoryInput}
+                      onChange={(e) => setFamilyHistoryInput(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleAddHistoryItem(e.target.value, familyHistory, setFamilyHistory);
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleAddHistoryItem(familyHistoryInput, familyHistory, setFamilyHistory);
+                          setFamilyHistoryInput("")
+                          e.target.value = ""
+                        }
                       }}
                       className="responsive-input"
                     />
@@ -968,8 +994,14 @@ const PatientForm = () => {
                     <input
                       type="text"
                       placeholder="Add Birth History"
+                      value={birthHistoryInput}
+                      onChange={(e) => setBirthHistoryInput(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleAddHistoryItem(e.target.value, birthHistory, setBirthHistory);
+                        if (e.key === "Enter") {
+                          handleAddHistoryItem(birthHistoryInput, birthHistory, setBirthHistory);
+                          setBirthHistoryInput("")
+                          e.target.value = ""
+                        }
                       }}
                       className="responsive-input"
                     />
@@ -996,9 +1028,19 @@ const PatientForm = () => {
                     <input
                       type="text"
                       placeholder="Add Surgical History"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleAddHistoryItem(e.target.value, surgicalHistory, setSurgicalHistory);
-                      }}
+                       value={surgicalHistoryInput}
+                        onChange={(e) => setSurgicalHistoryInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleAddHistoryItem(
+                              surgicalHistoryInput,
+                              surgicalHistory,
+                              setSurgicalHistory
+                            );
+                            setSurgicalHistoryInput("")
+                            e.target.value = ""
+                          }
+                        }}
                       className="responsive-input"
                     />
                   </div>
@@ -1024,9 +1066,15 @@ const PatientForm = () => {
                     <input
                       type="text"
                       placeholder="Add Other History"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleAddHistoryItem(e.target.value, otherHistory, setOtherHistory);
-                      }}
+                      value={otherHistoryInput}
+                        onChange={(e) => setOtherHistoryInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleAddHistoryItem(otherHistoryInput, otherHistory, setOtherHistory);
+                            otherHistoryInput("")
+                            e.target.value = ""
+                          }
+                        }}
                       className="responsive-input"
                     />
                   </div>
