@@ -127,6 +127,7 @@ const AdminFormOut = () => {
   const [stream, setStream] = useState(null);
   const [dentalOptions, setDentalOptions] = useState([]);
   const [vitalinput, setvitalinput] = useState([])
+  const [basic,setbasic]=useState({})
 
   // State for section visibility and toggle
   const [viewState, setViewState] = useState({
@@ -176,7 +177,14 @@ const AdminFormOut = () => {
       [section]: !prev[section],
     }));
   };
-
+  const basicData=async()=>{
+    const searchParams = new URLSearchParams(location.search);
+    // setUrlParams(getUrlParams());
+    // console.log("sdfghsfjgn",urlParams)
+    const res= await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-basic-detail/${searchParams.get('id')}/${searchParams.get('name')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
+    console.log(res)
+    setbasic(res.data)
+  }
   // Fetch initial data
   useEffect(() => {
     fetchVitalsInput();
@@ -187,6 +195,7 @@ const AdminFormOut = () => {
     fetchData('https://amrithaahospitals.visualplanetserver.in/api/onsystem', setOnSystem);
     fetchData('https://amrithaahospitals.visualplanetserver.in/api/tests', setAvailableTests);
     fetchData('https://amrithaahospitals.visualplanetserver.in/column-vitals', setvitalinput)
+    basicData()
   }, [location]);
 
   // Fetch vitals input fields
@@ -1013,26 +1022,40 @@ const AdminFormOut = () => {
               <div className="user-info">
                 <div className="info-row">
                   <span className="info-label">Name:</span>
-                  <span className="info-value">{urlParams.name}</span>
+                  <span className="info-value">{basic.full_name}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Number:</span>
-                  <span className="info-value">{urlParams.businessName}</span>
+                  <span className="info-value">{basic.phone_number}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">ID:</span>
-                  <span className="info-value">{urlParams.id}</span>
+                  <span className="info-value">{basic.id}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Visited:</span>
-                  <span className="info-value">{urlParams.visited}</span>
+                  <span className="info-value">{basic.visted}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Nurse:</span>
                   <span className="info-value">
-                    {urlParams.nursename ? urlParams.nursename : "Not Checked by any nurse"}
+                    {basic.nursename ? basic.nursename : "Not Checked by any nurse"}
                   </span>
                 </div>
+                <div className="info-row">
+                  <span className="info-label">Location:</span>
+                  <span className="info-value">
+                    {basic.belongedlocation ? basic.belongedlocation:""}
+                  </span>
+                </div>
+                {basic.room_number!=null&&(
+                  <div className="info-row">
+                  <span className="info-label">Room number:</span>
+                  <span className="info-value">
+                    {basic.room_number ? basic.room_number:""}
+                  </span>
+                </div>
+                )}
               </div>
             </div>
             <div className="section-container">

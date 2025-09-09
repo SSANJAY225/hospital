@@ -7,6 +7,7 @@ import autoTable from 'jspdf-autotable';
 import { jsPDF } from 'jspdf';
 import templateImage from './images/templatepre.jpg';
 import letterpadImage from './images/Letterpad.jpg';
+import { jwtDecode } from "jwt-decode";
 
 const toothMapping = {
   1: '18', 2: '17', 3: '16', 4: '15', 5: '14', 6: '13', 7: '12', 8: '11',
@@ -101,6 +102,8 @@ const PatientForm = () => {
     dental: true,
     follow: true,
   });
+  const [basic, setbasic] = useState({})
+  const [tokendecode, settokendecode] = useState({})
 
   useEffect(() => {
     if (!auth) {
@@ -145,9 +148,29 @@ const PatientForm = () => {
       console.error('Error fetching dental options:', error);
     }
   };
-
+  const [isdisable,setisdisable]=useState(true)
+  const basicData = async () => {
+    const searchParams = new URLSearchParams(location.search);
+    // setUrlParams(getUrlParams());
+    // console.log("sdfghsfjgn",urlParams)
+    const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-basic-detail/${searchParams.get('id')}/${searchParams.get('name')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
+    console.log("basic", res)
+    setbasic(res.data)
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        console.log("Decoded JWT:", decoded);
+        settokendecode(decoded)
+      } catch (error) {
+        console.error("Invalid token", error);
+      }
+    }
+  setisdisable(basic.status === "billingcompleted" && tokendecode.roll != "admin")
+  }
   useEffect(() => {
     fetchDentalOptions();
+
   }, []);
 
   const handleGeneratePrescription = () => {
@@ -345,6 +368,7 @@ const PatientForm = () => {
     const params = getUrlParams();
     setUrlParams(params);
     // fetchvitalsinput();
+    basicData()
     apifetchData();
     fetchData('https://amrithaahospitals.visualplanetserver.in/api/onexamination', setOnExamination);
     fetchData('https://amrithaahospitals.visualplanetserver.in/api/onsystem', setOnSystem);
@@ -464,7 +488,7 @@ const PatientForm = () => {
   }, [stream]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     const finalFamilyHistory = familyHistoryInput.trim() !== ""
       ? [...familyHistory, familyHistoryInput.trim()]
       : [...familyHistory];
@@ -495,10 +519,10 @@ const PatientForm = () => {
       dignosis,
       vitals,
       majorComplaints,
-      finalFamilyHistory,
-      finalBirthHistory,
-      finalSurgicalHistory,
-      finalOtherHistory,
+      familyHistory:finalFamilyHistory,
+      birthHistory:finalBirthHistory,
+      surgicalHistory:finalSurgicalHistory,
+      otherHistory:finalOtherHistory,
       selectavailableTests: testsArray, // Send array instead of object
       selectonexamination: onExaminationArray, // Send array
       selectsystematic: systematicArray, // Send array
@@ -576,14 +600,7 @@ const PatientForm = () => {
         console.log("Uploaded Files:", fileUploadResponse.data.fileData);
       }
 
-      // const data = await response.json();
-      Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Patient data and files uploaded successfully.',
-        confirmButtonText: 'OK',
-      });
-
+      // const data = await response.json()
       // Refresh uploaded files
       // const fileResponse = await axios.get(
       //   `https://amrithaahospitals.visualplanetserver.in/files/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`
@@ -592,6 +609,12 @@ const PatientForm = () => {
       //   setUploadedFiles(fileResponse.data.files);
       // }
       setMultipleFiles([]);
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Patient data and files uploaded successfully.',
+        confirmButtonText: 'OK',
+      });
     } catch (error) {
       console.error('Error in handleSubmit:', error);
       Swal.fire({
@@ -803,28 +826,46 @@ const PatientForm = () => {
               <div className="user-info">
                 <div className="info-row">
                   <span className="info-label">Name:</span>
-                  <span className="info-value">{urlParams.name}</span>
+                  <span className="info-value">{basic.full_name}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Number:</span>
-                  <span className="info-value">{urlParams.businessName}</span>
+                  <span className="info-value">{basic.phone_number}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">ID:</span>
-                  <span className="info-value">{urlParams.id}</span>
+                  <span className="info-value">{basic.id}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Visited:</span>
-                  <span className="info-value">{urlParams.visited}</span>
+                  <span className="info-value">{basic.visted}</span>
                 </div>
                 <div className="info-row">
-                  <span className="info-label">Doctor:</span>
-                  <span className="info-value">{urlParams.doctorname || 'Not specified'}</span>
+                  <span className="info-label">Location:</span>
+                  <span className="info-value">
+                    {basic.belongedlocation ? basic.belongedlocation : ""}
+                  </span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Nurse:</span>
-                  <span className="info-value">{urlParams.nursename || 'Not specified'}</span>
+                  <span className="info-value">
+                    {basic.nursename ? basic.nursename : "Not Checked by any nurse"}
+                  </span>
                 </div>
+                <div className="info-row">
+                  <span className="info-label">Doctor:</span>
+                  <span className="info-value">
+                    {basic.doctorname ? basic.doctorname : "Not Checked by any doctor"}
+                  </span>
+                </div>
+                {basic.room_number != null && (
+                  <div className="info-row">
+                    <span className="info-label">Room number:</span>
+                    <span className="info-value">
+                      {basic.room_number ? basic.room_number : ""}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <TabButton visitedCount={visitedCount} handlevisitedpage={handlevisitedpage} />
@@ -844,6 +885,7 @@ const PatientForm = () => {
                           value={vitals[item] || ''}
                           onChange={handleVitalsChange}
                           className="responsive-input"
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                         />
                       </div>
                     ))
@@ -869,7 +911,11 @@ const PatientForm = () => {
                             <td
                               key={toothNumber}
                               className={`dental-tooth-cell ${dental[toothNumber] ? 'has-value' : ''}`}
-                              onClick={() => { setSelectedTooth(toothNumber); console.log("dent", dental) }}
+                              onClick={() => {
+                                if (!isdisable) {
+                                  setSelectedTooth(toothNumber)
+                                }
+                              }}
                             >
                               <div className="tooth-number">{toothNumber}</div>
                               <div className="tooth-condition">
@@ -883,10 +929,15 @@ const PatientForm = () => {
                             48, 47, 46, 45, 44, 43, 42, 41,
                             31, 32, 33, 34, 35, 36, 37, 38
                           ].map((toothNumber, index) => (
+                            
                             <td
                               key={toothNumber}
                               className={`dental-tooth-cell ${dental[toothNumber] ? 'has-value' : ''}`}
-                              onClick={() => setSelectedTooth(toothNumber)}
+                              onClick={() => {
+                                if (!isdisable) {
+                                  setSelectedTooth(toothNumber)
+                                }
+                              }}
                             >
                               <div className="tooth-number">{toothNumber}</div>
                               <div className="tooth-condition">
@@ -948,6 +999,7 @@ const PatientForm = () => {
                               <button
                                 className="buttondred responsive-button"
                                 onClick={() => handleDeleteHistory(familyHistory, setFamilyHistory, item)}
+                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               >
                                 Delete
                               </button>
@@ -961,6 +1013,7 @@ const PatientForm = () => {
                       placeholder="Add Family History"
                       value={familyHistoryInput}
                       onChange={(e) => setFamilyHistoryInput(e.target.value)}
+                      disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault();
@@ -983,6 +1036,7 @@ const PatientForm = () => {
                               <button
                                 className="buttonred responsive-button"
                                 onClick={() => handleDeleteHistory(birthHistory, setBirthHistory, item)}
+                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               >
                                 Delete
                               </button>
@@ -996,6 +1050,7 @@ const PatientForm = () => {
                       placeholder="Add Birth History"
                       value={birthHistoryInput}
                       onChange={(e) => setBirthHistoryInput(e.target.value)}
+                      disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           handleAddHistoryItem(birthHistoryInput, birthHistory, setBirthHistory);
@@ -1017,6 +1072,7 @@ const PatientForm = () => {
                               <button
                                 className="buttondelete responsive-button"
                                 onClick={() => handleDeleteHistory(surgicalHistory, setSurgicalHistory, item)}
+                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               >
                                 Delete
                               </button>
@@ -1028,19 +1084,20 @@ const PatientForm = () => {
                     <input
                       type="text"
                       placeholder="Add Surgical History"
-                       value={surgicalHistoryInput}
-                        onChange={(e) => setSurgicalHistoryInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleAddHistoryItem(
-                              surgicalHistoryInput,
-                              surgicalHistory,
-                              setSurgicalHistory
-                            );
-                            setSurgicalHistoryInput("")
-                            e.target.value = ""
-                          }
-                        }}
+                      value={surgicalHistoryInput}
+                      onChange={(e) => setSurgicalHistoryInput(e.target.value)}
+                      disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleAddHistoryItem(
+                            surgicalHistoryInput,
+                            surgicalHistory,
+                            setSurgicalHistory
+                          );
+                          setSurgicalHistoryInput("")
+                          e.target.value = ""
+                        }
+                      }}
                       className="responsive-input"
                     />
                   </div>
@@ -1055,6 +1112,7 @@ const PatientForm = () => {
                               <button
                                 className="buttondelete responsive-button"
                                 onClick={() => handleDeleteHistory(otherHistory, setOtherHistory, item)}
+                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               >
                                 Delete
                               </button>
@@ -1067,14 +1125,15 @@ const PatientForm = () => {
                       type="text"
                       placeholder="Add Other History"
                       value={otherHistoryInput}
-                        onChange={(e) => setOtherHistoryInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleAddHistoryItem(otherHistoryInput, otherHistory, setOtherHistory);
-                            otherHistoryInput("")
-                            e.target.value = ""
-                          }
-                        }}
+                      disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                      onChange={(e) => setOtherHistoryInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleAddHistoryItem(otherHistoryInput, otherHistory, setOtherHistory);
+                          otherHistoryInput("")
+                          e.target.value = ""
+                        }
+                      }}
                       className="responsive-input"
                     />
                   </div>
@@ -1091,6 +1150,7 @@ const PatientForm = () => {
                     <textarea
                       value={majorComplaints}
                       onChange={(e) => setMajorComplaints(e.target.value)}
+                      disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                       placeholder="Type..."
                       className="responsive-textarea local-examination-textarea"
                     />
@@ -1112,6 +1172,7 @@ const PatientForm = () => {
                           <input
                             type="checkbox"
                             name={field.toLowerCase().replace(/\s+/g, '')}
+                            disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                             checked={selectonexamination[field.toLowerCase().replace(/\s+/g, '')] || false}
                             onChange={(e) => {
                               const { name, checked } = e.target;
@@ -1130,6 +1191,7 @@ const PatientForm = () => {
                     {onsystem.map((field, index) => (
                       <div className="checkbox-item" key={index}>
                         <input
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                           type="checkbox"
                           name={field.toLowerCase().replace(/\s+/g, '')}
                           checked={selectsystematic[field.toLowerCase().replace(/\s+/g, '')] || false}
@@ -1147,6 +1209,7 @@ const PatientForm = () => {
                     {availableTests.map((field, index) => (
                       <div className="checkbox-item" key={index}>
                         <input
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                           type="checkbox"
                           name={field.toLowerCase().replace(/\s+/g, '')}
                           checked={selectavailableTests[field.toLowerCase().replace(/\s+/g, '')] || false}
@@ -1181,6 +1244,7 @@ const PatientForm = () => {
                     {!useCamera && (
                       <div className="file-upload-controls">
                         <input
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                           type="file"
                           multiple
                           onChange={handleMultipleFilesChange}
@@ -1191,6 +1255,7 @@ const PatientForm = () => {
                           type="button"
                           onClick={startCamera}
                           className="buttonblack responsive-button"
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                         >
                           Use Camera
                         </button>
@@ -1203,11 +1268,13 @@ const PatientForm = () => {
                           autoPlay
                           playsInline
                           className="responsive-video"
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                         />
                         <button
                           type="button"
                           onClick={capturePhoto}
                           className="buttonblack responsive-button"
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                         >
                           Capture Photo
                         </button>
@@ -1224,6 +1291,7 @@ const PatientForm = () => {
                             <button
                               onClick={() => removeFile(index)}
                               className="remove-file-button"
+                              disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                             >
                               Remove
                             </button>
@@ -1303,6 +1371,7 @@ const PatientForm = () => {
                   <div className="vitals-column">
                     <label>Local Examination</label>
                     <textarea
+                      readOnly={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                       placeholder="Type...."
                       value={local || ''}
                       onChange={(e) => setlocal(e.target.value)}
@@ -1312,6 +1381,7 @@ const PatientForm = () => {
                   <div className="vitals-column">
                     <label>Diagnosis</label>
                     <textarea
+                      readOnly={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                       placeholder="Type"
                       value={dignosis || ''}
                       onChange={(e) => setdignosis(e.target.value)}
@@ -1349,6 +1419,7 @@ const PatientForm = () => {
                               <button
                                 className="buttondelete responsive-button"
                                 onClick={() => handleDeleteHistory(treatment, settreatment, item)}
+                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               >
                                 Delete
                               </button>
@@ -1357,6 +1428,7 @@ const PatientForm = () => {
                               <button
                                 className="buttongrey responsive-button"
                                 onClick={() => handleEditTreatment(index)}
+                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               >
                                 Edit
                               </button>
@@ -1369,6 +1441,7 @@ const PatientForm = () => {
                               type="text"
                               placeholder="Name"
                               className="responsive-input"
+                              disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                             />
                           </td>
                           <td data-title="Dosage">
@@ -1376,6 +1449,7 @@ const PatientForm = () => {
                               type="text"
                               placeholder="Dosage"
                               className="responsive-input"
+                              disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                             />
                           </td>
                           <td data-title="Route of Administration">
@@ -1383,6 +1457,7 @@ const PatientForm = () => {
                               type="text"
                               placeholder="Route of Administration"
                               className="responsive-input"
+                              disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                             />
                           </td>
                           <td colSpan={2} data-title="Add">
@@ -1390,6 +1465,7 @@ const PatientForm = () => {
                               <button
                                 className="buttonblack responsive-button"
                                 onClick={handleAddTreatment}
+                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               >
                                 Add Treatment
                               </button>
@@ -1432,12 +1508,14 @@ const PatientForm = () => {
                               <button
                                 className="buttondelete responsive-button"
                                 onClick={() => handleDeleteHistory(prescription, setPrescription, item)}
+                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               >
                                 Delete
                               </button>
                             </td>
                             <td data-title="Edit">
                               <button
+                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                                 className="buttongrey responsive-button"
                                 onClick={() => handleEditPrescription(index)}>
                                 Edit
@@ -1448,6 +1526,7 @@ const PatientForm = () => {
                         <tr className="add-prescription-row">
                           <td data-title="Medicine">
                             <input
+                              disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               type="text"
                               placeholder="Medicine"
                               className="responsive-input"
@@ -1455,6 +1534,7 @@ const PatientForm = () => {
                           </td>
                           <td data-title="Dosage">
                             <input
+                              disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               type="text"
                               placeholder="Dosage"
                               id="dosage"
@@ -1463,6 +1543,7 @@ const PatientForm = () => {
                           </td>
                           <td data-title="Timing">
                             <input
+                              disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               type="text"
                               placeholder="Timing"
                               className="responsive-input"
@@ -1470,6 +1551,7 @@ const PatientForm = () => {
                           </td>
                           <td data-title="Duration">
                             <input
+                              disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                               type="text"
                               placeholder="Duration"
 
@@ -1479,6 +1561,7 @@ const PatientForm = () => {
                           <td colSpan={2} data-title="Add">
                             <div className="button-wrapper">
                               <button
+                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                                 className="buttonblack responsive-button"
                                 onClick={handleAddPrescription}
                               >
@@ -1502,6 +1585,7 @@ const PatientForm = () => {
                   <div className="vitals-column">
                     <label>Follow Up Date</label>
                     <input
+                      disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                       type="date"
                       value={followupdate || ''}
                       onChange={(e) => setfollowupdate(e.target.value)}
@@ -1511,6 +1595,7 @@ const PatientForm = () => {
                   <div className="vitals-column">
                     <label>Advice Given</label>
                     <textarea
+                      readOnly={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
                       placeholder="Type..."
                       value={advicegiven || ''}
                       onChange={(e) => setadvicegiven(e.target.value)}
@@ -1522,7 +1607,7 @@ const PatientForm = () => {
             </div>
           </div>
           <div className="button-container">
-            <button className="buttonblack responsive-button btn-save" onClick={() => setTimeout(handleSubmit, 0)}>Save</button>
+            <button className="buttonblack responsive-button btn-save" onClick={() => handleSubmit()}>Save</button>
             <button
               className="buttongrey responsive-button btn-generate"
               onClick={handleGeneratePrescription}

@@ -34,6 +34,7 @@ const ReceptionBillingform = () => {
   const [membershipPrice, setMembershipPrice] = useState(0);
   const [membershipOffer, setMembershipOffer] = useState(0);
   const [optpaymnetmethod, setoptpaymentmethod] = useState([])
+  const [basic,setbasic]=useState({})
 
   const inputRefs = useRef([]);
 
@@ -52,6 +53,14 @@ const ReceptionBillingform = () => {
     };
   };
 
+  const basicData=async()=>{
+    const searchParams = new URLSearchParams(location.search);
+    // setUrlParams(getUrlParams());
+    // console.log("sdfghsfjgn",urlParams)
+    const res= await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-basic-detail/${searchParams.get('id')}/${searchParams.get('name')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
+    console.log(res)
+    setbasic(res.data)
+  }
   const generateBillId = (params) => {
     const locationCode = params.belongedlocation
       ? params.belongedlocation.slice(0, 3).toUpperCase()
@@ -93,6 +102,7 @@ const ReceptionBillingform = () => {
     const newBillId = generateBillId(params);
     setBillId(newBillId);
     fetchPaymentMethod()
+    basicData()
     if (params.memberType && params.memberType !== 'null' && params.memberType !== 'undefined') {
       setSelectedMembership(params.memberType);
     }
@@ -589,34 +599,42 @@ const ReceptionBillingform = () => {
           <div className="details-left">
             <div className="info-row">
               <span className="info-label">Doctor:</span>
-              <span className="info-value">{urlParams.doctorname}</span>
+              <span className="info-value">{basic.doctorname}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Nurse:</span>
-              <span className="info-value">{urlParams.nursename}</span>
+              <span className="info-value">{basic.nursename}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Member:</span>
-              <span className="info-value">{urlParams.id}</span>
+              <span className="info-value">{basic.id}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Location:</span>
-              <span className="info-value">{urlParams.belongedlocation}</span>
+              <span className="info-value">{basic.belongedlocation}</span>
             </div>
           </div>
           <div className="details-right">
             <div className="info-row">
               <span className="info-label">Name:</span>
-              <span className="info-value">{urlParams.name}</span>
+              <span className="info-value">{basic.full_name}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Visited:</span>
-              <span className="info-value">{urlParams.visited}</span>
+              <span className="info-value">{basic.visted}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Number:</span>
-              <span className="info-value">{urlParams.businessName}</span>
+              <span className="info-value">{basic.phone_number}</span>
             </div>
+            {basic.room_number!=null&&(
+                  <div className="info-row">
+                  <span className="info-label">Room number:</span>
+                  <span className="info-value">
+                    {basic.room_number ? basic.room_number:""}
+                  </span>
+                </div>
+                )}
           </div>
         </div>
 

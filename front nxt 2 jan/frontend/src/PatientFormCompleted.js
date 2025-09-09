@@ -47,7 +47,7 @@ const PatientFormCompleted = () => {
     nursename: '',
     doctorname: '',
   });
-const [familyHistoryInput, setFamilyHistoryInput] = useState("");
+  const [familyHistoryInput, setFamilyHistoryInput] = useState("");
   const [birthHistoryInput, setBirthHistoryInput] = useState("");
   const [surgicalHistoryInput, setSurgicalHistoryInput] = useState("");
   const [otherHistoryInput, setOtherHistoryInput] = useState("");
@@ -89,6 +89,13 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
   const [stream, setStream] = useState(null);
   const videoRef = useRef(null);
   const [docname, setdocname] = useState('')
+  const [Name, setname] = useState('')
+  const [Number, setNumber] = useState('')
+  const [Id, setid] = useState('')
+  const [visit, setvisit] = useState("")
+  const [Nurse, setnurse] = useState("")
+  const [visitlocation, setvisitlocation] = useState('')
+  const [basic,setbasic]=useState({})
 
   const [isOpen, setIsOpen] = useState({
     vitals: true,
@@ -299,8 +306,8 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
           visited: urlParams.visited
         }
       });
-      console.log("to find=>>",response.data.patient[response.data.patient.length-1].doctor_name)
-      setdocname(response.data.patient[response.data.patient.length-1].doctor_name)
+      console.log("to find=>>", response.data.patient[response.data.patient.length - 1].doctor_name)
+      setdocname(response.data.patient[response.data.patient.length - 1].doctor_name)
       const data = response.data;
       setapidata(data);
       // const lastPatient = apidata?.patient?.[apidata.patient.length - 1];
@@ -373,6 +380,14 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
     }, {});
   };
 
+  const basicData=async()=>{
+    const searchParams = new URLSearchParams(location.search);
+    // setUrlParams(getUrlParams());
+    // console.log("sdfghsfjgn",urlParams)
+    const res= await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-basic-detail/${searchParams.get('id')}/${searchParams.get('name')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
+    console.log(res)
+    setbasic(res.data)
+  }
   useEffect(() => {
     setUrlParams(getUrlParams());
   }, [location]);
@@ -380,6 +395,7 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
   useEffect(() => {
     if (urlParams.businessName && urlParams.visited) {
       fetchImage(urlParams.businessName, urlParams.visited);
+      basicData()
       apifetchData();
     }
   }, [urlParams]);
@@ -497,21 +513,21 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const finalFamilyHistory = familyHistoryInput.trim()!== ""
-    ? [...familyHistory, familyHistoryInput.trim()]
-    : [...familyHistory];
+    const finalFamilyHistory = familyHistoryInput.trim() !== ""
+      ? [...familyHistory, familyHistoryInput.trim()]
+      : [...familyHistory];
 
-  const finalBirthHistory = birthHistoryInput.trim()!== ""
-    ? [...birthHistory, birthHistoryInput.trim()]
-    : [...birthHistory];
+    const finalBirthHistory = birthHistoryInput.trim() !== ""
+      ? [...birthHistory, birthHistoryInput.trim()]
+      : [...birthHistory];
 
-  const finalSurgicalHistory = surgicalHistoryInput.trim()!== ""
-    ? [...surgicalHistory, surgicalHistoryInput.trim()]
-    : [...surgicalHistory];
+    const finalSurgicalHistory = surgicalHistoryInput.trim() !== ""
+      ? [...surgicalHistory, surgicalHistoryInput.trim()]
+      : [...surgicalHistory];
 
-  const finalOtherHistory = otherHistoryInput.trim()!== ""
-    ? [...otherHistory, otherHistoryInput.trim()]
-    : [...otherHistory];
+    const finalOtherHistory = otherHistoryInput.trim() !== ""
+      ? [...otherHistory, otherHistoryInput.trim()]
+      : [...otherHistory];
     const onExaminationArray = Object.entries(selectonexamination)
       .filter(([_, value]) => value)
       .map(([key]) => key);
@@ -526,10 +542,10 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
       dignosis,
       vitals,
       majorComplaints,
-      finalFamilyHistory,
-      finalBirthHistory,
-      finalSurgicalHistory,
-      finalOtherHistory,
+      familyHistory:finalFamilyHistory,
+      birthHistory:finalBirthHistory,
+      surgicalHistory:finalSurgicalHistory,
+      otherHistory:finalOtherHistory,
       selectavailableTests: testsArray,
       selectonexamination: onExaminationArray,
       selectsystematic: systematicArray,
@@ -760,13 +776,13 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
     return (
       <div className="tab-button-container">
         {Array.from({ length: visitedCount }, (_, i) => visitedCount - i).map((num) => (
-        <button
-          onClick={() => handlevisitedpage(num)}
-          className={`custom-tab-button ${urlParams.visited == num ? 'active' : ''}`}
-          key={num}
-        >
-          {num}
-        </button>
+          <button
+            onClick={() => handlevisitedpage(num)}
+            className={`custom-tab-button ${urlParams.visited == num ? 'active' : ''}`}
+            key={num}
+          >
+            {num}
+          </button>
         ))}
       </div>
     );
@@ -805,27 +821,37 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
               <div className="user-info">
                 <div className="info-row">
                   <span className="info-label">Name:</span>
-                  <span className="info-value">{urlParams.name}</span>
+                  <span className="info-value">{basic.full_name}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Number:</span>
-                  <span className="info-value">{urlParams.businessName}</span>
+                  <span className="info-value">{basic.phone_number}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">ID:</span>
-                  <span className="info-value">{urlParams.id}</span>
+                  <span className="info-value">{basic.id}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Visited:</span>
-                  <span className="info-value">{urlParams.visited}</span>
+                  <span className="info-value">{basic.visted}</span>
                 </div>
                 <div className="info-row">
-                  <span className="info-label">Doctor:</span>
-                  <span className="info-value">{docname || 'Not specified'}</span>
+                  <span className="info-label">Location:</span>
+                  <span className="info-value">
+                    {basic.belongedlocation ? basic.belongedlocation:""}
+                  </span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Nurse:</span>
-                  <span className="info-value">{urlParams.nursename || 'Not specified'}</span>
+                  <span className="info-value">
+                    {basic.nursename ? basic.nursename : "Not Checked by any nurse"}
+                  </span>
+                </div>
+                <div className="info-row">
+                  <span className="info-label">Doctor:</span>
+                  <span className="info-value">
+                    {basic.doctorname ? basic.doctorname : "Not Checked by any doctor"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -965,14 +991,14 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
                       placeholder="Add Family History"
                       value={familyHistoryInput}
                       onChange={(e) => setFamilyHistoryInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            handleAddHistoryItem(familyHistoryInput, familyHistory, setFamilyHistory);
-                            setFamilyHistoryInput("")
-                            e.target.value = ""
-                          }
-                        }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleAddHistoryItem(familyHistoryInput, familyHistory, setFamilyHistory);
+                          setFamilyHistoryInput("")
+                          e.target.value = ""
+                        }
+                      }}
                       className="responsive-input"
                     />
                   </div>
@@ -998,14 +1024,14 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
                     <input
                       type="text"
                       value={birthHistoryInput}
-                        onChange={(e) => setBirthHistoryInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleAddHistoryItem(birthHistoryInput, birthHistory, setBirthHistory);
-                            setBirthHistoryInput("")
-                            e.target.value = ""
-                          }
-                        }}
+                      onChange={(e) => setBirthHistoryInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleAddHistoryItem(birthHistoryInput, birthHistory, setBirthHistory);
+                          setBirthHistoryInput("")
+                          e.target.value = ""
+                        }
+                      }}
                       className="responsive-input"
                     />
                   </div>
@@ -1032,18 +1058,18 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
                       type="text"
                       placeholder="Add Surgical History"
                       value={surgicalHistoryInput}
-                        onChange={(e) => setSurgicalHistoryInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleAddHistoryItem(
-                              surgicalHistoryInput,
-                              surgicalHistory,
-                              setSurgicalHistory
-                            );
-                            setSurgicalHistoryInput("")
-                            e.target.value = ""
-                          }
-                        }}
+                      onChange={(e) => setSurgicalHistoryInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleAddHistoryItem(
+                            surgicalHistoryInput,
+                            surgicalHistory,
+                            setSurgicalHistory
+                          );
+                          setSurgicalHistoryInput("")
+                          e.target.value = ""
+                        }
+                      }}
                       className="responsive-input"
                     />
                   </div>
@@ -1070,14 +1096,14 @@ const [familyHistoryInput, setFamilyHistoryInput] = useState("");
                       type="text"
                       placeholder="Add Other History"
                       value={otherHistoryInput}
-                        onChange={(e) => setOtherHistoryInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleAddHistoryItem(otherHistoryInput, otherHistory, setOtherHistory);
-                            otherHistoryInput("")
-                            e.target.value = ""
-                          }
-                        }}
+                      onChange={(e) => setOtherHistoryInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleAddHistoryItem(otherHistoryInput, otherHistory, setOtherHistory);
+                          otherHistoryInput("")
+                          e.target.value = ""
+                        }
+                      }}
                       className="responsive-input"
                     />
                   </div>

@@ -32,7 +32,7 @@ const Createusers = () => {
     useEffect(() => {
         fetchLoginLocations()
         // console.log(optlocation)
-    })
+    },[])
     // Debounced function to fetch location suggestions
     const fetchSuggestions = useCallback(
         debounce(async (query) => {
@@ -125,7 +125,7 @@ const Createusers = () => {
 
         try {
             const response = await axios.post("https://amrithaahospitals.visualplanetserver.in/Createuser", dataToSend);
-
+            console.log(response)
             if (response.status === 201) {
                 Swal.fire({
                     icon: "success",

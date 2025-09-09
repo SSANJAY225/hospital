@@ -37,9 +37,17 @@ const AdminBillingForm = () => {
   const [optpaymnetmethod, setoptpaymentmethod] = useState([])
   const [apiData, setApiData] = useState({})
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  
+  const [basic,setbasic]=useState({})
   const inputRefs = useRef([]);
 
+  const basicData=async()=>{
+    const searchParams = new URLSearchParams(location.search);
+    // setUrlParams(getUrlParams());
+    // console.log("sdfghsfjgn",urlParams)
+    const res= await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-basic-detail/${searchParams.get('id')}/${searchParams.get('user')}/${searchParams.get('phonenumber')}/${searchParams.get('visit')}`)
+    console.log(res)
+    setbasic(res.data)
+  }
   const getUrlParams = () => {
     const searchParams = new URLSearchParams(location.search);
     return {
@@ -172,7 +180,7 @@ const AdminBillingForm = () => {
     if (params.businessName && params.visited) {
       fetchImage(params.businessName, params.visited);
     }
-    
+    basicData()
     // Load API data
     fetchapidata();
   }, [location]);
@@ -682,34 +690,42 @@ const AdminBillingForm = () => {
           <div className="details-left">
             <div className="info-row">
               <span className="info-label">Doctor:</span>
-              <span className="info-value">{apiData.doctor_name || urlParams.doctorname}</span>
+              <span className="info-value">{basic.doctorname}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Nurse:</span>
-              <span className="info-value">{apiData.nurse_name || urlParams.nursename}</span>
+              <span className="info-value">{basic.nursename}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Member:</span>
-              <span className="info-value">{apiData.user_id || urlParams.id}</span>
+              <span className="info-value">{basic.id}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Location:</span>
-              <span className="info-value">{apiData.location||urlParams.belongedlocation}</span>
+              <span className="info-value">{basic.belongedlocation}</span>
             </div>
           </div>
           <div className="details-right">
             <div className="info-row">
               <span className="info-label">Name:</span>
-              <span className="info-value">{apiData.user_name || urlParams.name}</span>
+              <span className="info-value">{basic.full_name}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Visited:</span>
-              <span className="info-value">{apiData.visit_number || urlParams.visited}</span>
+              <span className="info-value">{basic.visted}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Number:</span>
-              <span className="info-value">{apiData.phone_number || urlParams.businessName}</span>
+              <span className="info-value">{basic.phone_number}</span>
             </div>
+            {basic.room_number!=null&&(
+                  <div className="info-row">
+                  <span className="info-label">Room number:</span>
+                  <span className="info-value">
+                    {basic.room_number ? basic.room_number:""}
+                  </span>
+                </div>
+                )}
           </div>
         </div>
 

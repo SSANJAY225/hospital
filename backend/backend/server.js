@@ -28,16 +28,16 @@ app.use(cors({
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials:true
+  credentials: true
 }));
 app.use(express.json());
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: "localhost",
   user: "root",
   password: "",
   database: "visualpl_zfitbot"
 });
-// const db = mysql.createConnection({
+// const db = mysql.createPool({
 //   host: "localhost",
 //   user: "visualpl_zfitbotusername",
 //   password: "zfit@3839",
@@ -186,7 +186,7 @@ app.post('/api/save-bill-pdf', (req, res) => {
     }
 
     // Optionally, you could store the file path in a database with userId and visitNumber
-    console.log(`PDF saved at: ${filePath}`);
+    // console.log(`PDF saved at: ${filePath}`);
     res.json({ success: true, message: 'PDF saved successfully', filePath });
   });
 });
@@ -246,7 +246,7 @@ app.post('/api/save-bill-pdf', (req, res) => {
       return res.status(500).json({ success: false, message: 'Failed to save PDF' });
     }
 
-    console.log(`PDF saved at: ${filePath}`);
+    // console.log(`PDF saved at: ${filePath}`);
     res.json({ success: true, message: 'PDF saved successfully', filePath });
   });
 });
@@ -295,7 +295,7 @@ function handleError(err, res, message) {
 // Add Data to Complaints
 app.post('/addComplaints', (req, res) => {
   const { complaint } = req.body;
-  console.log('Request body:', req.body);  // Log the request body
+  // console.log('Request body:', req.body);  // Log the request body
 
   if (!complaint) {
     return res.status(400).json({ error: 'Complaint is required' });
@@ -327,7 +327,7 @@ app.get('/getRoA', (req, res) => {
 // Add RoA
 app.post('/addRoA', (req, res) => {
   const { RoA } = req.body;
-  console.log('Request body:', req.body);  // Log the request body
+  // console.log('Request body:', req.body);  // Log the request body
   if (!RoA) {
     return res.status(400).json({ error: 'Complaint is required' });
   }
@@ -375,7 +375,7 @@ app.get("/column-vitals", (req, res) => {
       .filter((col) => !ignoredColumns.includes(col))
       .map((col) => col.replace("_", " "));
 
-    console.log("Returning columns:", columnNames); // Debug log
+    // console.log("Returning columns:", columnNames); // Debug log
     res.json(columnNames);
   });
 });
@@ -433,7 +433,7 @@ app.delete('/delete-user/:phone_number', (req, res) => {
 
 app.put("/update-data", (req, res) => {
   const formData = req.body;
-  console.log("Received update data:", formData);
+  // console.log("Received update data:", formData);
 
   // Extract required fields
   const phoneNumber = formData.vitals?.Phone_number || formData.Phone_number;
@@ -486,7 +486,7 @@ app.put("/update-data", (req, res) => {
         });
       }
 
-      console.log("Updated patients table:", patientsResult);
+      // console.log("Updated patients table:", patientsResult);
 
       // Step 2: Update or insert into general_patient table (Major_Complaints)
       const checkGeneralPatientSql = `
@@ -515,7 +515,7 @@ app.put("/update-data", (req, res) => {
                 res.status(500).json({ message: "Database error updating general_patient table", error: err.message });
               });
             }
-            console.log("Updated general_patient table:", updateGeneralResult);
+            // console.log("Updated general_patient table:", updateGeneralResult);
             updateVitals();
           });
         } else {
@@ -532,7 +532,7 @@ app.put("/update-data", (req, res) => {
                 res.status(500).json({ message: "Database error inserting general_patient table", error: err.message });
               });
             }
-            console.log("Inserted into general_patient table:", insertGeneralResult);
+            // console.log("Inserted into general_patient table:", insertGeneralResult);
             updateVitals();
           });
         }
@@ -550,7 +550,7 @@ app.put("/update-data", (req, res) => {
           }
 
           const fields = results.map((itm) => itm.Field);
-          console.log("Vitals columns:", fields);
+          // console.log("Vitals columns:", fields);
 
           // Check if vitals record exists
           const checkVitalsSql = `
@@ -585,7 +585,7 @@ app.put("/update-data", (req, res) => {
                     res.status(500).json({ message: "Database error updating vitals table", error: err.message });
                   });
                 }
-                console.log("Updated vitals table:", updateVitalsResult);
+                // console.log("Updated vitals table:", updateVitalsResult);
                 commitTransaction();
               });
             } else {
@@ -600,8 +600,8 @@ app.put("/update-data", (req, res) => {
                     res.status(500).json({ message: "Database error inserting vitals table", error: err.message });
                   });
                 }
-                console.log("Inserted into vitals table:", insertVitalsResult);
-                commitTransaction();
+                // console.log("Inserted into vitals table:", insertVitalsResult);
+                // commitTransaction();
               });
             }
           });
@@ -617,7 +617,7 @@ app.put("/update-data", (req, res) => {
               res.status(500).json({ message: "Database transaction commit error", error: err.message });
             });
           }
-          console.log("Transaction committed successfully");
+          // console.log("Transaction committed succe/ssfully");
           res.status(200).json({
             message: "Data updated successfully",
             updated_patients_rows: patientsResult.affectedRows,
@@ -630,7 +630,7 @@ app.put("/update-data", (req, res) => {
 
 
 app.post("/adddata-vitals", (req, res) => {
-  console.log("Received data for vitals san:", req.body);
+  // console.log("Received data for vitals san:", req.body);
 
   db.query(`SHOW COLUMNS FROM vitals`, (err, results) => {
     if (err) {
@@ -639,7 +639,7 @@ app.post("/adddata-vitals", (req, res) => {
     }
 
     const fields = results.map((itm) => itm.Field);
-    console.log("Database columns:", fields);
+    // console.log("Database columns:", fields);
 
     // Validate required fields
     const requiredFields = ['Name', 'Phone_number', 'Visit'];
@@ -653,7 +653,7 @@ app.post("/adddata-vitals", (req, res) => {
     // Map request body to database fields
     const values = fields.map((field) => {
       const value = req.body[field];
-      console.log(`Field: ${field}, Value: ${value}`);
+      // console.log(`Field: ${field}, Value: ${value}`);
       return value !== undefined ? value : null;
     });
 
@@ -673,7 +673,7 @@ app.post("/adddata-vitals", (req, res) => {
         console.error("Database insert error:", err);
         return res.status(500).json({ message: "Database error", error: err.message });
       }
-      console.log("Inserted Data:", result);
+      // console.log("Inserted Data:", result);
       res.json({ message: "Data inserted successfully", id: result.insertId });
     });
   });
@@ -682,14 +682,14 @@ app.post("/adddata-vitals", (req, res) => {
 // get vitals
 app.get("/getvitals/:Name/:Visit/:Phone_number", (req, res) => {
   const { Name, Visit, Phone_number } = req.params;
-  console.log(`Received request: Name=${Name}, Visit=${Visit}, Phone_number=${Phone_number}`);
+  // console.log(`Received request: Name=${Name}, Visit=${Visit}, Phone_number=${Phone_number}`);
 
   const query = `SELECT * FROM vitals WHERE Name = ? AND Visit = ? AND Phone_number = ?`;
 
   db.query(query, [Name, Visit, Phone_number], (err, result) => {
     if (err) {
       console.error("Database Query Error:", err);
-      console.log(query)
+      // console.log(query)
       return res.status(500).json({ error: err.message });
     }
     // List of columns to ignore
@@ -704,7 +704,7 @@ app.get("/getvitals/:Name/:Visit/:Phone_number", (req, res) => {
     };
 
     const formattedResult = result.map(formatKeys);
-    console.log("Formatted Query Result:", formattedResult);
+    // console.log("Formatted Query Result:", formattedResult);
 
     return res.json(formattedResult);
   });
@@ -714,7 +714,7 @@ app.get("/getvitals/:Name/:Visit/:Phone_number", (req, res) => {
 
 app.get('/get-major/:Name/:Visted/:Phone_Number', (req, res) => {
   const { Name, Phone_Number, Visted } = req.params;
-  console.log(req.params)
+  // console.log(req.params)
   const query = `SELECT Major_Complaints FROM general_patient WHERE Name = ? AND Phone_Number = ? AND Visted=?`
   db.query(query, [Name, Phone_Number, Visted], (err, result) => {
     if (err) {
@@ -722,7 +722,7 @@ app.get('/get-major/:Name/:Visted/:Phone_Number', (req, res) => {
       res.status(500).json({ error: 'Error fetching data' });
     }
     else {
-      console.log(result)
+      // console.log(result)
       res.json(result);
     }
   })
@@ -760,7 +760,7 @@ app.post('/addSystemicExamination', (req, res) => {
   });
 });
 app.post('/addDental', (req, res) => {
-  console.log('Received request:', req.body); // Log request body
+  // console.log('Received request:', req.body); // Log request body
 
   const { dental } = req.body;
   if (!dental) {
@@ -953,7 +953,7 @@ app.get('/vitals', (req, res) => {
   db.query(sql, (err, results) => {
     if (err) return handleError(err, res, 'Failed to fetch columns');
     const columns = results.map(row => row.COLUMN_NAME);
-    console.log('Columns fetched from database:', columns);
+    // console.log('Columns fetched from database:', columns);
     res.json(columns);
   });
 });
@@ -974,7 +974,7 @@ app.post('/vitals', (req, res) => {
   const sql = `ALTER TABLE vitals ADD \`${columnName}\` VARCHAR(255)`;
   db.query(sql, (err, result) => {
     if (err) return handleError(err, res, 'Failed to add column');
-    console.log('Column added:', { columnName });
+    // console.log('Column added:', { columnName });
     res.status(201).json({ message: 'Column added successfully', columnName });
   });
 });
@@ -996,7 +996,7 @@ app.put('/vitals/:column', (req, res) => {
   const sql = `ALTER TABLE vitals CHANGE \`${column}\` \`${newColumnName}\` VARCHAR(255)`;
   db.query(sql, (err, result) => {
     if (err) return handleError(err, res, 'Failed to update column');
-    console.log('Column updated:', { oldName: column, newName: new OLD_NAME });
+    // console.log('Column updated:', { oldName: column, newName: new OLD_NAME });
     res.json({ message: 'Column updated successfully' });
   });
 });
@@ -1008,7 +1008,7 @@ app.delete('/vitals/:column', (req, res) => {
   const sql = `ALTER TABLE vitals DROP COLUMN \`${column}\``;
   db.query(sql, (err, result) => {
     if (err) return handleError(err, res, 'Failed to delete column');
-    console.log('Column deleted:', { column });
+    // console.log('Column deleted:', { column });
     res.json({ message: 'Column deleted successfully' });
   });
 });
@@ -1017,7 +1017,7 @@ app.get('/examinations', (req, res) => {
   const sql = 'SELECT * FROM onexam';
   db.query(sql, (err, results) => {
     if (err) return handleError(err, res, 'Failed to fetch examinations');
-    console.log('Examinations fetched from database:', results); // Debugging line
+    // console.log('Examinations fetched from database:', results); // Debugging line
     res.json(results);
   });
 });
@@ -1035,8 +1035,8 @@ app.get('/api/receptionists', (req, res) => {
     WHERE receptionistname LIKE ?
     LIMIT 10
   `;
-  console.log('Received request for receptionist name:', name);
-  console.log('Query:', query, 'with parameter:', `${name}%`);
+  // console.log('Received request for receptionist name:', name);
+  // console.log('Query:', query, 'with parameter:', `${name}%`);
 
   db.query(query, [`${name}%`], (err, results) => {
     if (err) {
@@ -1053,7 +1053,7 @@ app.put('/examinations/:id', (req, res) => {
   const { id } = req.params;
   const { examination_text } = req.body;
 
-  console.log('Received request body:', req.body); // Debugging line
+  // console.log('Received request body:', req.body); // Debugging line
 
   if (!examination_text) {
     return res.status(400).json({ error: 'Examination text is required' });
@@ -1081,7 +1081,7 @@ app.get('/sysexaminations', (req, res) => {
   const sql = 'SELECT * FROM sysexam';
   db.query(sql, (err, results) => {
     if (err) return handleError(err, res, 'Failed to fetch systematic examinations');
-    console.log('Systematic examinations fetched from database:', results); // Debugging line
+    // console.log('Systematic examinations fetched from database:', results); // Debugging line
     res.json(results);
   });
 });
@@ -1119,7 +1119,7 @@ app.get('/tests', (req, res) => {
   const sql = 'SELECT * FROM tests';
   db.query(sql, (err, results) => {
     if (err) return handleError(err, res, 'Failed to fetch tests');
-    console.log('Tests fetched from database:', results);
+    // console.log('Tests fetched from database:', results);
     res.json(results);
   });
 });
@@ -1157,7 +1157,7 @@ app.get('/treatmentgiven', (req, res) => {
   const sql = 'SELECT * FROM treatmentgiven';
   db.query(sql, (err, results) => {
     if (err) return handleError(err, res, 'Failed to fetch treatments');
-    console.log('Treatments fetched from database:', results);
+    // console.log('Treatments fetched from database:', results);
     res.json(results);
   });
 });
@@ -1194,7 +1194,7 @@ app.get('/drugs', (req, res) => {
   const sql = 'SELECT * FROM drugs';
   db.query(sql, (err, results) => {
     if (err) return handleError(err, res, 'Failed to fetch drugs');
-    console.log('Drugs fetched from database:', results);
+    // console.log('Drugs fetched from database:', results);
     res.json(results);
   });
 });
@@ -1231,7 +1231,7 @@ app.get('/dosage', (req, res) => {
   const sql = 'SELECT * FROM dosage';
   db.query(sql, (err, results) => {
     if (err) return handleError(err, res, 'Failed to fetch dosage');
-    console.log('Dosage fetched from database:', results);
+    // console.log('Dosage fetched from database:', results);
     res.json(results);
   });
 });
@@ -1268,7 +1268,7 @@ app.get('/timing', (req, res) => {
   const sql = 'SELECT * FROM timing';
   db.query(sql, (err, results) => {
     if (err) return handleError(err, res, 'Failed to fetch timings');
-    console.log('Timings fetched from database:', results);
+    // console.log('Timings fetched from database:', results);
     res.json(results);
   });
 });
@@ -1482,8 +1482,10 @@ app.post("/Createuser", (req, res) => {
   const password = req.body.password;
   const roll = req.body.roll;
   const location = req.body.Location || req.body.location;
-  const Phone_Number = req.body.Phone_Number
-  console.log("all data", req.body)
+  const Phone_Number = req.body.Phone_Number;
+
+  // console.log("all data", req.body);
+
   if (!UserName || !password || !roll || !location) {
     return res.status(400).json({
       error: `Missing required field: ${!UserName ? "UserName" :
@@ -1493,28 +1495,43 @@ app.post("/Createuser", (req, res) => {
     });
   }
 
-  const checkUsernameSql = "SELECT * FROM users_database WHERE UserName = ?";
-  db.query(checkUsernameSql, [UserName], (err, userResults) => {
+  const checkPhoneSql = "SELECT * FROM users_database WHERE Phone_Number = ?";
+  db.query(checkPhoneSql, [Phone_Number], (err, phoneResults) => {
     if (err) {
       console.error("Database error:", err);
       return res.status(500).json({ error: "Database error", details: err.message });
     }
 
-    if (userResults.length > 0) {
-      return res.status(400).json({ error: "This username is already taken. Choose a different username." });
+    if (phoneResults.length > 0) {
+      return res.status(400).json({ error: "This phone number is already taken. Choose a different one." });
     }
 
-    const insertSql = "INSERT INTO users_database(UserName, Password, roll, Location,Phone_Number) VALUES (?, ?, ?, ?,?)";
-    db.query(insertSql, [UserName, password, roll, location, Phone_Number], (err) => {
+    // ✅ Only check username if phone number is not taken
+    const checkUsernameSql = "SELECT * FROM users_database WHERE UserName = ?";
+    db.query(checkUsernameSql, [UserName], (err, userResults) => {
       if (err) {
         console.error("Database error:", err);
         return res.status(500).json({ error: "Database error", details: err.message });
       }
-      console.log("User added successfully");
-      return res.status(201).json({ status: "User added successfully" }); // Change to 201
+
+      if (userResults.length > 0) {
+        return res.status(400).json({ error: "This username is already taken. Choose a different username." });
+      }
+
+      // ✅ Only insert if both phone + username are free
+      const insertSql = "INSERT INTO users_database(UserName, Password, roll, Location, Phone_Number) VALUES (?, ?, ?, ?, ?)";
+      db.query(insertSql, [UserName, password, roll, location, Phone_Number], (err) => {
+        if (err) {
+          console.error("Database error:", err);
+          return res.status(500).json({ error: "Database error", details: err.message });
+        }
+        // console.log("User added successfully");
+        return res.status(201).json({ status: "User added successfully" });
+      });
     });
   });
 });
+
 
 
 
@@ -1556,7 +1573,7 @@ app.post('/services', (req, res) => {
       console.error('Error adding service:', err);
       return res.status(500).json({ message: 'Failed to add service', error: err.message });
     }
-    console.log('Service added:', { insertId: result.insertId });
+    // console.log('Service added:', { insertId: result.insertId });
     res.status(201).json({ message: 'Service added successfully', id: result.insertId });
   });
 });
@@ -1587,7 +1604,7 @@ app.put('/services/:id', (req, res) => {
       console.error('Service not found:', idNumber);
       return res.status(404).json({ message: 'Service not found' });
     }
-    console.log('Service updated:', { id: idNumber });
+    // console.log('Service updated:', { id: idNumber });
     res.json({ message: 'Service updated successfully' });
   });
 });
@@ -1612,7 +1629,7 @@ app.delete('/services/:id', (req, res) => {
       console.error('Service not found:', idNumber);
       return res.status(404).json({ message: 'Service not found' });
     }
-    console.log('Service deleted:', { id: idNumber });
+    // console.log('Service deleted:', { id: idNumber });
     res.json({ message: 'Service deleted successfully' });
   });
 });
@@ -1644,7 +1661,7 @@ app.post('/roa', (req, res) => {
       console.error('Error adding ROA entry:', err);
       return res.status(500).json({ message: 'Failed to add ROA entry', error: err.message });
     }
-    console.log('ROA entry added:', { insertId: result.insertId });
+    // console.log('ROA entry added:', { insertId: result.insertId });
     res.status(201).json({ message: 'ROA entry added successfully', id: result.insertId });
   });
 });
@@ -1675,7 +1692,7 @@ app.put('/roa/:id', (req, res) => {
       console.error('ROA entry not found:', idNumber);
       return res.status(404).json({ message: 'ROA entry not found' });
     }
-    console.log('ROA entry updated:', { id: idNumber });
+    // console.log('ROA entry updated:', { id: idNumber });
     res.json({ message: 'ROA entry updated successfully' });
   });
 });
@@ -1700,14 +1717,14 @@ app.delete('/roa/:id', (req, res) => {
       console.error('ROA entry not found:', idNumber);
       return res.status(404).json({ message: 'ROA entry not found' });
     }
-    console.log('ROA entry deleted:', { id: idNumber });
+    // console.log('ROA entry deleted:', { id: idNumber });
     res.json({ message: 'ROA entry deleted successfully' });
   });
 });
 
 
 app.get('/locationsuggestion', (req, res) => {
-  console.log('Received request for /locationsuggestion at:', new Date().toISOString());
+  // console.log('Received request for /locationsuggestion at:', new Date().toISOString());
   const { search } = req.query;
   let sql = 'SELECT * FROM locations';
   let params = [];
@@ -1722,7 +1739,7 @@ app.get('/locationsuggestion', (req, res) => {
       console.error('Error fetching location suggestions:', err);
       return res.status(500).json({ message: 'Failed to fetch location suggestions', error: err.message });
     }
-    console.log('Fetched locations:', results);
+    // console.log('Fetched locations:', results);
     res.json(results);
   });
 });
@@ -1754,7 +1771,7 @@ app.post('/doctors_names', (req, res) => {
       console.error('Error adding doctor entry:', err);
       return res.status(500).json({ message: 'Failed to add doctor entry', error: err.message });
     }
-    console.log('Doctor entry added:', { insertId: result.insertId });
+    // console.log('Doctor entry added:', { insertId: result.insertId });
     res.status(201).json({ message: 'Doctor entry added successfully', id: result.insertId });
   });
 });
@@ -1785,7 +1802,7 @@ app.put('/doctors_names/:id', (req, res) => {
       console.error('Doctor entry not found:', idNumber);
       return res.status(404).json({ message: 'Doctor entry not found' });
     }
-    console.log('Doctor entry updated:', { id: idNumber });
+    // console.log('Doctor entry updated:', { id: idNumber });
     res.json({ message: 'Doctor entry updated successfully' });
   });
 });
@@ -1832,7 +1849,7 @@ app.put('/locations/:id', (req, res) => {
       console.error('Location not found:', idNumber);
       return res.status(404).json({ message: 'Location not found' });
     }
-    console.log('Location updated:', { id: idNumber });
+    // console.log('Location updated:', { id: idNumber });
     res.json({ message: 'Location updated successfully' });
   });
 });
@@ -1857,7 +1874,7 @@ app.delete('/locations/:id', (req, res) => {
       console.error('Location not found:', idNumber);
       return res.status(404).json({ message: 'Location not found' });
     }
-    console.log('Location deleted:', { id: idNumber });
+    // console.log('Location deleted:', { id: idNumber });
     res.json({ message: 'Location deleted successfully' });
   });
 });
@@ -1883,7 +1900,7 @@ app.delete('/doctors_names/:id', (req, res) => {
       console.error('Doctor entry not found:', idNumber);
       return res.status(404).json({ message: 'Doctor entry not found' });
     }
-    console.log('Doctor entry deleted:', { id: idNumber });
+    // console.log('Doctor entry deleted:', { id: idNumber });
     res.json({ message: 'Doctor entry deleted successfully' });
   });
 });
@@ -1916,7 +1933,7 @@ app.post('/nurses_name', (req, res) => {
       console.error('Error adding nurse entry:', err);
       return res.status(500).json({ message: 'Failed to add nurse entry', error: err.message });
     }
-    console.log('Nurse entry added:', { insertId: result.insertId });
+    // console.log('Nurse entry added:', { insertId: result.insertId });
     res.status(201).json({ message: 'Nurse entry added successfully', id: result.insertId });
   });
 });
@@ -1947,7 +1964,7 @@ app.put('/nurses_name/:id', (req, res) => {
       console.error('Nurse entry not found:', idNumber);
       return res.status(404).json({ message: 'Nurse entry not found' });
     }
-    console.log('Nurse entry updated:', { id: idNumber });
+    // console.log('Nurse entry updated:', { id: idNumber });
     res.json({ message: 'Nurse entry updated successfully' });
   });
 });
@@ -1972,7 +1989,7 @@ app.delete('/nurses_name/:id', (req, res) => {
       console.error('Nurse entry not found:', idNumber);
       return res.status(404).json({ message: 'Nurse entry not found' });
     }
-    console.log('Nurse entry deleted:', { id: idNumber });
+    // console.log('Nurse entry deleted:', { id: idNumber });
     res.json({ message: 'Nurse entry deleted successfully' });
   });
 });
@@ -1982,7 +1999,7 @@ app.get('/dental', (req, res) => {
   const sql = 'SELECT id, dental_text AS treatment_name FROM dental_values';
   db.query(sql, (err, results) => {
     if (err) return handleError(err, res, 'Failed to fetch dental values');
-    console.log('Dental values fetched from database:', results);
+    // console.log('Dental values fetched from database:', results);
     res.json(results);
   });
 });
@@ -2003,7 +2020,7 @@ app.put('/dental/:id', (req, res) => {
       console.error('Dental value not found:', id);
       return res.status(404).json({ message: 'Dental value not found' });
     }
-    console.log('Dental value updated:', { id, treatment_name });
+    // console.log('Dental value updated:', { id, treatment_name });
     res.json({ message: 'Dental value updated successfully' });
   });
 });
@@ -2018,7 +2035,7 @@ app.delete('/dental/:id', (req, res) => {
       console.error('Dental value not found:', id);
       return res.status(404).json({ message: 'Dental value not found' });
     }
-    console.log('Dental value deleted:', { id });
+    // console.log('Dental value deleted:', { id });
     res.json({ message: 'Dental value deleted successfully' });
   });
 });
@@ -2231,7 +2248,7 @@ app.get('/adminlocations', (req, res) => {
       console.error('Error fetching locations:', error);
       return res.status(500).json({ message: 'Error fetching locations', error: error.message });
     }
-    console.log('Fetched locations:', results.length, 'records');
+    // console.log('Fetched locations:', results.length, 'records');
     res.json(results.map(row => row.location_name));
   });
 });
@@ -2259,7 +2276,7 @@ app.get('/adminservices', (req, res) => {
 
 ////////////for admin follow////////////
 app.get('/api/getpatients', (req, res) => {
-  const { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, Location, Services, NurseName, DoctorName,PatientType } = req.query;
+  const { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, Location, Services, NurseName, DoctorName, PatientType } = req.query;
 
   // Base query
   let query = `
@@ -2281,12 +2298,12 @@ app.get('/api/getpatients', (req, res) => {
       MAX(visted) AS visted
     FROM patients
     WHERE 1=1 `;
-    // AND status = 'billingcompleted'
+  // AND status = 'billingcompleted'
 
   const params = [];
-  console.log("location=>>>>>>>>>.",Location)
+  // console.log("location=>>>>>>>>>.", Location)
   // Add conditions based on provided query parameters
-  if(PatientType){
+  if (PatientType) {
     query += ' AND patient_type = ?';
     params.push(PatientType);
   }
@@ -2317,7 +2334,7 @@ app.get('/api/getpatients', (req, res) => {
   if (Location) {
     query += ' AND belongedlocation = ?';
     params.push(Location);
-    console.log("fetch location",Location)
+    // console.log("fetch location", Location)
   }
   if (NurseName) {
     query += ' AND nursename = ?';
@@ -2331,8 +2348,8 @@ app.get('/api/getpatients', (req, res) => {
   query += ' GROUP BY phone_number ORDER BY queue DESC'; // Changed from 'id DESC' to 'queue DESC'
 
   // Log the constructed query and parameters for debugging
-  console.log("Executing query:", query);
-  console.log("Query parameters:", params);
+  // console.log("Executing query:", query);
+  // console.log("Query parameters:", params);
 
   // Execute the query with parameters
   db.query(query, params, (error, results) => {
@@ -2340,7 +2357,7 @@ app.get('/api/getpatients', (req, res) => {
       console.error("Error executing query:", error);
       return res.status(500).send({ message: "Error fetching data", error: error.message });
     }
-    console.log("Fetched patients with billingcompleted status:", results.length, "records");
+    // console.log("Fetched patients with billingcompleted status:", results.length, "records");
     res.json(results);
   });
 });
@@ -2501,7 +2518,7 @@ app.get('/api/fetch-patients', (req, res) => {
 app.get('/api/fetch-patients-in', (req, res) => {
   const { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, statusFilter, currentDate } = req.query;
 
-  console.log('Received query params:', { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, statusFilter, currentDate });
+  // console.log('Received query params:', { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, statusFilter, currentDate });
 
   // Base query
   let query = `
@@ -2561,8 +2578,8 @@ app.get('/api/fetch-patients-in', (req, res) => {
 
   query += ' GROUP BY phone_number ORDER BY id DESC';
 
-  console.log('Executing query:', query);
-  console.log('Query parameters:', params);
+  // console.log('Executing query:', query);
+  // console.log('Query parameters:', params);
 
   // Execute the query with parameters
   db.query(query, params, (error, results) => {
@@ -2570,7 +2587,7 @@ app.get('/api/fetch-patients-in', (req, res) => {
       console.error('Error executing query:', error);
       return res.status(500).send({ message: 'Error fetching data', error: error.message });
     }
-    console.log('Query results:', results);
+    // console.log('Query results:', results);
     res.json(results);
   });
 });
@@ -2590,10 +2607,10 @@ app.get('/api/fetch-patients-out', (req, res) => {
     statusFilter,
     currentDate
   } = req.query;
-
-  console.log('Received query params:', {
-    PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, statusFilter, currentDate
-  });
+// console.log('Received query params:', {
+    // PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, statusFilter, currentDate
+  // });
+  
 
   let query = `
     SELECT 
@@ -2654,8 +2671,8 @@ app.get('/api/fetch-patients-out', (req, res) => {
 
   query += ` GROUP BY p.phone_number ORDER BY p.queue DESC`;
 
-  console.log('Executing query:', query);
-  console.log('Query parameters:', params);
+  // console.log('Executing query:', query);
+  // console.log('Query parameters:', params);
 
   db.query(query, params, (error, results) => {
     if (error) {
@@ -2671,18 +2688,18 @@ app.get('/api/fetch-patients-out', (req, res) => {
 
 app.post("/api/save-billing", (req, res) => {
   const billingData = req.body;
-  console.log("Received billing data:", billingData);
-  console.log("Phone Number:", billingData.phoneNumber);
-  console.log("Visit Number:", billingData.visitNumber);
-  console.log("Received Date:", billingData.date);
-  console.log("all data",req.body)
+  // console.log("Received billing data:", billingData);
+  // console.log("Phone Number:", billingData.phoneNumber);
+  // console.log("Visit Number:", billingData.visitNumber);
+  // console.log("Received Date:", billingData.date);
+  // console.log("all data", req.body)
 
   // Ensure date is in correct format (YYYY-MM-DD HH:MM:SS)
   let formattedDate = billingData.date;
   if (formattedDate.includes('T')) {
     formattedDate = new Date(formattedDate).toISOString().slice(0, 19).replace('T', ' ');
   }
-  console.log("Formatted Date:", formattedDate);
+  // console.log("Formatted Date:", formattedDate);
 
   // Insert into billing_headers
   const insertHeaderSql = `
@@ -2720,11 +2737,11 @@ app.post("/api/save-billing", (req, res) => {
     billingData.membership_type,
     billingData.reference,
     billingData.overallDiscount,
-    billingData.membershipOffer||'',
-    billingData.membershipType||'',
-    billingData.membershipPrice||'',
-    billingData.reviewDate||'',
-    billingData.doctorName||''
+    billingData.membershipOffer || '',
+    billingData.membershipType || '',
+    billingData.membershipPrice || '',
+    billingData.reviewDate || '',
+    billingData.doctorName || ''
   ];
 
   db.query(insertHeaderSql, insertHeaderValues, (err, result) => {
@@ -2733,8 +2750,8 @@ app.post("/api/save-billing", (req, res) => {
       return res.status(500).json({ message: "Database error", error: err });
     }
 
-    console.log("Billing header inserted, now inserting details...");
-    const    billingId = billingData.billId;
+    // console.log("Billing header inserted, now inserting details...");
+    const billingId = billingData.billId;
 
     // Insert billing details
     const insertDetailsSql = `
@@ -2775,7 +2792,7 @@ app.post("/api/save-billing", (req, res) => {
           return res.status(500).json({ message: "Error updating status", error: err });
         }
 
-        console.log("Status updated...");
+        // console.log("Status updated...");
         res.status(200).json({
           message: "Billing information saved, status updated to 'billingcompleted'",
           success: true
@@ -2805,7 +2822,7 @@ app.post("/api/save-billing", (req, res) => {
 
         // When all details are inserted, update patient status
         if (completedInserts === validServices.length) {
-          console.log("All billing details inserted, now updating status...");
+          // console.log("All billing details inserted, now updating status...");
           const phoneNumber = billingData.phoneNumber;
           const visitNumber = billingData.visitNumber;
 
@@ -2823,7 +2840,7 @@ app.post("/api/save-billing", (req, res) => {
               return res.status(500).json({ message: "Error updating status", error: err });
             }
 
-            console.log("Status updated...");
+            // console.log("Status updated...");
             res.status(200).json({
               message: "Billing information saved, status updated to 'billingcompleted'",
               success: true
@@ -3181,13 +3198,13 @@ app.get('/api/doctor-suggestions', (req, res) => {
 });
 
 const insertData = async (tableName, columns, dataArray) => {
-  console.log(`Inserting into ${tableName}:`, { dataArray, isArray: Array.isArray(dataArray) });
+  // console.log(`Inserting into ${tableName}:`, { dataArray, isArray: Array.isArray(dataArray) });
   if (!dataArray || !Array.isArray(dataArray)) {
     console.warn(`Skipping insert into ${tableName}: dataArray is not iterable`, dataArray);
     return;
   }
   if (dataArray.length === 0) {
-    console.log(`No data to insert into ${tableName}`);
+    // console.log(`No data to insert into ${tableName}`);
     return;
   }
   const sql = `
@@ -3197,7 +3214,7 @@ const insertData = async (tableName, columns, dataArray) => {
   for (const item of dataArray) {
     try {
       const [result] = await db.query(sql, item);
-      console.log(`Inserted into ${tableName}:`, item);
+      // console.log(`Inserted into ${tableName}:`, item);
     } catch (error) {
       console.error(`Error inserting into ${tableName}:`, error, { item });
     }
@@ -3207,8 +3224,8 @@ const insertData = async (tableName, columns, dataArray) => {
 // Update the /save-data endpoint to ensure all data arrays are valid
 app.post('/save-data', uploadfiles.array('uploadfiles', 10), (req, res) => {
   const formData = req.body;
-  console.log('Received formData:', formData);
-  console.log("vitals: ", formData.vitals)
+  // console.log('Received formData:', formData);
+  // console.log("vitals: ", formData.vitals)
   // vitals 
   const { Name, Phone_number, Visit } = formData.vitals
   if (!Name) {
@@ -3231,17 +3248,17 @@ app.post('/save-data', uploadfiles.array('uploadfiles', 10), (req, res) => {
 
     const columns = Object.keys(formData.vitals);
     const values = Object.values(formData.vitals);
-    console.log("columsn->", columns)
-    console.log("values->", values)
+    // console.log("columsn->", columns)
+    // console.log("values->", values)
     if (results.length > 0) {
       // UPDATE 
       const setClause = columns.map(col => `\`${col}\` = ?`).join(", ");
-      console.log("setClause ", setClause)
+      // console.log("setClause ", setClause)
       const updateQuery = `UPDATE vitals SET ${setClause} WHERE Name = ? AND Phone_number = ? AND Visit = ?`;
       // , Name, Phone_number, Visit
       db.query(updateQuery, [...values, Name, Phone_number, Visit], (err) => {
         if (err) return res.status(400).json({ error: err });
-        console.log({ message: "Vital updated successfully" });
+        // console.log({ message: "Vital updated successfully" });
       });
 
     } else {
@@ -3254,7 +3271,7 @@ app.post('/save-data', uploadfiles.array('uploadfiles', 10), (req, res) => {
       const insertValues = [...values];
       db.query(insertQuery, insertValues, (err, result) => {
         if (err) return res.status(500).json({ error: err });
-        console.log({ message: "Vital inserted successfully" });
+        // console.log({ message: "Vital inserted successfully" });
       });
     }
   });
@@ -3309,7 +3326,7 @@ app.post('/save-data', uploadfiles.array('uploadfiles', 10), (req, res) => {
         console.error('Error updating patient status to doctorcompleted:', err);
         return res.status(500).json({ message: 'Database error updating status', error: err });
       }
-      console.log('Patient status updated to doctorcompleted:', result);
+      // console.log('Patient status updated to doctorcompleted:', result);
     });
 
     const insertData = (tableName, columns, dataArray) => {
@@ -3323,7 +3340,7 @@ app.post('/save-data', uploadfiles.array('uploadfiles', 10), (req, res) => {
             if (err) {
               console.error(`Error inserting into ${tableName}:`, err);
             } else {
-              console.log(`Inserted into ${tableName}:`, item);
+              // console.log(`Inserted into ${tableName}:`, item);
             }
           });
         });
@@ -3339,7 +3356,7 @@ app.post('/save-data', uploadfiles.array('uploadfiles', 10), (req, res) => {
         key,
       ]);
 
-    console.log('onExaminationData:', onExaminationData);
+    // console.log('onExaminationData:', onExaminationData);
 
     insertData('on_examination_form', ['Name', 'Phone_Number', 'Visited', 'onexam_form'], onExaminationData);
 
@@ -3433,43 +3450,43 @@ app.post('/save-data', uploadfiles.array('uploadfiles', 10), (req, res) => {
   });
 });
 
-app.post("/save-data-update",uploadfiles.array("uploadfiles", 10),async (req, res) => {
-    const formData = req.body;
-    console.log("Received formData:", formData);
-    // 1. Validate required fields
-    const requiredFields = ["name", "businessName", "visited"];
-    const missingFields = requiredFields.filter((field) => !formData[field]);
-    if (missingFields.length > 0) {
-      return res.status(400).json({
+app.post("/save-data-update", uploadfiles.array("uploadfiles", 10), async (req, res) => {
+  const formData = req.body;
+  // console.log("Received formData:", formData);
+  // 1. Validate required fields
+  const requiredFields = ["name", "businessName", "visited"];
+  const missingFields = requiredFields.filter((field) => !formData[field]);
+  if (missingFields.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: `Missing required fields: ${missingFields.join(", ")}`,
+    });
+  }
+  // Validate data types
+  if (isNaN(parseInt(formData.visited))) {
+    return res.status(400).json({
+      success: false,
+      message: "Visited must be a valid number",
+    });
+  }
+
+  // Get a database connection
+  db.getConnection(async (err, connection) => {
+    if (err) {
+      console.error("Error getting database connection:", err);
+      return res.status(500).json({
         success: false,
-        message: `Missing required fields: ${missingFields.join(", ")}`,
+        message: "Database connection error",
+        error: err.message,
       });
     }
-    // Validate data types
-    if (isNaN(parseInt(formData.visited))) {
-      return res.status(400).json({
-        success: false,
-        message: "Visited must be a valid number",
-      });
-    }
 
-    // Get a database connection
-    db.getConnection(async (err, connection) => {
-      if (err) {
-        console.error("Error getting database connection:", err);
-        return res.status(500).json({
-          success: false,
-          message: "Database connection error",
-          error: err.message,
-        });
-      }
+    try {
+      // Start transaction
+      await queryAsync("START TRANSACTION", [], connection);
 
-      try {
-        // Start transaction
-        await queryAsync("START TRANSACTION", [], connection);
-
-        // 2. Insert/Update general patient data
-        const patientSql = `
+      // 2. Insert/Update general patient data
+      const patientSql = `
           INSERT INTO general_patient (
             Name, Phone_Number, Visted, Major_Complaints, 
             FollowUpDate, Advice_Given, LocalExamination, 
@@ -3483,258 +3500,259 @@ app.post("/save-data-update",uploadfiles.array("uploadfiles", 10),async (req, re
             Dignosis = VALUES(Dignosis),
             doctor_name = VALUES(doctor_name);
         `;
-        const patientValues = [
-          formData.name,
-          formData.businessName,
-          formData.visited || 0,
-          formData.majorComplaints || null,
-          formData.followupdate || null,
-          formData.advicegiven || null,
-          formData.local || null,
-          formData.dignosis || null,
-          formData.doctorName || null,
-        ];
-        await queryAsync(patientSql, patientValues, connection);
+      const patientValues = [
+        formData.name,
+        formData.businessName,
+        formData.visited || 0,
+        formData.majorComplaints || null,
+        formData.followupdate || null,
+        formData.advicegiven || null,
+        formData.local || null,
+        formData.dignosis || null,
+        formData.doctorName || null,
+      ];
+      await queryAsync(patientSql, patientValues, connection);
 
-        // 3. Update patient status
-        const updateStatusSql = `
+      // 3. Update patient status
+      const updateStatusSql = `
           UPDATE patients
           SET status = ?, doctorname = ?
           WHERE full_name = ? AND phone_number = ? AND vKids = ?;
         `;
-        await queryAsync(
-          updateStatusSql,
-          [
-            "doctorcompleted",
-            formData.doctorName || null,
-            formData.name,
-            formData.businessName,
-            formData.visited || 0,
-          ],
-          connection
-        );
+      await queryAsync(
+        updateStatusSql,
+        [
+          "doctorcompleted",
+          formData.doctorName || null,
+          formData.name,
+          formData.businessName,
+          formData.visited || 0,
+        ],
+        connection
+      );
 
-        // 4. Helper function for batch inserts
-        const batchInsert = async (tableName, columns, dataArray) => {
-          if (!Array.isArray(dataArray) || dataArray.length === 0) {
-            console.log(`No data to insert into ${tableName}`);
-            return;
-          }
+      // 4. Helper function for batch inserts
+      const batchInsert = async (tableName, columns, dataArray) => {
+        if (!Array.isArray(dataArray) || dataArray.length === 0) {
+          // console.log(`No data to insert into ${tableName}`);
 
-          // Delete existing records
-          const deleteSql = `
+          return;
+        }
+
+        // Delete existing records
+        const deleteSql = `
             DELETE FROM ${connection.escapeId(tableName)} 
             WHERE Name = ? AND Phone_Number = ? AND Visited = ?;
           `;
-          await queryAsync(
-            deleteSql,
-            [formData.name, formData.businessName, formData.visited || 0],
-            connection
-          );
+        await queryAsync(
+          deleteSql,
+          [formData.name, formData.businessName, formData.visited || 0],
+          connection
+        );
 
-          // Insert new records
-          const insertSql = `
+        // Insert new records
+        const insertSql = `
             INSERT INTO ${connection.escapeId(tableName)} 
             (${columns.map((col) => connection.escapeId(col)).join(", ")})
             VALUES ?;
           `;
-          const values = dataArray.map((item) =>
-            columns.map((col) => item[columns.indexOf(col)] || null)
-          );
-          await queryAsync(insertSql, [values], connection);
-        };
+        const values = dataArray.map((item) =>
+          columns.map((col) => item[columns.indexOf(col)] || null)
+        );
+        await queryAsync(insertSql, [values], connection);
+      };
 
-        // 5. Process examination data
-        const onExaminationData = (formData.selectonexamination || []).map(
-          (key) => [
-            formData.name,
-            formData.businessName,
-            formData.visited || 0,
-            key,
-          ]
-        );
-        await batchInsert(
-          "on_examination_form",
-          ["Name", "Phone_Number", "Visited", "onexam_form"],
-          onExaminationData
-        );
-
-        // 6. Process systematic examination data
-        const systematicExamData = (formData.selectsystematic || []).map(
-          (key) => [
-            formData.name,
-            formData.businessName,
-            formData.visited || 0,
-            key,
-          ]
-        );
-        await batchInsert(
-          "systemic_examination_form",
-          ["Name", "Phone_Number", "Visited", "sysexam_form"],
-          systematicExamData
-        );
-
-        // 7. Process test data
-        const testData = (formData.selectavailableTests || []).map((key) => [
+      // 5. Process examination data
+      const onExaminationData = (formData.selectonexamination || []).map(
+        (key) => [
           formData.name,
           formData.businessName,
           formData.visited || 0,
           key,
-        ]);
-        await batchInsert(
-          "test_to_take",
-          ["Name", "Phone_Number", "Visited", "TestToTake"],
-          testData
-        );
+        ]
+      );
+      await batchInsert(
+        "on_examination_form",
+        ["Name", "Phone_Number", "Visited", "onexam_form"],
+        onExaminationData
+      );
 
-        // 8. Process treatment data
-        const treatmentData = (formData.treatment || []).map((treatment) => [
+      // 6. Process systematic examination data
+      const systematicExamData = (formData.selectsystematic || []).map(
+        (key) => [
           formData.name,
           formData.businessName,
           formData.visited || 0,
-          treatment.treatmentdosage || null,
-          treatment.treatmentrout || null,
-          treatment.treatmentgivenname || null,
+          key,
+        ]
+      );
+      await batchInsert(
+        "systemic_examination_form",
+        ["Name", "Phone_Number", "Visited", "sysexam_form"],
+        systematicExamData
+      );
+
+      // 7. Process test data
+      const testData = (formData.selectavailableTests || []).map((key) => [
+        formData.name,
+        formData.businessName,
+        formData.visited || 0,
+        key,
+      ]);
+      await batchInsert(
+        "test_to_take",
+        ["Name", "Phone_Number", "Visited", "TestToTake"],
+        testData
+      );
+
+      // 8. Process treatment data
+      const treatmentData = (formData.treatment || []).map((treatment) => [
+        formData.name,
+        formData.businessName,
+        formData.visited || 0,
+        treatment.treatmentdosage || null,
+        treatment.treatmentrout || null,
+        treatment.treatmentgivenname || null,
+      ]);
+      await batchInsert(
+        "treatment_given_form",
+        [
+          "Name",
+          "Phone_Number",
+          "Visited",
+          "Dosage",
+          "Route_Of_Administration",
+          "treatmentgivenname",
+        ],
+        treatmentData
+      );
+
+      // 9. Process prescription data
+      const prescriptionData = (formData.prescription || []).map(
+        (prescription) => [
+          formData.name,
+          formData.businessName,
+          formData.visited || 0,
+          prescription.medicine || null,
+          prescription.dosage || null,
+          prescription.timing || null,
+          prescription.duration || null,
+        ]
+      );
+      await batchInsert(
+        "prescription_form",
+        [
+          "Name",
+          "Phone_Number",
+          "Visited",
+          "Medicine",
+          "Dosage",
+          "Timing",
+          "Duration",
+        ],
+        prescriptionData
+      );
+
+      // 10. Process history data
+      const processHistoryData = async (tableName, columnName, items) => {
+        if (!Array.isArray(items) || items.length === 0) return;
+
+        const historyData = items.map((item) => [
+          formData.name,
+          formData.businessName,
+          formData.visited || 0,
+          item,
         ]);
-        await batchInsert(
-          "treatment_given_form",
-          [
-            "Name",
-            "Phone_Number",
-            "Visited",
-            "Dosage",
-            "Route_Of_Administration",
-            "treatmentgivenname",
-          ],
-          treatmentData
-        );
+        await batchInsert(tableName, [
+          "Name",
+          "Phone_Number",
+          "Visted",
+          columnName,
+        ], historyData);
+      };
 
-        // 9. Process prescription data
-        const prescriptionData = (formData.prescription || []).map(
-          (prescription) => [
-            formData.name,
-            formData.businessName,
-            formData.visited || 0,
-            prescription.medicine || null,
-            prescription.dosage || null,
-            prescription.timing || null,
-            prescription.duration || null,
-          ]
-        );
-        await batchInsert(
-          "prescription_form",
-          [
-            "Name",
-            "Phone_Number",
-            "Visited",
-            "Medicine",
-            "Dosage",
-            "Timing",
-            "Duration",
-          ],
-          prescriptionData
-        );
+      await processHistoryData(
+        "famil_history",
+        "Family_History",
+        formData.familyHistory || []
+      );
+      await processHistoryData(
+        "birth_history",
+        "Birth_History",
+        formData.birthHistory || []
+      );
+      await processHistoryData(
+        "surgical_history",
+        "Surgical_History",
+        formData.surgicalHistory | []
+      );
+      await processHistoryData(
+        "anyotherhistory",
+        "Other_History",
+        formData.otherHistory || []
+      );
 
-        // 10. Process history data
-        const processHistoryData = async (tableName, columnName, items) => {
-          if (!Array.isArray(items) || items.length === 0) return;
-
-          const historyData = items.map((item) => [
-            formData.name,
-            formData.businessName,
-            formData.visited || 0,
-            item,
-          ]);
-          await batchInsert(tableName, [
-            "Name",
-            "Phone_Number",
-            "Visted",
-            columnName,
-          ], historyData);
-        };
-
-        await processHistoryData(
-          "famil_history",
-          "Family_History",
-          formData.familyHistory || []
-        );
-        await processHistoryData(
-          "birth_history",
-          "Birth_History",
-          formData.birthHistory || []
-        );
-        await processHistoryData(
-          "surgical_history",
-          "Surgical_History",
-          formData.surgicalHistory | []
-        );
-        await processHistoryData(
-          "anyotherhistory",
-          "Other_History",
-          formData.otherHistory || []
-        );
-
-        // 11. Process uploaded files
-        if (req.files && req.files.length > 0) {
-          const fileInsertSql = `
+      // 11. Process uploaded files
+      if (req.files && req.files.length > 0) {
+        const fileInsertSql = `
             INSERT INTO uploaded_files (Phone_Number, Visted, FilePath, File_Name)
             VALUES ?;
           `;
-          const fileValues = req.files.map((file) => [
-            formData.businessName,
-            formData.visited || 0,
-            `/usersfiles/${file.filename}`,
-            file.originalname,
-          ]);
-          await queryAsync(fileInsertSql, [fileValues], connection);
-        }
-
-        // 12. Commit transaction
-        await queryAsync("COMMIT", [], connection);
-        connection.release();
-
-        res.status(200).json({
-          success: true,
-          message: "Data stored successfully",
-          affectedTables: [
-            "general_patient",
-            "patients",
-            "on_examination_form",
-            "systemic_examination_form",
-            "test_to_take",
-            "treatment_given_form",
-            "prescription_form",
-            "famil_history",
-            "birth_history",
-            "surgical_history",
-            "anyotherhistory",
-            ...(req.files?.length ? ["uploaded_files"] : []),
-          ],
-        });
-      } catch (error) {
-        // Rollback transaction on error
-        await queryAsync("ROLLBACK", [], connection);
-        connection.release();
-
-        console.error("Transaction error:", {
-          message: error.message,
-          stack: error.stack,
-          formData: {
-            name: formData.name,
-            businessName: formData.businessName,
-            visited: formData.visited,
-          },
-        });
-
-        res.status(500).json({
-          success: false,
-          message: "Database transaction failed",
-          error: error.message,
-          details: error.sqlMessage || "Unknown database error",
-        });
+        const fileValues = req.files.map((file) => [
+          formData.businessName,
+          formData.visited || 0,
+          `/usersfiles/${file.filename}`,
+          file.originalname,
+        ]);
+        await queryAsync(fileInsertSql, [fileValues], connection);
       }
-    });
-  }
+
+      // 12. Commit transaction
+      await queryAsync("COMMIT", [], connection);
+      connection.release();
+
+      res.status(200).json({
+        success: true,
+        message: "Data stored successfully",
+        affectedTables: [
+          "general_patient",
+          "patients",
+          "on_examination_form",
+          "systemic_examination_form",
+          "test_to_take",
+          "treatment_given_form",
+          "prescription_form",
+          "famil_history",
+          "birth_history",
+          "surgical_history",
+          "anyotherhistory",
+          ...(req.files?.length ? ["uploaded_files"] : []),
+        ],
+      });
+    } catch (error) {
+      // Rollback transaction on error
+      await queryAsync("ROLLBACK", [], connection);
+      connection.release();
+
+      console.error("Transaction error:", {
+        message: error.message,
+        stack: error.stack,
+        formData: {
+          name: formData.name,
+          businessName: formData.businessName,
+          visited: formData.visited,
+        },
+      });
+
+      res.status(500).json({
+        success: false,
+        message: "Database transaction failed",
+        error: error.message,
+        details: error.sqlMessage || "Unknown database error",
+      });
+    }
+  });
+}
 );
 
 
@@ -3803,8 +3821,8 @@ app.get('/api/fetch-patients-nurse', (req, res) => {
   query += ' GROUP BY phone_number ORDER BY id DESC';
 
   // Log the query and parameters for debugging
-  console.log('Executing Query:', query);
-  console.log('Parameters:', params);
+  // console.log('Executing Query:', query);
+  // console.log('Parameters:', params);
 
   // Execute the query with parameters
   db.query(query, params, (error, results) => {
@@ -3812,7 +3830,7 @@ app.get('/api/fetch-patients-nurse', (req, res) => {
       console.error('Error executing query:', error);
       return res.status(500).send({ message: 'Error fetching data', error: error.message });
     }
-    console.log('Query Results:', results);
+    // console.log('Query Results:', results);
     res.json(results);
   });
 });
@@ -3881,16 +3899,16 @@ app.post("/adddental/:Name/:Visit/:Phone_number", (req, res) => {
   const values = [Name, Phone_number, Visit, ...toothStatus];
 
   // Log for debugging
-  console.log('SQL Query:', sql);
-  console.log('Values:', values);
-  console.log('Dental Data:', dentalData);
+  // console.log('SQL Query:', sql);
+  // console.log('Values:', values);
+  // console.log('Dental Data:', dentalData);
 
   db.query(sql, values, (err, result) => {
     if (err) {
       console.error('Database error:', err);
       return res.status(400).json({ message: 'Failed to insert dental records', error: err.message });
     }
-    console.log('Insert Result:', result);
+    // console.log('Insert Result:', result);
     return res.json({ status: "success" });
   });
 });
@@ -3925,7 +3943,7 @@ app.put("/update-user/:phone_number", (req, res) => {
 
 app.post("/save-data-nurse", (req, res) => {
   const formData = req.body;
-  console.log("Received form data:", formData);
+  // console.log("Received form data:", formData);
 
   // Ensure we're using the correct field names
   const phoneNumber = formData.Phone_number || formData.Phone_Number;
@@ -3934,7 +3952,7 @@ app.post("/save-data-nurse", (req, res) => {
 
   // Validate required fields
   if (!phoneNumber || !formData.name || !visited) {
-    console.warn("Missing required fields:", { phoneNumber, name: formData.name, visited });
+    // console.warn("Missing required fields:", { phoneNumber, name: formData.name, visited });
     return res.status(400).json({
       message: "Missing required fields: Phone_number, name, or visited"
     });
@@ -3959,7 +3977,7 @@ app.post("/save-data-nurse", (req, res) => {
       });
     }
 
-    console.log("Inserted into general_patient:", result);
+    // console.log("Inserted into general_patient:", result);
 
     // Update the patients table with nurse name, status, and entrydate
     const updateSql = `UPDATE patients 
@@ -3987,7 +4005,7 @@ app.post("/save-data-nurse", (req, res) => {
         });
       }
 
-      console.log("Updated patients table:", updateResult);
+      // console.log("Updated patients table:", updateResult);
       res.status(200).json({
         message: "Data saved successfully, status and entrydate updated",
         general_patient_id: result.insertId,
@@ -4039,7 +4057,7 @@ app.post('/memberships', (req, res) => {
       console.error('Error adding membership entry:', err);
       return res.status(500).json({ message: 'Failed to add membership entry', error: err.message });
     }
-    console.log('Membership entry added:', { membership_type });
+    // console.log('Membership entry added:', { membership_type });
     res.status(201).json({ message: 'Membership entry added successfully', membership_type });
   });
 });
@@ -4069,7 +4087,7 @@ app.put('/memberships/:membership_type', (req, res) => {
       console.error('Membership entry not found:', oldMembershipType);
       return res.status(404).json({ message: 'Membership entry not found' });
     }
-    console.log('Membership entry updated:', { membership_type });
+    // console.log('Membership entry updated:', { membership_type });
     res.json({ message: 'Membership entry updated successfully' });
   });
 });
@@ -4093,7 +4111,7 @@ app.delete('/memberships/:membership_type', (req, res) => {
       console.error('Membership entry not found:', membership_type);
       return res.status(404).json({ message: 'Membership entry not found' });
     }
-    console.log('Membership entry deleted:', { membership_type });
+    // console.log('Membership entry deleted:', { membership_type });
     res.json({ message: 'Membership entry deleted successfully' });
   });
 });
@@ -4101,7 +4119,7 @@ app.delete('/memberships/:membership_type', (req, res) => {
 
 app.post("/addMemberships", (req, res) => {
   const { membership_type, price } = req.body;
-  console.log('Request body:', req.body); // Log the request body
+  // console.log('Request body:', req.body); // Log the request body
 
   // Validate inputs
   if (!membership_type || !price) {
@@ -4129,7 +4147,7 @@ app.post("/addMemberships", (req, res) => {
 
 app.post("/addservices", (req, res) => {
   const { service } = req.body
-  console.log('Request body:', req.body);  // Log the request bod
+  // console.log('Request body:', req.body);  // Log the request bod
 
   if (!service) {
     return res.status(400).json({ error: 'Complaint is required' });
@@ -4153,7 +4171,7 @@ function executeQuery(query, params) {
 }
 app.get('/get-data', async (req, res) => {
   const { name, visited, businessname } = req.query;
-  console.log('req->', req.query);
+  // console.log('req->', req.query);
 
   if (!name) return res.status(400).json({ error: "Missing name" });
   if (!visited) return res.status(400).json({ error: "Missing visited" });
@@ -4220,7 +4238,7 @@ app.get('/get-data', async (req, res) => {
       dental: dentalMapped, // Return only sequential dental data
     };
 
-    console.log('Response Data ->', responseData);
+    // console.log('Response Data ->', responseData);
     res.json(responseData);
   } catch (err) {
     console.error('Error ->', err);
@@ -4254,13 +4272,13 @@ app.delete('/delete-records', (req, res) => {
   ];
   let successCount = 0;
   queries.forEach((query, index) => {
-    console.log(query)
+    // console.log(query)
     db.query(query, [name, businessname, visited], (err, result) => {
       if (err) {
         console.error(`Error executing query ${index + 1}:`, err);
       } else {
         successCount++;
-        console.log(`Query ${index + 1} executed successfully`);
+        // console.log(`Query ${index + 1} executed successfully`);
       }
       if (index === queries.length - 1) {
         if (successCount === queries.length) {
@@ -4342,7 +4360,7 @@ app.get('/get-visited', (req, res) => {
   });
 })
 app.put("/update-vitals/:Name/:Visit/:Phone_number", (req, res) => {
-  console.log("Received data for update-vitals:", req.body);
+  // console.log("Received data for update-vitals:", req.body);
   db.query(`SHOW COLUMNS FROM vitals`, (err, results) => {
     if (err) {
       console.error('Error fetching vitals columns:', err);
@@ -4350,7 +4368,7 @@ app.put("/update-vitals/:Name/:Visit/:Phone_number", (req, res) => {
     }
 
     const fields = results.map((itm) => itm.Field);
-    console.log('Vitals table columns:', fields);
+    // console.log('Vitals table columns:', fields);
     const updates = fields
       .filter((field) => req.body[field] !== undefined)
       .map((field) => `\`${field}\` = ?`); // Use backticks for column names
@@ -4359,22 +4377,22 @@ app.put("/update-vitals/:Name/:Visit/:Phone_number", (req, res) => {
       .map((field) => req.body[field]);
 
     if (updates.length === 0) {
-      console.log('No matching fields to update');
+      // console.log('No matching fields to update');
       return res.status(400).json({ message: "Invalid request: No matching fields" });
     }
 
     const query = `UPDATE vitals SET ${updates.join(", ")} WHERE Name = ? AND Visit = ? AND Phone_number = ?`;
     values.push(req.params.Name, req.params.Visit, req.params.Phone_number);
 
-    console.log('Update Query:', query);
-    console.log('Update Values:', values);
+    // console.log('Update Query:', query);
+    // console.log('Update Values:', values);
 
     db.query(query, values, (updateErr, result) => {
       if (updateErr) {
         console.error('Update error:', updateErr);
         return res.status(500).json({ message: "Update failed", error: updateErr.message });
       }
-      console.log('Update Result:', result);
+      // console.log('Update Result:', result);
       res.json({ message: "Vitals updated successfully", affectedRows: result.affectedRows });
     });
   });
@@ -4389,7 +4407,7 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    console.log(file);
+    // console.log(file);
     const phoneNumber = req.params.Phone_Number;
     const visited = req.params.Visted;
     const fileExt = path.extname(file.originalname);
@@ -4508,8 +4526,8 @@ app.get('/download/:filename', (req, res) => {
 app.put("/update-datas", (req, res) => {
   // vitals
   const vitals = req.body.vitals;
-  console.log("vitals =>", vitals);
-  console.log("data", req.body)
+  // console.log("vitals =>", vitals);
+  // console.log("data", req.body)
 
   if (!vitals || !vitals.Name || !vitals.Phone_number || !vitals.Visit) {
     return res.status(400).json({
@@ -4616,7 +4634,7 @@ app.put("/update-datas", (req, res) => {
       updateValues.push(identifiers.Phone_number, identifiers.Visit);
 
       db.query(updateQuery, updateValues, (updateErr, updateResult) => {
-        console.log(updateQuery,updateValues)
+        // console.log(updateQuery, updateValues)
         if (updateErr) {
           console.error("Update error:", updateErr);
           return res.status(500).json({ message: "Failed to update", error: updateErr });
@@ -4736,25 +4754,26 @@ app.put("/update-datas", (req, res) => {
       const allKeys = [...keysArray.map(k => `\`${k}\``), "Name", "Phone_Number", "Visit"];
       // identifiers.Name, identifiers.Phone_number, identifiers.Visit,
       const allValues = [...valuesArray, identifiers.Name, identifiers.Phone_number, identifiers.Visit];
-      console.log(allKeys)
-      console.log(allValues)
+      // console.log(allKeys)
+      // console.log(allValues)
       const placeholders = allValues.map(() => "?").join(", ");
       const sql = `INSERT INTO dental_records (${allKeys.join(", ")}) VALUES (${placeholders})`;
-      console.log(req.body.formData.tooth)
+      // console.log(req.body.formData.tooth)
       db.query(sql, allValues, (err, result) => {
         if (err) {
           console.error("DB Insert Error:", err);
           return res.status(500).json({ error: "Database insert failed" });
         }
-        console.log({ message: "Dental record inserted successfully", id: result });
+        // console.log({ message: "Dental record inserted successfully", id: result });
       });
     })
   }
+  res.status(200).json({status:"alldata added"})
 })
 
 app.get("/get-adminfiles", (req, res) => {
   const { full_name, Phone_number, visted, from_date, to_date } = req.query;
-// AND p.Visted = bh.visit_number 
+  // AND p.Visted = bh.visit_number 
   let sql = `
     SELECT p.full_name, p.Phone_number, p.Visted, bh.total_price 
     FROM patients p 
@@ -4795,9 +4814,9 @@ app.get("/get-adminfiles", (req, res) => {
   });
 });
 
-app.get("/get-files",isauth, (req, res) => {
+app.get("/get-files", isauth, (req, res) => {
   const { full_name, Phone_number, visted, from_date, to_date } = req.query;
-  console.log("request---->",req)
+  // console.log("request---->", req)
   let sql = `
     SELECT p.full_name, p.Phone_number, p.Visted, bh.total_price 
     FROM patients p 
@@ -4831,7 +4850,7 @@ app.get("/get-files",isauth, (req, res) => {
     sql += " AND bh.billing_date <= ?";
     params.push(to_date);
   }
-  console.log("parameter------>",params)
+  // console.log("parameter------>", params)
   db.query(sql, params, (err, result) => {
     if (err) return res.status(500).json({ error: err });
     return res.json(result);
@@ -4889,7 +4908,7 @@ app.get('/downloadbill/:filename', (req, res) => {
 
 app.post("/add-dental", (req, res) => {
   const { dental, encodedName, encodedPhone, encodedVisit } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
 
   if (!dental || typeof dental !== 'object') {
     return res.status(400).json({ error: "Invalid dental data" });
@@ -4914,33 +4933,33 @@ app.post("/add-dental", (req, res) => {
   });
 })
 
-app.post("/addpaymentMethod",(req,res)=>{
-  const {method}=req.body
-  console.log(req.body)
-  sql=`INSERT INTO payment_methods (method) VALUES (?)`
-  db.query(sql,[method],(err,result)=>{
+app.post("/addpaymentMethod", (req, res) => {
+  const { method } = req.body
+  // console.log(req.body)
+  sql = `INSERT INTO payment_methods (method) VALUES (?)`
+  db.query(sql, [method], (err, result) => {
     if (err) {
       console.log(err)
-      return res.status(500).json({error:err})
+      return res.status(500).json({ error: err })
     }
-    return res.status(200).json({message:result})
+    return res.status(200).json({ message: result })
   })
 })
 
-app.get("/get-paymentMethod",(req,res)=>{
-  sql=`SELECT * FROM payment_methods`
-  db.query(sql,(err,result)=>{
-    if(err){
-      return res.status(500).json({error:err})
+app.get("/get-paymentMethod", (req, res) => {
+  sql = `SELECT * FROM payment_methods`
+  db.query(sql, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err })
     }
     // .map(row => row.method)
     return res.status(200).json(result)
   })
 })
-app.delete('/delete-paymentMethod/:id',(req,res)=>{
+app.delete('/delete-paymentMethod/:id', (req, res) => {
   const { id } = req.params;
   const sql = 'DELETE FROM payment_methods WHERE payment_id = ?';
-  console.log(req)
+  // console.log(req)
   db.query(sql, [id], (err, result) => {
     if (err) {
       console.error('Error deleting payment method:', err);
@@ -4955,7 +4974,7 @@ app.delete('/delete-paymentMethod/:id',(req,res)=>{
   });
 
 })
-app.put('/update-PaymentMethod/:id',(req,res) => {
+app.put('/update-PaymentMethod/:id', (req, res) => {
   const { id } = req.params;
   const { method } = req.body;
 
@@ -4974,10 +4993,11 @@ app.put('/update-PaymentMethod/:id',(req,res) => {
     }
 
     res.status(200).json({ message: 'Payment method updated successfully' });
-  });})
+  });
+})
 
-  // get billing
-  app.get('/get_billing/:phone_number/:visit_number/:user_name', (req, res) => {
+// get billing
+app.get('/get_billing/:phone_number/:visit_number/:user_name', (req, res) => {
   const { phone_number, visit_number, user_name } = req.params;
 
   const sql = 'SELECT * FROM billing_headers WHERE phone_number=? AND visit_number=? AND user_name=?';
@@ -4994,15 +5014,15 @@ app.put('/update-PaymentMethod/:id',(req,res) => {
 
     const out = result[result.length - 1]; // last record
     const billingId = out.id;
-    let location=''
-    const sql='SELECT belongedlocation FROM general_patient WHERE Name=? AND Phone_Number=? AND Visted=?'
-    db.query(sql,[user_name,phone_number,visit_number],(err,result)=>{
-      if(err) {
+    let location = ''
+    const sql = 'SELECT belongedlocation FROM general_patient WHERE Name=? AND Phone_Number=? AND Visted=?'
+    db.query(sql, [user_name, phone_number, visit_number], (err, result) => {
+      if (err) {
         console.log(err);
         return res.status(500).json(err)
       }
-      location=result[result.length-1].belongedlocation
-      console.log("resultsssssss=sssss",location)
+      location = result[result.length - 1].belongedlocation
+      // console.log("resultsssssss=sssss", location)
     })
     const servicesql = 'SELECT * FROM billing_details WHERE billing_id = ?';
     db.query(servicesql, [billingId], (err, result2) => {
@@ -5012,14 +5032,14 @@ app.put('/update-PaymentMethod/:id',(req,res) => {
       }
 
       out.service = result2; // attach service details
-      out.location=location
+      out.location = location
       return res.status(200).json(out); // respond AFTER both queries complete
     });
   });
 });
 app.put('/api/update_billing', (req, res) => {
-  console.log('Request body:', req.body);
-  
+  // console.log('Request body:', req.body);
+
   const {
     userId,
     userName,
@@ -5056,68 +5076,68 @@ app.put('/api/update_billing', (req, res) => {
     updateFields.push('user_id = ?');
     updateValues.push(userId);
   }
-  
+
   if (userName !== undefined) {
     updateFields.push('user_name = ?');
     updateValues.push(userName);
   }
-  
+
   if (phoneNumber !== undefined) {
     updateFields.push('phone_number = ?');
     updateValues.push(phoneNumber);
   }
-  
+
   if (visitNumber !== undefined) {
     updateFields.push('visit_number = ?');
     updateValues.push(visitNumber);
   }
-  
+
   if (nurseName !== undefined) {
     updateFields.push('nurse_name = ?');
     updateValues.push(nurseName);
   }
-  
+
   if (totalPrice !== undefined) {
     updateFields.push('total_price = ?');
     updateValues.push(parseFloat(totalPrice) || 0);
   }
-  
+
   if (date !== undefined) {
     updateFields.push('billing_date = ?');
     updateValues.push(date);
   }
-  
+
   if (paymentMode !== undefined) {
     updateFields.push('payment_method = ?');
     updateValues.push(paymentMode || null);
   }
-  
+
   if (membershipType !== undefined) {
     updateFields.push('membership_type = ?');
     updateValues.push(membershipType || null);
   }
-  
+
   if (reference !== undefined) {
     updateFields.push('reference = ?');
     updateValues.push(reference || null);
   }
-  
+
   if (overallDiscount !== undefined) {
     updateFields.push('discount = ?');
     updateValues.push(parseInt(overallDiscount) || null);
   }
-  
+
   if (membershipOffer !== undefined) {
     updateFields.push('membership_offer = ?');
     updateValues.push(membershipOffer || null);
   }
-  
+
   if (membershipPrice !== undefined) {
     updateFields.push('membership_price = ?');
     updateValues.push(membershipPrice || null);
   }
-  
-  if(reviewDate !== undefined) {
+
+  if (reviewDate !== undefined) {
     updateFields.push('review_date = ?');
     updateValues.push(reviewDate);
   }
@@ -5166,8 +5186,8 @@ app.put('/api/update_billing', (req, res) => {
         WHERE id = ?
       `;
 
-      console.log('Billing Update SQL:', billingUpdateSql);
-      console.log('Billing Values:', updateValues);
+      // console.log('Billing Update SQL:', billingUpdateSql);
+      // console.log('Billing Values:', updateValues);
 
       db.query(billingUpdateSql, updateValues, callback);
     };
@@ -5180,14 +5200,14 @@ app.put('/api/update_billing', (req, res) => {
 
       // First, delete existing services for this bill
       const deleteServicesSql = 'DELETE FROM billing_details WHERE billing_id = ?';
-      
+
       db.query(deleteServicesSql, [billId], (deleteErr, deleteResults) => {
         if (deleteErr) {
           return callback(deleteErr);
         }
 
-        console.log(`Deleted ${deleteResults.affectedRows} existing services`);
-
+        // console.log(`Deleted ${deleteResults.affectedRows} existing services`);
+// 
         // Method 1: Bulk insert with proper VALUES syntax
         if (services.length === 1) {
           // Single service insert
@@ -5206,8 +5226,8 @@ app.put('/api/update_billing', (req, res) => {
             parseFloat(service.discount) || 0
           ];
 
-          console.log('Single Service Insert SQL:', insertServiceSql);
-          console.log('Single Service Values:', serviceValues);
+          // console.log('Single Service Insert SQL:', insertServiceSql);
+          // console.log('Single Service Values:', serviceValues);
 
           db.query(insertServiceSql, serviceValues, callback);
         } else {
@@ -5231,8 +5251,8 @@ app.put('/api/update_billing', (req, res) => {
             );
           });
 
-          console.log('Multiple Services Insert SQL:', insertServicesSql);
-          console.log('Multiple Services Values:', serviceValues);
+          // console.log('Multiple Services Insert SQL:', insertServicesSql);
+          // console.log('Multiple Services Values:', serviceValues);
 
           db.query(insertServicesSql, serviceValues, callback);
         }
@@ -5247,13 +5267,13 @@ app.put('/api/update_billing', (req, res) => {
 
       // First, delete existing services for this bill
       const deleteServicesSql = 'DELETE FROM billing_details WHERE billing_id = ?';
-      
+
       db.query(deleteServicesSql, [billId], (deleteErr, deleteResults) => {
         if (deleteErr) {
           return callback(deleteErr);
         }
 
-        console.log(`Deleted ${deleteResults.affectedRows} existing services`);
+        // console.log(`Deleted ${deleteResults.affectedRows} existing services`);
 
         // Insert services one by one
         let insertedCount = 0;
@@ -5279,7 +5299,7 @@ app.put('/api/update_billing', (req, res) => {
             parseFloat(service.discount) || 0
           ];
 
-          console.log(`Inserting service ${index + 1}:`, serviceValues);
+          // console.log(`Inserting service ${index + 1}:`, serviceValues);
           db.query(insertServiceSql, serviceValues, (insertErr, insertResult) => {
             if (insertErr && !hasError) {
               hasError = true;
@@ -5287,7 +5307,7 @@ app.put('/api/update_billing', (req, res) => {
             }
 
             insertedCount++;
-            console.log(`Service ${index + 1} inserted successfully`);
+            // console.log(`Service ${index + 1} inserted successfully`);
 
             // Check if all services have been processed
             if (insertedCount === services.length && !hasError) {
@@ -5304,7 +5324,7 @@ app.put('/api/update_billing', (req, res) => {
         return handleError(billingErr, 'Error updating billing table');
       }
 
-      console.log('Billing table updated successfully');
+      // console.log('Billing table updated successfully');
 
       // Execute services table update (use the one-by-one method for reliability)
       updateServicesTableOneByOne((servicesErr, servicesResults) => {
@@ -5312,7 +5332,7 @@ app.put('/api/update_billing', (req, res) => {
           return handleError(servicesErr, 'Error updating services table');
         }
 
-        console.log('Services updated successfully');
+        // console.log('Services updated successfully');
 
         // Commit the transaction
         db.commit((commitErr) => {
@@ -5320,7 +5340,7 @@ app.put('/api/update_billing', (req, res) => {
             return handleError(commitErr, 'Error committing transaction');
           }
 
-          console.log('Update successful - transaction committed');
+          // console.log('Update successful - transaction committed');
           res.status(200).json({
             success: true,
             message: 'Billing record and services updated successfully',
@@ -5333,14 +5353,29 @@ app.put('/api/update_billing', (req, res) => {
   });
 });
 
-app.get("/billingdoc/:number/:name/:visited",(req,res)=>{
-  console.log(req.params)
-  const {number,name,visited}=req.params
-  const sql='select doctor_name FROM general_patient WHERE Phone_Number=? And Name=? AND Visted=?'
-  db.query(sql,[number,name,visited],(err,result)=>{
-    if(err) return res.status(400).json(err)
-    console.log(result[result.length-1].doctor_name)
-    return res.status(200).json(result[result.length-1].doctor_name)
+app.get("/billingdoc/:number/:name/:visited", (req, res) => {
+  // console.log(req.params)
+  const { number, name, visited } = req.params
+  const sql = 'select doctor_name FROM general_patient WHERE Phone_Number=? And Name=? AND Visted=?'
+  db.query(sql, [number, name, visited], (err, result) => {
+    if (err) return res.status(400).json(err)
+    // console.log(result[result.length - 1].doctor_name)
+    return res.status(200).json(result[result.length - 1].doctor_name)
+  })
+})
+
+app.get("/get-basic-detail/:id/:full_name/:phone_number/:visit",(req,res)=>{
+  const {id,phone_number,full_name,visit}=req.params
+  // console.log("basic",req.params)
+  const sql='select id,full_name,phone_number,visted,belongedlocation,nursename,doctorname,room_number,status from patients where phone_number=? and full_name=? and visted=?'
+  db.query(sql,[phone_number,full_name,visit],(err,result)=>{
+    // console.log("basic",sql)
+    if(err) {
+      console.log(err)
+      return res.status(501).json(err)
+    }
+    // console.log("basic detail",result)
+    res.status(200).json(result[result.length-1])
   })
 })
 
