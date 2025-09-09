@@ -489,6 +489,14 @@ const PatientForm = () => {
 
   const handleSubmit = async (e) => {
     // e.preventDefault();
+    if(isdisable){
+      Swal.fire({
+      icon: 'warning',
+      title: 'Submission Blocked',
+      text: 'Patient details cannot be edited or submitted because billing is already completed.'
+    });
+    return ;
+    }
     const finalFamilyHistory = familyHistoryInput.trim() !== ""
       ? [...familyHistory, familyHistoryInput.trim()]
       : [...familyHistory];
