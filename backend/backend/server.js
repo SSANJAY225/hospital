@@ -4663,7 +4663,6 @@ app.put("/update-datas", (req, res) => {
     if (deleteErr) return res.status(500).json({ error: deleteErr });
 
     const treatments = req.body.formData.treatment;
-
     if (!Array.isArray(treatments) || treatments.length === 0) {
       return res.status(200).json({ message: "No treatments to insert." });
     }

@@ -512,7 +512,7 @@ const PatientFormCompleted = () => {
   }, [stream]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     const finalFamilyHistory = familyHistoryInput.trim() !== ""
       ? [...familyHistory, familyHistoryInput.trim()]
       : [...familyHistory];
