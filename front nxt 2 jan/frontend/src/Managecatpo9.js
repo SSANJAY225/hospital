@@ -82,7 +82,7 @@ function ManageDurations() {
   useEffect(() => {
     const fetchDurations = async () => {
       try {
-        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/duration');
+        const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/duration');
         setDurations(response.data);
       } catch (error) {
         console.error('Error fetching durations:', error);
@@ -102,7 +102,7 @@ function ManageDurations() {
   // Handle update of duration
   const handleUpdateDuration = async () => {
     try {
-      await axios.put(`https://amrithaahospitals.visualplanetserver.in/duration/${selectedDuration.id}`, {
+      await axios.put(`http://amrithaahospitals.visualplanetserver.in/duration/${selectedDuration.id}`, {
         duration_text: newDurationText,
       });
       console.log('Duration updated successfully');
@@ -140,7 +140,7 @@ function ManageDurations() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/duration/${duration.id}`);
+          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/duration/${duration.id}`);
           console.log('Duration deleted successfully');
           refreshDurations();
           Swal.fire('Deleted!', 'Duration deleted successfully!', 'success');
@@ -157,7 +157,7 @@ function ManageDurations() {
   // Refresh durations after adding, editing, or deleting
   const refreshDurations = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/duration');
+      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/duration');
       setDurations(response.data);
     } catch (error) {
       console.error('Error fetching durations:', error);

@@ -89,7 +89,7 @@ function ManageLocation() {
 
   const fetchLocationEntries = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/locations');
+      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/locations');
       setLocations(response.data);
     } catch (error) {
       console.error('Error fetching location entries:', error.response?.data?.message || error.message);
@@ -118,7 +118,7 @@ function ManageLocation() {
       return;
     }
     try {
-      await axios.put(`https://amrithaahospitals.visualplanetserver.in/locations/${selectedLocation.id}`, {
+      await axios.put(`http://amrithaahospitals.visualplanetserver.in/locations/${selectedLocation.id}`, {
         location_name: newLocationName,
       });
       await fetchLocationEntries();
@@ -153,7 +153,7 @@ function ManageLocation() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/locations/${location.id}`);
+          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/locations/${location.id}`);
           await fetchLocationEntries();
           Swal.fire({
             icon: 'success',

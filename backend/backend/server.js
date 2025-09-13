@@ -4741,11 +4741,10 @@ app.put("/update-datas", (req, res) => {
     db.query(deleteSql_for_dental, [identifiers.Name, identifiers.Phone_number, identifiers.Visit], err => {
       if (err) return res.status(500).json({ err: err })
       const dental = req.body.formData.tooth;
-      // Ensure keys are 1 to 32
+      // Ensure keys are
       if (!dental || typeof dental !== 'object') {
         return res.status(400).json({ error: "Invalid dental data" });
       }
-
       const keysArray = Object.keys(dental).sort((a, b) => a - b);
       const valuesArray = keysArray.map((key) => dental[key]);
 
@@ -4767,7 +4766,7 @@ app.put("/update-datas", (req, res) => {
       });
     })
   }
-  res.status(200).json({status:"alldata added"})
+  res.status(200).json({status:"all data added"})
 })
 
 app.get("/get-adminfiles", (req, res) => {

@@ -37,7 +37,7 @@ const AddPatient = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await axios.get('https://amrithaahospitals.visualplanetserver.in/getservices');
+      const res = await axios.get('http://amrithaahospitals.visualplanetserver.in/getservices');
       setServices(res.data);
     } catch (error) {
       console.error('Error fetching services:', error);
@@ -46,7 +46,7 @@ const AddPatient = () => {
 
   const fetchVisitCount = async (phoneNumber) => {
     try {
-      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/checkpatient/${phoneNumber}`);
+      const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/checkpatient/${phoneNumber}`);
       const visitCount = response.data.exists ? response.data.visitCount + 1 : 1;
       return visitCount;
     } catch (error) {
@@ -57,7 +57,7 @@ const AddPatient = () => {
 
   const fetchPatientDetails = async (phoneNumber) => {
     try {
-      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/patient-details/${phoneNumber}`);
+      const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/patient-details/${phoneNumber}`);
       const data = response.data;
       setIsNewPatient(false);
       setPatient((prev) => ({
@@ -71,23 +71,31 @@ const AddPatient = () => {
         services: data.services || [],
         roomNumber: data.roomNumber || '', // Include roomNumber
       }));
+      // const visitCount = await fetchVisitCount(phoneNumber);
+      // const newId = generatePatientId(data.fullName, data.age, data.gender, visitCount);
+      // setPatient((prev) => ({ ...prev, id: newId }));
     } catch (error) {
       if (error.response && error.response.status === 404) {
         setIsNewPatient(true);
         setPatient((prev) => ({
           ...prev,
-          fullName: '',
-          fathersName: '',
-          age: '',
-          gender: '',
-          city: '',
-          patientType: '',
-          services: [],
-          id: '',
-          roomNumber: '', // Reset roomNumber
+          fullName: prev.fullName || '',
+          fathersName: prev.fathersName || '',
+          age: prev.age || '',
+          gender: prev.gender || '',
+          city: prev.city || '',
+          patientType: prev.patientType || '',
+          services: prev.services || [],
+          id: '',        // allow ID to be regenerated
+          roomNumber: prev.roomNumber||'', // Reset roomNumber
         }));
         setPhoto(null);
         setCameraPhoto(null);
+
+        fetchVisitCount(phoneNumber).then((visitCount) => {
+          const newId = generatePatientId('A', '00', 'U', visitCount);
+          setPatient((prev) => ({ ...prev, id: newId }));
+        })
       } else {
         console.error('Error fetching patient details:', error);
         Swal.fire({
@@ -128,21 +136,20 @@ const AddPatient = () => {
   }, [auth, navigate, stream]);
 
   useEffect(() => {
-    let timeoutId;
     if (patient.phoneNumber.length === 10) {
-      timeoutId = setTimeout(() => {
-        fetchPatientDetails(patient.phoneNumber);
-        fetchVisitCount(patient.phoneNumber).then((visitCount) => {
-          const newId = generatePatientId(patient.fullName, patient.age, patient.gender, visitCount);
-          setPatient((prev) => ({ ...prev, id: newId }));
-        });
-      }, 500);
-    } else {
-      setIsNewPatient(false);
+      fetchPatientDetails(patient.phoneNumber);
+      fetchVisitCount(patient.phoneNumber).then((visitCount) => {
+        const newId = generatePatientId(
+          patient.fullName || 'A',
+          patient.age || '00',
+          patient.gender || 'U',
+          visitCount
+        );
+        setPatient((prev) => ({ ...prev, id: newId }));
+      });
     }
-
-    return () => clearTimeout(timeoutId);
   }, [patient.phoneNumber]);
+
 
   const startCamera = async () => {
     try {
@@ -274,7 +281,7 @@ const AddPatient = () => {
     }
 
     try {
-      const checkResponse = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/checkpatient/${patient.phoneNumber}`);
+      const checkResponse = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/checkpatient/${patient.phoneNumber}`);
       const isExistingPatient = checkResponse.data.exists;
 
       const selectedPhoto = cameraPhoto || photo;
@@ -312,7 +319,7 @@ const AddPatient = () => {
         formData.append('photo', selectedPhoto, `photo.${cameraPhoto ? 'jpg' : selectedPhoto.name.split('.').pop()}`);
       }
 
-      const response = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/patients', formData, {
+      const response = await axios.post('http://amrithaahospitals.visualplanetserver.in/api/patients', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

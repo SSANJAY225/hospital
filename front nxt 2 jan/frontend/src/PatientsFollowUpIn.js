@@ -211,7 +211,7 @@ function PatientsFollowUpIn() {
 
       const queryString = new URLSearchParams(queryParams).toString();
 
-      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-in?${queryString}`);
+      const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/fetch-patients-in?${queryString}`);
       console.log('API Response:', response.data);
 
       setBusinesses(response.data);

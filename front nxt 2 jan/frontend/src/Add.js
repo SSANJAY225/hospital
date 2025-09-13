@@ -87,7 +87,7 @@ function Add() {
         location: 'location', // Add location mapping
         method: 'method'
       };
-      const apiEndpoint = `https://amrithaahospitals.visualplanetserver.in/add${endpoint}`;
+      const apiEndpoint = `http://amrithaahospitals.visualplanetserver.in/add${endpoint}`;
       console.log('API Endpoint:', apiEndpoint);
       
 

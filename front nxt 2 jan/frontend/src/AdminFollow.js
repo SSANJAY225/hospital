@@ -57,7 +57,7 @@ function BusinessList({ onBusinessClick, businesses, onDownloadBill }) {
 
 const handleDownloadBill = async (business) => {
   try {
-    const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/get-billing-details', {
+    const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/api/get-billing-details', {
       params: {
         phone_number: business.phone_number,
         visted: business.visted,
@@ -207,7 +207,7 @@ function AdminFollow() {
     const doctorname = encodeURIComponent(business.doctorname);
 
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-data', {
+      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/get-data', {
         params: {
           businessname,
           name,
@@ -237,10 +237,10 @@ function AdminFollow() {
     const fetchNursesAndDoctors = async () => {
       try {
         const [nurseResponse, doctorResponse] = await Promise.all([
-          axios.get('https://amrithaahospitals.visualplanetserver.in/api/nurse-suggestions', {
+          axios.get('http://amrithaahospitals.visualplanetserver.in/api/nurse-suggestions', {
             params: { franchiselocation }
           }),
-          axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
+          axios.get('http://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
             params: { franchiselocation }
           })
         ]);
@@ -270,7 +270,7 @@ function AdminFollow() {
     setSelectedLocation(value); // Store the raw input (case preserved for display)
     if (value && value.trim().length > 0) {
       try {
-        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/adminlocations', {
+        const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/api/adminlocations', {
           params: { search: value }
         });
         setLocationSuggestions(response.data);
@@ -288,7 +288,7 @@ function AdminFollow() {
     setSelectedServices(value);
     if (value && value.trim().length > 0) {
       try {
-        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/adminservices', {
+        const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/adminservices', {
           params: { search: value }
         });
         setServicesSuggestions(response.data);
@@ -406,7 +406,7 @@ function AdminFollow() {
       }
       const queryString = new URLSearchParams(queryParams).toString();
       console.log("params=>", queryParams)
-      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/getpatients?${queryString}`);
+      const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/getpatients?${queryString}`);
       const sortedPatients = response.data.sort((a, b) => b.id - a.id);
       setBusinesses(response.data);
     } catch (error) {
@@ -418,7 +418,7 @@ function AdminFollow() {
   useEffect(() => {
     const fetchLoginLocations = async () => {
       try {
-        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/adminlocations');
+        const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/adminlocations');
         setLocationOptions(response.data);
       } catch (error) {
         console.error('Error fetching login locations:', error);
@@ -438,10 +438,10 @@ function AdminFollow() {
     const fetchNursesAndDoctors = async () => {
       try {
         const [nurseResponse, doctorResponse] = await Promise.all([
-          axios.get('https://amrithaahospitals.visualplanetserver.in/api/nurse-suggestions', {
+          axios.get('http://amrithaahospitals.visualplanetserver.in/api/nurse-suggestions', {
             params: { franchiselocation }
           }),
-          axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
+          axios.get('http://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
             params: { franchiselocation }
           })
         ]);
@@ -509,7 +509,7 @@ function AdminFollow() {
   useEffect(() => {
     const fetchLoginLocations = async () => {
       try {
-        const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/adminlocations');
+        const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/adminlocations');
         setLocationOptions(response.data);
       } catch (error) {
         console.error('Error fetching login locations:', error);

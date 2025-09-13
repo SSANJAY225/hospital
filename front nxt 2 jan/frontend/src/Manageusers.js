@@ -95,7 +95,7 @@ function ManageUsers() {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          `https://amrithaahospitals.visualplanetserver.in/users?loginlocation=${username}`
+          `http://amrithaahospitals.visualplanetserver.in/users?loginlocation=${username}`
         );
         console.log("RAW res =>",response.data)
         const filteredUsers = response.data.filter((user) => user.UserName !== "admin");
@@ -136,7 +136,7 @@ function ManageUsers() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`https://amrithaahospitals.visualplanetserver.in/delete-user/${user.Phone_Number}`);
+          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/delete-user/${user.Phone_Number}`);
           Swal.fire("Deleted!", "User has been deleted.", "success");
           setUsers(users.filter((u) => u.Phone_Number !== user.Phone_Number));
         } catch (error) {
@@ -170,7 +170,7 @@ function ManageUsers() {
       delete updatedData.Password;
     }
     try {
-      await axios.put(`https://amrithaahospitals.visualplanetserver.in/update-user/${formData.Phone_Number}`, updatedData);
+      await axios.put(`http://amrithaahospitals.visualplanetserver.in/update-user/${formData.Phone_Number}`, updatedData);
       Swal.fire("Success", "User details updated successfully!", "success");
       setModalIsOpen(false);
       setUsers(users.map((user) => (user.Phone_Number === formData.Phone_Number ? { ...user, ...updatedData } : user)));
