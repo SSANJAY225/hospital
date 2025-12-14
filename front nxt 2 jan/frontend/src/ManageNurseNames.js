@@ -89,7 +89,7 @@ function ManageNurseNames() {
 
   const fetchNurseEntries = async () => {
     try {
-      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/nurses_name');
+      const response = await axios.get('http://localhost:5000/nurses_name');
       setNurses(response.data);
     } catch (error) {
       console.error('Error fetching nurse entries:', error.response?.data?.message || error.message);
@@ -118,7 +118,7 @@ function ManageNurseNames() {
       return;
     }
     try {
-      await axios.post('http://amrithaahospitals.visualplanetserver.in/nurses_name', {
+      await axios.post('http://localhost:5000/nurses_name', {
         name: newNurseName,
       });
       await fetchNurseEntries();
@@ -149,7 +149,7 @@ function ManageNurseNames() {
       return;
     }
     try {
-      await axios.put(`http://amrithaahospitals.visualplanetserver.in/nurses_name/${selectedNurse.id}`, {
+      await axios.put(`http://localhost:5000/nurses_name/${selectedNurse.id}`, {
         name: newNurseName,
       });
       await fetchNurseEntries();
@@ -184,7 +184,7 @@ function ManageNurseNames() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/nurses_name/${nurse.id}`);
+          await axios.delete(`http://localhost:5000/nurses_name/${nurse.id}`);
           await fetchNurseEntries();
           Swal.fire({
             icon: 'success',

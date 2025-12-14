@@ -82,7 +82,7 @@ function ManageTreatments() {
   useEffect(() => {
     const fetchTreatments = async () => {
       try {
-        const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/treatmentgiven');
+        const response = await axios.get('http://localhost:5000/treatmentgiven');
         setTreatments(response.data);
       } catch (error) {
         console.error('Error fetching treatments:', error);
@@ -100,7 +100,7 @@ function ManageTreatments() {
 
   const handleUpdateTreatment = async () => {
     try {
-      await axios.put(`http://amrithaahospitals.visualplanetserver.in/treatmentgiven/${selectedTreatment.id}`, {
+      await axios.put(`http://localhost:5000/treatmentgiven/${selectedTreatment.id}`, {
         treatmentgiven_text: newTreatmentText,
       });
       console.log('Treatment updated successfully');
@@ -137,7 +137,7 @@ function ManageTreatments() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/treatmentgiven/${treatment.id}`);
+          await axios.delete(`http://localhost:5000/treatmentgiven/${treatment.id}`);
           console.log('Treatment deleted successfully');
           refreshTreatments();
           Swal.fire('Deleted!', 'Treatment deleted successfully!', 'success');
@@ -153,7 +153,7 @@ function ManageTreatments() {
 
   const refreshTreatments = async () => {
     try {
-      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/treatmentgiven');
+      const response = await axios.get('http://localhost:5000/treatmentgiven');
       setTreatments(response.data);
     } catch (error) {
       console.error('Error fetching treatments:', error);

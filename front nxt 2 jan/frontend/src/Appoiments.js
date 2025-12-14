@@ -36,7 +36,7 @@ const Appoiments = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await axios.get('http://amrithaahospitals.visualplanetserver.in/getservices');
+      const res = await axios.get('http://localhost:5000/getservices');
       setServices(res.data);
     } catch (error) {
       console.error('Error fetching services:', error);
@@ -45,7 +45,7 @@ const Appoiments = () => {
 
   const fetchVisitCount = async (phoneNumber) => {
     try {
-      const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/checkpatient/${phoneNumber}`);
+      const response = await axios.get(`http://localhost:5000/api/checkpatient/${phoneNumber}`);
       const visitCount = response.data.exists ? response.data.visitCount + 1 : 1;
       return visitCount;
     } catch (error) {
@@ -56,7 +56,7 @@ const Appoiments = () => {
 
   const fetchPatientDetails = async (phoneNumber) => {
     try {
-      const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/patient-details/${phoneNumber}`);
+      const response = await axios.get(`http://localhost:5000/api/patient-details/${phoneNumber}`);
       const data = response.data;
       setIsNewPatient(false);
       setPatient((prev) => ({
@@ -252,7 +252,7 @@ const Appoiments = () => {
     }
 
     try {
-      const checkResponse = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/checkpatient/${patient.phoneNumber}`);
+      const checkResponse = await axios.get(`http://localhost:5000/api/checkpatient/${patient.phoneNumber}`);
       const isExistingPatient = checkResponse.data.exists;
 
       const selectedPhoto = cameraPhoto || photo;
@@ -290,7 +290,7 @@ const Appoiments = () => {
         formData.append('photo', selectedPhoto, `photo.${cameraPhoto ? 'jpg' : selectedPhoto.name.split('.').pop()}`);
       }
 
-      const response = await axios.post('http://amrithaahospitals.visualplanetserver.in/api/patients', formData, {
+      const response = await axios.post('http://localhost:5000/api/patients', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

@@ -88,7 +88,7 @@ const NurseForm = () => {
 
   const fetchvitalsinput = async () => {
     try {
-      const response = await fetch('http://amrithaahospitals.visualplanetserver.in/column-vitals', {
+      const response = await fetch('http://localhost:5000/column-vitals', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -112,7 +112,7 @@ const NurseForm = () => {
     if (!franchiselocation) return;
     setIsLoadingNurses(true);
     try {
-      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/api/nurse-suggestions', {
+      const response = await axios.get('http://localhost:5000/api/nurse-suggestions', {
         params: { franchiselocation }
       });
       setNurseSuggestions(response.data);
@@ -154,7 +154,7 @@ const NurseForm = () => {
       return;
     }
     try {
-      await axios.post('http://amrithaahospitals.visualplanetserver.in/addNurseName', {
+      await axios.post('http://localhost:5000/addNurseName', {
         nurseName: name,
         location: urlParams.franchiselocation
       });
@@ -173,7 +173,7 @@ const NurseForm = () => {
 
   const fetchImage = async (phoneNumber, visited) => {
     try {
-      const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/user-photo`, {
+      const response = await axios.get(`http://localhost:5000/api/user-photo`, {
         params: { phoneNumber, visited },
       });
       setImageUrl(response.data.imageUrl);
@@ -243,7 +243,7 @@ const NurseForm = () => {
       console.log("Vitals Data to Send:", vitalsData);
   
       const vitalsResponse = await axios.post(
-        `http://amrithaahospitals.visualplanetserver.in/adddata-vitals/`,
+        `http://localhost:5000/adddata-vitals/`,
         vitalsData
       );
   
@@ -256,7 +256,7 @@ const NurseForm = () => {
       formData.location=urlParams.franchiselocation;
       console.log("Nurse Form Data to Send:", formData);
       const response = await axios.post(
-        'http://amrithaahospitals.visualplanetserver.in/save-data-nurse',
+        'http://localhost:5000/save-data-nurse',
         formData,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -340,31 +340,31 @@ const NurseForm = () => {
   const handleDosageChange = (e) => {
     const value = e.target.value;
     settreatmentdosage(value);
-    fetchSuggestions(value, 'http://amrithaahospitals.visualplanetserver.in/api/dosage-suggestions', setDosageSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/dosage-suggestions', setDosageSuggestions);
   };
 
   const handlePriscriptionDosageChange = (e) => {
     const value = e.target.value;
     setDosage(value);
-    fetchSuggestions(value, 'http://amrithaahospitals.visualplanetserver.in/api/dosage-suggestions', setPrescriptiondosagesuggestion);
+    fetchSuggestions(value, 'http://localhost:5000/api/dosage-suggestions', setPrescriptiondosagesuggestion);
   };
 
   const handleTiming = (e) => {
     const value = e.target.value;
     setTiming(value);
-    fetchSuggestions(value, 'http://amrithaahospitals.visualplanetserver.in/api/timing-suggestions', settimingSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/timing-suggestions', settimingSuggestions);
   };
 
   const handleDuration = (e) => {
     const value = e.target.value;
     setDuration(value);
-    fetchSuggestions(value, 'http://amrithaahospitals.visualplanetserver.in/api/duration-suggestions', setdurationsuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/duration-suggestions', setdurationsuggestions);
   };
 
   const handleAdvicegiven = (e) => {
     const value = e.target.value;
     setadvicegiven(value);
-    fetchSuggestions(value, 'http://amrithaahospitals.visualplanetserver.in/api/advicegiven-suggestions', setadvicegivenSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/advicegiven-suggestions', setadvicegivenSuggestions);
   };
 
   const handleEditPrescription = (index) => {
@@ -388,9 +388,9 @@ const NurseForm = () => {
   };
 
   useEffect(() => {
-    fetchData('http://amrithaahospitals.visualplanetserver.in/api/onexamination', setOnExamination);
-    fetchData('http://amrithaahospitals.visualplanetserver.in/api/onsystem', setOnSystem);
-    fetchData('http://amrithaahospitals.visualplanetserver.in/api/tests', setavalableTests);
+    fetchData('http://localhost:5000/api/onexamination', setOnExamination);
+    fetchData('http://localhost:5000/api/onsystem', setOnSystem);
+    fetchData('http://localhost:5000/api/tests', setavalableTests);
   }, []);
 
   const handleExaminationChange = (e) => {

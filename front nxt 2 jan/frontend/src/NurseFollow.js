@@ -260,7 +260,7 @@ function NurseFollow() {
       const queryString = new URLSearchParams(queryParams).toString();
 
       const response = await axios.get(
-        `http://amrithaahospitals.visualplanetserver.in/api/fetch-patients-nurse?${queryString}`
+        `http://localhost:5000/api/fetch-patients-nurse?${queryString}`
       );
       console.log('Fetched Data:', response.data);
       setBusinesses(response.data);

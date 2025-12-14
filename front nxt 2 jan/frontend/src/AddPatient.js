@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import './AddPatient.css';
+import { jwtDecode } from "jwt-decode";
+
 
 const AddPatient = () => {
   const [patient, setPatient] = useState({
@@ -19,7 +21,10 @@ const AddPatient = () => {
     id: '',
     roomNumber: '', // Add roomNumber to state
   });
-
+  const [newNurseName, setNewNurseName] = useState('');
+  const [nurseSuggestions, setNurseSuggestions] = useState([]);
+  const [doctorName,setDoctorName]=useState("")
+  const [isNurseModalOpen,setIsNurseModalOpen]=useState(false)
   const [photo, setPhoto] = useState(null);
   const [cameraPhoto, setCameraPhoto] = useState(null);
   const [useCamera, setUseCamera] = useState(false);
@@ -31,14 +36,19 @@ const AddPatient = () => {
   const auth = localStorage.getItem('authToken');
   const [searchParams] = useSearchParams();
   const franchiseLocation = searchParams.get('franchiselocation');
-
+  const nurse_name = useState("")
   const today = new Date();
   const minDate = today.toISOString().split('T')[0];
 
+
   const fetchServices = async () => {
     try {
-      const res = await axios.get('http://amrithaahospitals.visualplanetserver.in/getservices');
+      const res = await axios.get('http://localhost:5000/getservices');
       setServices(res.data);
+      const decode=jwtDecode(auth)
+      console.log(decode.frachiselocation)
+      const nurse = await axios.get(`http://localhost:5000/getnurse/${decode.frachiselocation}`);
+      console.log(nurse.data)
     } catch (error) {
       console.error('Error fetching services:', error);
     }
@@ -46,7 +56,7 @@ const AddPatient = () => {
 
   const fetchVisitCount = async (phoneNumber) => {
     try {
-      const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/checkpatient/${phoneNumber}`);
+      const response = await axios.get(`http://localhost:5000/api/checkpatient/${phoneNumber}`);
       const visitCount = response.data.exists ? response.data.visitCount + 1 : 1;
       return visitCount;
     } catch (error) {
@@ -57,7 +67,7 @@ const AddPatient = () => {
 
   const fetchPatientDetails = async (phoneNumber) => {
     try {
-      const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/patient-details/${phoneNumber}`);
+      const response = await axios.get(`http://localhost:5000/api/patient-details/${phoneNumber}`);
       const data = response.data;
       setIsNewPatient(false);
       setPatient((prev) => ({
@@ -87,7 +97,7 @@ const AddPatient = () => {
           patientType: prev.patientType || '',
           services: prev.services || [],
           id: '',        // allow ID to be regenerated
-          roomNumber: prev.roomNumber||'', // Reset roomNumber
+          roomNumber: prev.roomNumber || '', // Reset roomNumber
         }));
         setPhoto(null);
         setCameraPhoto(null);
@@ -281,7 +291,7 @@ const AddPatient = () => {
     }
 
     try {
-      const checkResponse = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/checkpatient/${patient.phoneNumber}`);
+      const checkResponse = await axios.get(`http://localhost:5000/api/checkpatient/${patient.phoneNumber}`);
       const isExistingPatient = checkResponse.data.exists;
 
       const selectedPhoto = cameraPhoto || photo;
@@ -319,7 +329,7 @@ const AddPatient = () => {
         formData.append('photo', selectedPhoto, `photo.${cameraPhoto ? 'jpg' : selectedPhoto.name.split('.').pop()}`);
       }
 
-      const response = await axios.post('http://amrithaahospitals.visualplanetserver.in/api/patients', formData, {
+      const response = await axios.post('http://localhost:5000/api/patients', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -344,6 +354,38 @@ const AddPatient = () => {
       });
     }
   };
+  const fetchNurseSuggestions=async()=>{
+    const req=await axios.get(`http://localhost:5000/getnurse/${franchiseLocation}`)
+    setNurseSuggestions(req.data)
+  }
+
+  const handleAddNurseName = async (name) => {
+    if (name.trim() === '') return;
+    if (!franchiseLocation) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Franchise location is missing. Please ensure it is provided in the URL.',
+      });
+      return;
+    }
+    try {
+      await axios.post('http://localhost:5000/addNurseName', {
+        doctorName: name,
+        location: franchiseLocation // Include location from urlParams
+      });
+      setDoctorName(name);
+      setIsNurseModalOpen(false);
+      fetchNurseSuggestions(); // This should be fetchDoctorSuggestions
+    } catch (error) {
+      console.error('Error adding doctor name:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to add doctor name.',
+      });
+    }
+  };
 
   return (
     <div className="patient-registration-page">
@@ -351,6 +393,71 @@ const AddPatient = () => {
         <header className="registration-form-header">
           <h2>Add New Patient</h2>
           {franchiseLocation && <p>Franchise Location: {franchiseLocation}</p>}
+          <div  onClick={() => {
+              setIsNurseModalOpen(true);
+              fetchNurseSuggestions();
+            }}>
+              <span className="section-toggle"></span> {doctorName ? `Nurse - ${doctorName}` : 'Choose Nurtse Name'}
+          </div>
+          {isNurseModalOpen && (
+            <div className="nurse-input-overlay">
+                <label>Select Doctor Name</label>
+                <div className="nurse-listbox">
+                  {nurseSuggestions === null ? (
+                    <div className="nurse-listbox-item">Loading doctors...</div>
+                  ) : nurseSuggestions.length > 0 ? (
+                    nurseSuggestions.map((doctor, index) => (
+                      <div
+                        key={index}
+                        className={`nurse-listbox-item ${doctorName === doctor ? 'selected' : ''}`}
+                        onClick={() => {
+                          setDoctorName(doctor);
+                          setIsNurseModalOpen(false);
+                        }}
+                      >
+                        {doctor}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="nurse-listbox-item disabled">
+                      {franchiseLocation
+                        ? `No doctors available for ${franchiseLocation}`
+                        : 'No location specified'}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label>Add New Nurse</label>
+                  <input
+                    type="text"
+                    value={newNurseName}
+                    onChange={(e) => setNewNurseName(e.target.value)}
+                    placeholder="Enter doctor name"
+                    className="responsive-input"
+                  />
+                </div>
+                <div className="modal-buttons">
+                  <button
+                    className="buttonred responsive-button"
+                    onClick={() => {
+                      if (newNurseName) handleAddNurseName(newNurseName);
+                      setNewNurseName('');
+                    }}
+                  >
+                    Add New Doctor
+                  </button>
+                  <button
+                    className="buttonblack responsive-button"
+                    onClick={() => {
+                      setIsNurseModalOpen(false);
+                      setNewNurseName('');
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+          )}
         </header>
         <form onSubmit={handleSubmit} className="patient-registration-form">
           <div className="registration-form-grid">

@@ -266,7 +266,7 @@ app.post('/login', (req, res) => {
       res.status(401).json({ error: 'INVALID_PASSWORD' });
       return;
     }
-
+    console.log(results)
     // Assuming these are the column names in your users table
     const { Country, State, District, Area, Location, roll } = results[0];
     const token = jwt.sign(
@@ -5376,7 +5376,17 @@ app.get("/get-basic-detail/:id/:full_name/:phone_number/:visit",(req,res)=>{
     res.status(200).json(result[result.length-1])
   })
 })
-
+app.get("/getnurse/:location",(req,res)=>{
+  const{location}=req.params
+  const sql='select * from nurses_name where location=?'
+  db.query(sql,[location],(err,result)=>{
+    if(err){
+      console.log(err)
+      return res.status(501).json(err)
+    }
+    res.status(200).json(result.map(res=>res.name))
+  })
+})
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

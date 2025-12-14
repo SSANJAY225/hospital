@@ -23,7 +23,7 @@ const Createusers = () => {
     const [optlocation, setoptlocation] = useState([])
     const fetchLoginLocations = async () => {
         try {
-            const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/adminlocations');
+            const response = await axios.get('http://localhost:5000/adminlocations');
             setoptlocation(response.data);
         } catch (error) {
             console.error('Error fetching login locations:', error);
@@ -42,7 +42,7 @@ const Createusers = () => {
                 return;
             }
             try {
-                const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/locationsuggestion?search=${query}`);
+                const response = await axios.get(`http://localhost:5000/locationsuggestion?search=${query}`);
                 setSuggestions(response.data);
                 setShowSuggestions(true);
             } catch (error) {
@@ -124,7 +124,7 @@ const Createusers = () => {
         };
 
         try {
-            const response = await axios.post("http://amrithaahospitals.visualplanetserver.in/Createuser", dataToSend);
+            const response = await axios.post("http://localhost:5000/Createuser", dataToSend);
             console.log(response)
             if (response.status === 201) {
                 Swal.fire({

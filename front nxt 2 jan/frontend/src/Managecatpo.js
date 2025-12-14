@@ -76,7 +76,7 @@ function ManageComplaints() {
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
-        const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/complaints');
+        const response = await axios.get('http://localhost:5000/complaints');
         setComplaints(response.data);
       } catch (error) {
         console.error('Error fetching complaints:', error);
@@ -94,7 +94,7 @@ function ManageComplaints() {
 
   const handleUpdateComplaint = async () => {
     try {
-      await axios.put(`http://amrithaahospitals.visualplanetserver.in/complaints/${selectedComplaint.id}`, {
+      await axios.put(`http://localhost:5000/complaints/${selectedComplaint.id}`, {
         complaint_text: newComplaintText,
       });
       console.log('Complaint updated successfully');
@@ -131,7 +131,7 @@ function ManageComplaints() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/complaints/${complaint.id}`);
+          await axios.delete(`http://localhost:5000/complaints/${complaint.id}`);
           console.log('Complaint deleted successfully');
           refreshComplaints();
           Swal.fire('Deleted!', 'Complaint deleted successfully!', 'success');
@@ -147,7 +147,7 @@ function ManageComplaints() {
 
   const refreshComplaints = async () => {
     try {
-      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/complaints');
+      const response = await axios.get('http://localhost:5000/complaints');
       setComplaints(response.data);
     } catch (error) {
       console.error('Error fetching complaints:', error);
@@ -169,7 +169,7 @@ function ManageComplaints() {
       return;
     }
     try {
-      await axios.post('http://amrithaahospitals.visualplanetserver.in/addComplaints', {
+      await axios.post('http://localhost:5000/addComplaints', {
         complaint: newComplaintText,
       });
       await refreshComplaints();

@@ -42,10 +42,10 @@ function Admin() {
   useEffect(() => {
     const fetchPatientCounts = async () => {
       try {
-        const inpatientResponse = await fetch(`http://amrithaahospitals.visualplanetserver.in/api/fetch-patients-in?franchiselocation=${franchiselocation}`);
+        const inpatientResponse = await fetch(`http://localhost:5000/api/fetch-patients-in?franchiselocation=${franchiselocation}`);
         const inpatientData = await inpatientResponse.json();
         
-        const outpatientResponse = await fetch(`http://amrithaahospitals.visualplanetserver.in/api/fetch-patients-out?franchiselocation=${franchiselocation}`);
+        const outpatientResponse = await fetch(`http://localhost:5000/api/fetch-patients-out?franchiselocation=${franchiselocation}`);
         const outpatientData = await outpatientResponse.json();
 
         setPatientCounts({
@@ -70,7 +70,7 @@ function Admin() {
 
   const handleBackup = async () => {
     try {
-      const response = await fetch('http://amrithaahospitals.visualplanetserver.in/api/backup', {
+      const response = await fetch('http://localhost:5000/api/backup', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

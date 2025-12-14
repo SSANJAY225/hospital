@@ -85,7 +85,7 @@ function ManageSysExaminations() {
   useEffect(() => {
     const fetchSysExaminations = async () => {
       try {
-        const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/sysexaminations');
+        const response = await axios.get('http://localhost:5000/sysexaminations');
         setSysExaminations(response.data);
       } catch (error) {
         console.error('Error fetching systematic examinations:', error);
@@ -103,7 +103,7 @@ function ManageSysExaminations() {
 
   const handleUpdateSysExamination = async () => {
     try {
-      await axios.put(`http://amrithaahospitals.visualplanetserver.in/sysexaminations/${selectedSysExamination.id}`, {
+      await axios.put(`http://localhost:5000/sysexaminations/${selectedSysExamination.id}`, {
         sysexam_text: newSysExaminationText,
       });
       console.log('Systematic examination updated successfully');
@@ -140,7 +140,7 @@ function ManageSysExaminations() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/sysexaminations/${sysExamination.id}`);
+          await axios.delete(`http://localhost:5000/sysexaminations/${sysExamination.id}`);
           console.log('Systematic examination deleted successfully');
           refreshSysExaminations();
           Swal.fire('Deleted!', 'Systematic examination deleted successfully!', 'success');
@@ -156,7 +156,7 @@ function ManageSysExaminations() {
 
   const refreshSysExaminations = async () => {
     try {
-      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/sysexaminations');
+      const response = await axios.get('http://localhost:5000/sysexaminations');
       setSysExaminations(response.data);
     } catch (error) {
       console.error('Error fetching systematic examinations:', error);

@@ -82,7 +82,7 @@ function ManageAdviceGiven() {
   useEffect(() => {
     const fetchAdvice = async () => {
       try {
-        const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/advicegiven');
+        const response = await axios.get('http://localhost:5000/advicegiven');
         setAdvice(response.data);
       } catch (error) {
         console.error('Error fetching advice:', error);
@@ -102,7 +102,7 @@ function ManageAdviceGiven() {
   // Handle update of advice
   const handleUpdateAdvice = async () => {
     try {
-      await axios.put(`http://amrithaahospitals.visualplanetserver.in/advicegiven/${selectedAdvice.id}`, {
+      await axios.put(`http://localhost:5000/advicegiven/${selectedAdvice.id}`, {
         advicegiven_text: newAdviceText,
       });
       console.log('Advice updated successfully');
@@ -140,7 +140,7 @@ function ManageAdviceGiven() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/advicegiven/${adviceEntry.id}`);
+          await axios.delete(`http://localhost:5000/advicegiven/${adviceEntry.id}`);
           console.log('Advice deleted successfully');
           refreshAdvice();
           Swal.fire('Deleted!', 'Advice deleted successfully!', 'success');
@@ -157,7 +157,7 @@ function ManageAdviceGiven() {
   // Refresh advice after adding, editing, or deleting
   const refreshAdvice = async () => {
     try {
-      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/advicegiven');
+      const response = await axios.get('http://localhost:5000/advicegiven');
       setAdvice(response.data);
     } catch (error) {
       console.error('Error fetching advice:', error);

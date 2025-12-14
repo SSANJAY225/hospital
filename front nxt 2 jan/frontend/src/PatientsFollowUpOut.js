@@ -210,7 +210,7 @@ function PatientsFollowUpOut() {
 
       const queryString = new URLSearchParams(queryParams).toString();
 
-      const response = await axios.get(`http://amrithaahospitals.visualplanetserver.in/api/fetch-patients-out?${queryString}`);
+      const response = await axios.get(`http://localhost:5000/api/fetch-patients-out?${queryString}`);
       console.log('API Response:', response.data);
 
       setBusinesses(response.data);

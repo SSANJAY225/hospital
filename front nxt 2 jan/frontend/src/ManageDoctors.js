@@ -90,7 +90,7 @@ function ManageDoctors() {
 
   const fetchDoctorEntries = async () => {
     try {
-      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/doctors_names');
+      const response = await axios.get('http://localhost:5000/doctors_names');
       setDoctors(response.data);
     } catch (error) {
       console.error('Error fetching doctor entries:', error.response?.data?.message || error.message);
@@ -119,7 +119,7 @@ function ManageDoctors() {
       return;
     }
     try {
-      await axios.post('http://amrithaahospitals.visualplanetserver.in/doctors_names', {
+      await axios.post('http://localhost:5000/doctors_names', {
         name: newDoctorName,
       });
       await fetchDoctorEntries();
@@ -150,7 +150,7 @@ function ManageDoctors() {
       return;
     }
     try {
-      await axios.put(`http://amrithaahospitals.visualplanetserver.in/doctors_names/${selectedDoctor.id}`, {
+      await axios.put(`http://localhost:5000/doctors_names/${selectedDoctor.id}`, {
         name: newDoctorName,
       });
       await fetchDoctorEntries();
@@ -185,7 +185,7 @@ function ManageDoctors() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/doctors_names/${doctor.id}`);
+          await axios.delete(`http://localhost:5000/doctors_names/${doctor.id}`);
           await fetchDoctorEntries();
           Swal.fire({
             icon: 'success',

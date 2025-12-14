@@ -82,7 +82,7 @@ function ManageTests() {
   useEffect(() => {
     const fetchTests = async () => {
       try {
-        const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/tests');
+        const response = await axios.get('http://localhost:5000/tests');
         setTests(response.data);
       } catch (error) {
         console.error('Error fetching tests:', error);
@@ -100,7 +100,7 @@ function ManageTests() {
 
   const handleUpdateTest = async () => {
     try {
-      await axios.put(`http://amrithaahospitals.visualplanetserver.in/tests/${selectedTest.id}`, {
+      await axios.put(`http://localhost:5000/tests/${selectedTest.id}`, {
         tests_text: newTestText,
       });
       console.log('Test updated successfully');
@@ -137,7 +137,7 @@ function ManageTests() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/tests/${test.id}`);
+          await axios.delete(`http://localhost:5000/tests/${test.id}`);
           console.log('Test deleted successfully');
           refreshTests();
           Swal.fire('Deleted!', 'Test deleted successfully!', 'success');
@@ -153,7 +153,7 @@ function ManageTests() {
 
   const refreshTests = async () => {
     try {
-      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/tests');
+      const response = await axios.get('http://localhost:5000/tests');
       setTests(response.data);
     } catch (error) {
       console.error('Error fetching tests:', error);

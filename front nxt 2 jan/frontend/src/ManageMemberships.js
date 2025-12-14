@@ -93,7 +93,7 @@ function ManageMemberships() {
 
   const fetchMembershipEntries = async () => {
     try {
-      const response = await axios.get('http://amrithaahospitals.visualplanetserver.in/memberships');
+      const response = await axios.get('http://localhost:5000/memberships');
       setMemberships(response.data);
     } catch (error) {
       console.error('Error fetching membership entries:', error.response?.data?.message || error.message);
@@ -132,7 +132,7 @@ function ManageMemberships() {
       return;
     }
     try {
-      await axios.post('http://amrithaahospitals.visualplanetserver.in/memberships', {
+      await axios.post('http://localhost:5000/memberships', {
         membership_type: newMembershipType,
         price: newPrice ? priceValue : null,
       });
@@ -174,7 +174,7 @@ function ManageMemberships() {
       return;
     }
     try {
-      await axios.put(`http://amrithaahospitals.visualplanetserver.in/memberships/${selectedMembership.membership_type}`, {
+      await axios.put(`http://localhost:5000/memberships/${selectedMembership.membership_type}`, {
         membership_type: newMembershipType,
         price: newPrice ? priceValue : null,
       });
@@ -211,7 +211,7 @@ function ManageMemberships() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://amrithaahospitals.visualplanetserver.in/memberships/${membership.membership_type}`);
+          await axios.delete(`http://localhost:5000/memberships/${membership.membership_type}`);
           await fetchMembershipEntries();
           Swal.fire({
             icon: 'success',
