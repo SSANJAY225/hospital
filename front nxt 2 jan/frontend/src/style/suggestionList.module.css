@@ -1,0 +1,68 @@
+.suggestions_dropdown {
+  /* position: absolute; */
+  top: 100%; /* Position below the input */
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000; /* Ensure it appears above other elements */
+  width: 100%; /* Match the width of the input */
+  margin-top: 2px; /* Small gap between input and suggestions */
+}
+.suggestions_dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestions_dropdown:empty {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .suggestions_dropdown {
+    max-height: 150px; /* Slightly smaller on medium screens */
+    font-size: 13px;
+  }
+
+  .suggestion_item {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .suggestions_dropdown {
+    max-height: 120px; /* Smaller on small screens */
+    font-size: 12px;
+  }
+
+  .suggestion_item {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+}
+
+.suggestion_item {
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.suggestion_item:hover {
+  background-color: #bc171b;
+}
+
+.input_with_suggestions {
+  position: relative;
+  width: 100%;
+  display: inline-block;
+}
+.input_with_suggestions {
+  position: relative;
+  display: inline-block;
+}

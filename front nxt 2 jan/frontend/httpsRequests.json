@@ -1,0 +1,32 @@
+[
+  {
+    "method": "GET",
+    "url": "https://...",
+    "source": "..\\src\\link.js"
+  },
+  {
+    "method": "POST",
+    "url": "https://...",
+    "source": "..\\src\\link.js"
+  },
+  {
+    "method": "PUT",
+    "url": "https://...",
+    "source": "..\\src\\link.js"
+  },
+  {
+    "method": "DELETE",
+    "url": "https://...",
+    "source": "..\\src\\link.js"
+  },
+  {
+    "method": "POST",
+    "url": "https://...",
+    "source": "..\\src\\link.js"
+  },
+  {
+    "method": "GET",
+    "url": "https://...",
+    "source": "..\\src\\link.js"
+  }
+]

@@ -1,0 +1,197 @@
+.admin_header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.admin_panel_image {
+    max-width: 150px;
+    height: auto;
+}
+
+.centered {
+    text-align: center;
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+.vp {
+    margin: 20px 0;
+}
+
+.inbody {
+    margin: 20px 0;
+}
+
+.inbtn {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter_item {
+    flex: 1 1 200px; /* Allow items to grow and shrink, with a minimum width of 200px */
+    max-width: 250px; /* Set a maximum width to prevent stretching too much */
+    position: relative; /* Ensure the date picker pop-up positions relative to this */
+}
+
+.input_AdminFollow {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.button_row {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.inlabel.Afollowbuttonsearchblack {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.inlabel.Afollowbuttonsearchblack:hover {
+    background-color: #555;
+}
+
+.container_fluid {
+    padding: 0 15px;
+}
+
+.table_responsive {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.table th,
+.table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+.table td a button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.table td a button:hover {
+    background-color: #c82333;
+}
+
+.pagination_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    gap: 4px; /* Reduced gap between buttons */
+    width: fit-content; /* Makes the container only as wide as its content */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pagination_button {
+    padding: 6px 10px; /* Reduced padding for smaller buttons */
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px; /* Reduced font size */
+    transition: all 0.2s ease;
+}
+
+.pagination_button:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination_button.active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+    font-weight: bold;
+}
+
+.pagination_arrow {
+    padding: 6px 10px; /* Reduced padding for smaller arrows */
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px; /* Reduced font size */
+    transition: all 0.2s ease;
+}
+
+.pagination_arrow:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination_arrow:disabled {
+    background-color: #f5f5f5;
+    color: #aaa;
+    cursor: not-allowed;
+    border-color: #ddd;
+}
+
+/* DatePicker specific styles */
+.datePickerWrapper {
+    width: 100%;
+    position: relative;
+}
+
+.datePickerPopper {
+    z-index: 10000 !important; /* Very high z-index to ensure it appears above everything */
+    position: absolute !important;
+}
+
+.react_datepicker {
+    font-size: 14px;
+    z-index: 10000 !important; /* Ensure the date picker pop-up is above other elements */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.react_datepicker-popper {
+    z-index: 10000 !important; /* Ensure the pop-up is not cropped */
+    transform: none !important; /* Prevent any unwanted transformations */
+}
+
+.react_datepicker__input_container {
+    width: 100%;
+}
+
+.react_datepicker__input_container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Ensure no parent container clips the date picker */
+.centered, .inbody, .inbtn {
+    overflow: visible !important;
+}

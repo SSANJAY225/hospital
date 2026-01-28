@@ -1,0 +1,1454 @@
+/* PatientsFollowUp.css */
+
+.a4_sheet {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.admin_header{
+  display: flex;
+  margin-top: 35px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.admin_panel_image{
+  max-width: 150px;
+  height: auto;
+  width: 100%;
+}
+
+.white_color_button{
+  color: white;
+  text-decoration: none;
+}
+
+.contact_form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.contact_form input {
+  flex: 1;
+  min-width: 150px;
+}
+
+.photo_center {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.photo {
+  border: 1px solid #ccc;
+  padding: 20px;
+  display: inline-block;
+}
+.vitals {
+  margin-bottom: 20px;
+}
+
+.vitals_header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.vitals_row {
+  display: flex;
+  gap: 10px; /* Adjust the gap as needed for spacing */
+  flex-wrap: wrap; /* Allows items to wrap to the next line if necessary */
+}
+
+.vitals_row input {
+  flex: 1;
+  min-width: 120px; /* Adjust min-width for better fit */
+  box-sizing: border-box; /* Ensures padding and border are included in width */
+}
+
+.major_complaints {
+  display: flex;
+  flex-direction: column;
+}
+
+.red, .green {
+  font-weight: bold;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
+}
+
+.tests button, .actions button {
+  margin-right: 10px;
+}
+
+.button {
+  margin-right: 10px;
+}
+
+.actions button {
+  margin-right: 10px;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: auto;
+}
+
+.complaints, .local_examination, .diagnosis {
+  margin-bottom: 20px;
+}
+
+.horizontal_container {
+  display: flex;
+  gap: 20px; /* Adjust the gap as needed for spacing between sections */
+  flex-wrap: wrap; /* Allows items to wrap if the screen is too narrow */
+}
+
+.major_complaints, .local_examination, .diagnosis {
+  flex: 1;
+  min-width: 200px; /* Adjust as needed for better fit */
+  box-sizing: border-box; /* Ensures padding and border are included in width */
+}
+
+.major_complaints textarea,
+.local_examination textarea,
+.diagnosis textarea {
+  width: 100%; /* Make textareas take full width of their container */
+  box-sizing: border-box; /* Ensure padding and border are included in width */
+}
+
+.major_complaints span,
+.local_examination span,
+.diagnosis span {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.history_container {
+  display: flex;
+  gap: 20px; /* Adjust the gap as needed for spacing between sections */
+  flex-wrap: wrap; /* Allows items to wrap if the screen is too narrow */
+  margin-bottom: 20px;
+}
+
+.history_box {
+  flex: 1;
+  min-width: 150px; /* Decreased width for each box */
+  max-width: 200px; /* Limit width to prevent too wide boxes */
+  height: 100px; /* Increased height for each box */
+  box-sizing: border-box; /* Ensures padding and border are included in width and height */
+}
+
+.history_box textarea {
+  width: 100%; /* Make textareas take full width of their container */
+  height: 100%; /* Make textareas take full height of their container */
+  box-sizing: border-box; /* Ensure padding and border are included in width and height */
+  resize: none; /* Prevent resizing of the textarea */
+}
+
+.history_box span {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+
+.a4_sheet {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.contact_form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.contact_form input {
+  flex: 1;
+  min-width: 150px;
+}
+
+.photo_center {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.photo {
+  border: 1px solid #ccc;
+  padding: 20px;
+  display: inline-block;
+}
+
+.vitals {
+  margin-bottom: 20px;
+}
+
+.vitals_header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.vitals_row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.vitals_row input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.horizontal_container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.horizontal_container > div {
+  flex: 1;
+  min-width: 200px;
+}
+
+.history_container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.history_box {
+  flex: 1;
+  min-width: 150px;
+  max-width: 200px;
+  height: 150px;
+}
+
+.history_box textarea {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  resize: none;
+}
+
+.examination {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.examination > div {
+  flex: 1;
+}
+
+.examination span {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.examination .on_examination label,
+.examination .systematic_examination label {
+  display: block;
+}
+
+.tests {
+  display: flex;
+  gap: 10px;
+}
+
+.tests button {
+  margin-right: 10px;
+}
+
+.treatment, .prescription, .follow_up, .advice {
+  margin-bottom: 20px;
+}
+
+.local_examination, .diagnosis {
+  margin-bottom: 20px;
+}
+
+.a4_sheet {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.contact_form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.contact_form input {
+  flex: 1;
+  min-width: 150px;
+}
+
+.photo_center {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.photo {
+  border: 1px solid #ccc;
+  padding: 20px;
+  display: inline-block;
+}
+
+.vitals {
+  margin-bottom: 20px;
+}
+
+.vitals_header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.vitals_row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.vitals_row input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.horizontal_container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.horizontal_container > div {
+  flex: 1;
+  min-width: 200px;
+}
+
+.history_container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.history_box {
+  flex: 1;
+  min-width: 150px;
+  max-width: 200px;
+  height: 150px;
+}
+
+.history_box textarea {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  resize: none;
+}
+
+.examination {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.examination > div {
+  flex: 1;
+}
+
+.examination span {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.examination .on_examination label,
+.examination .systematic_examination label {
+  display: block;
+}
+
+.tests {
+  display: flex;
+  gap: 10px;
+}
+
+.tests button {
+  margin-right: 10px;
+}
+
+.treatment,
+.prescription,
+.follow_up,
+.advice {
+  margin-bottom: 20px;
+}
+
+.treatment table,
+.prescription table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.treatment th,
+.prescription th,
+.treatment td,
+.prescription td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.treatment th,
+.prescription th {
+  background-color: #f4f4f4;
+}
+
+.treatment button,
+.prescription button {
+  margin-top: 10px;
+}
+
+.a4_sheet {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.contact_form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.contact_form input {
+  flex: 1;
+  min-width: 150px;
+}
+
+.photo_center {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.photo {
+  border: 1px solid #ccc;
+  padding: 20px;
+  display: inline-block;
+}
+
+.vitals {
+  margin-bottom: 20px;
+}
+
+.vitals_header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.vitals_row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.vitals_row input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.horizontal_container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.horizontal_container > div {
+  flex: 1;
+  min-width: 200px;
+}
+
+.history_container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.history_box {
+  flex: 1;
+  min-width: 150px;
+  max-width: 200px;
+}
+
+.history_box textarea {
+  width: 100%;
+  height: 150px;
+  box-sizing: border-box;
+  resize: none;
+}
+
+.examination {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.examination > div {
+  flex: 1;
+}
+
+.examination span {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.examination .on_examination label,
+.examination .systematic_examination label,
+.examination .tests label {
+  display: block;
+}
+
+.tests {
+  display: flex;
+  gap: 10px;
+}
+
+.tests label {
+  display: flex;
+  align-items: center;
+}
+
+.treatment,
+.prescription,
+.follow_up,
+.advice {
+  margin-bottom: 20px;
+}
+
+.treatment table,
+.prescription table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.treatment th,
+.prescription th,
+.treatment td,
+.prescription td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.treatment th,
+.prescription th {
+  background-color: #f4f4f4;
+}
+
+.treatment button,
+.prescription button {
+  margin-top: 10px;
+}
+
+.treatment table input,
+.prescription table input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.contact_form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.contact_form input {
+  flex: 1;
+  min-width: 120px; /* Reduced width for compact display */
+}
+
+.vitals_row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap; /* Ensure that all items stay on one line */
+}
+
+.vitals_row input {
+  flex: 1;
+  min-width: 80px; /* Adjusted to make sure inputs fit on one line */
+}
+.contact_form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contact_form input {
+  width: 100%;
+}
+
+.contact_form button {
+  margin-top: 10px;
+}
+
+.a4_sheet {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+
+.contact_form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contact_entry {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.contact_entry input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.contact_form button {
+  margin-top: 10px;
+}
+
+.a4_sheet {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+
+.vitals, .horizontal_container, .history_container, .examination, .treatment, .prescription, .follow_up, .advice, .actions {
+  margin-top: 20px;
+}
+
+.visit_buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.visit_buttons button {
+  margin: 0;
+  padding: 5px 10px;
+}
+
+.add_visit_button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  cursor: pointer;
+}
+/* Filter Section Styles */
+.filter_section {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+  width:95%
+}
+
+.filter_container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filter_inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1;
+  min-width: 300px;
+}
+
+.filter_input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.filter_input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.filter_dates {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-direction: row;
+  /* justify-content: center; */
+  min-width: 10px;
+  /* max-width: 500px; */
+}
+
+.custom_input {
+  padding: 10px 15px;
+  border: 1px solid #bc171b;
+  border-radius: 5px;
+  background-color: #bc171b;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: border-color 0.3s ease;
+}
+
+.custom_input.grey {
+  background-color: #bc171b;
+}
+
+.custom_input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.filter_actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 200px;
+  justify-content: flex-end;
+}
+
+/* Professional Button Styles */
+.professional_btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn_primary {
+  background-color: #343a40;
+  color: white;
+}
+
+.btn_primary:hover {
+  background-color: #23272b;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn_secondary {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn_secondary:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filter_container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter_inputs {
+    flex-direction: column;
+    min-width: 100%;
+  }
+
+  .filter_input {
+    min-width: 100%;
+  }
+
+  .filter_dates {
+    /* min-width: 100%; */
+    /* justify-content: space-between; */
+    flex-direction: row;
+  }
+
+  .filter_actions {
+    min-width: 100%;
+    justify-content: center;
+  }
+
+  .professional_btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter_dates {
+    flex-direction: column;
+  }
+
+  .custom_input {
+    width: 100%;
+  }
+}
+
+/* Existing CSS remains unchanged, adding new styles for status filter */
+.filter_status {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.status_label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.status_label input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* admin */
+
+/* Modal styles */
+.Modal_AdminFollow {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  max-width: 90%;
+  max-height: 90%;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .Modal_AdminFollow {
+    width: 80%;
+    height: 80%;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .Modal_AdminFollow {
+    width: 95%;
+    height: 85%;
+    padding: 10px;
+  }
+}
+
+/* Content inside modal */
+.Modal_AdminFollow .label-input-container {
+  max-width: 100%;
+}
+
+/* Container styles */
+.container-fluid {
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.close-btn_AdminFollow {
+  background-color: #ff6347;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.close-btn_AdminFollow:hover {
+  background-color: #ff4832;
+}
+
+/* Label-input container */
+.label-input-container-wrapper {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.label-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .label-input-container {
+    flex-direction: column;
+  }
+}
+
+/* Inbody layout */
+.inbody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 10px; /* Reduced gap to fit layout */
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: auto;
+}
+
+.inbtn {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.inbtn > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px; /* Adjusted for label-input pairs */
+  position: relative; /* Required for suggestions positioning */
+}
+
+.intext {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+}
+
+.input_AdminFollow {
+  width: 100%;
+  padding: 6px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.input_AdminFollow:focus {
+  border-color: #007bff;
+}
+
+.date-picker-container {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+  flex: 0 0 auto; /* Keeps datepickers compact */
+}
+
+.CustomInputF,
+.CustomInputT {
+  width: 100%;
+  max-width: 120px;
+  padding: 4px;
+  font-size: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+/* Button row */
+.inbody .button-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+
+.inlabel.Afollowbuttonsearchblack {
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #fff;
+  background-color: #000;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.inlabel.Afollowbuttonsearchblack:hover {
+  background-color: #333;
+}
+
+@media (max-width: 768px) {
+  .inbody {
+    padding: 10px;
+  }
+
+  .inbtn {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .inbtn > div {
+    min-width: 100%;
+  }
+
+  .intext {
+    font-size: 12px;
+  }
+
+  .input_AdminFollow {
+    font-size: 10px;
+    padding: 5px;
+  }
+
+  .date-picker-container {
+    flex-direction: row;
+    gap: 4px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .CustomInputF,
+  .CustomInputT {
+    max-width: 100px;
+    padding: 3px;
+    font-size: 9px;
+  }
+
+  .inbody .button-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .inlabel.Afollowbuttonsearchblack {
+    padding: 5px 10px;
+    font-size: 10px;
+    width: 100%; /* Full width on smaller screens */
+    text-align: center;
+  }
+}
+
+/* Centered container */
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Button container */
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.next-meeting-button {
+  flex: 0 0 auto;
+  margin-left: 10px;
+}
+
+/* Product buttons */
+.product-buttons {
+  margin-bottom: 20px;
+}
+
+.AfollowbuttonP {
+  background-color: #6f0798;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  margin: 10px 10px 0 0;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+.AfollowbuttonP:hover {
+  background-color: #43045d;
+}
+
+.Afollowbuttonsearch {
+  background-color: #bc171b;
+  margin: 10px;
+}
+
+.Afollowbuttonsearch:hover {
+  background-color: #146c43;
+}
+
+.Afollowbuttonshow {
+  background-color: #43045d;
+  margin: 10px;
+}
+
+.Afollowbuttonshow:hover {
+  background-color: #2e033f;
+}
+
+.Afollowbuttonspanco {
+  background-color: #038dff;
+}
+
+.Afollowbuttonspanco:hover {
+  background-color: #06518e;
+}
+
+.Afollowbuttonexcel {
+  background-color: #ddbf25d5;
+}
+
+.Afollowbuttonexcel:hover {
+  background-color: #796607e5;
+}
+
+/* Table styles */
+.table-responsive {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.thead {
+  background-color: #f2f2f2;
+}
+
+.th {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+
+
+.td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Hover info */
+.hover-info {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 10px;
+  z-index: 1;
+}
+
+.hoverable:hover .hover-info {
+  display: block;
+}
+
+/* Spanco Modal */
+.SpancoModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 50%;
+  max-width: 600px;
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .SpancoModal {
+    width: 80%;
+  }
+}
+
+/* Modal Overlay */
+.modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal_content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.modal_title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.modal-footer button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.modal-footer .apply-button {
+  background-color: #198754;
+  color: #fff;
+}
+
+.modal-footer .close-button {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.inputF[type="text"],
+select {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+  }
+
+  .modal-footer button {
+    width: 100%;
+  }
+}
+
+/* Datepicker adjustments */
+.react-datepicker-popper {
+  z-index: 9999;
+}
+
+.date-picker-container > div {
+  position: relative;
+}
+
+.mrg {
+  margin-bottom: 3px;
+}
+
+.setmargin {
+  margin-left: 15px;
+}
+
+.selected {
+  background-color: #007bff;
+  color: #fff;
+}
+
+/* Suggestions list styles */
+.suggestions_list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-width: 200px;
+  background-color: #ffffff;
+  border: 1px solid #d1d3e2;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: 180px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  z-index: 1000;
+}
+
+.suggestions_list li {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.suggestions_list li:hover {
+  background-color: #007bff;
+  color: #ffffff;
+}
+
+.suggestions_list li + li {
+  border-top: 1px solid #e9ecef;
+}
+
+/* Ensure suggestions are responsive */
+@media (max-width: 768px) {
+  .suggestions_list {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+.action_icon{
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 8px;
+  border-radius: 4px;
+  margin-left: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+.clear_filters{
+  background-color: #343a40;
+  color: white;
+}
+.add_appointment{
+  background-color: #009218;
+  color: white;
+}
+.completion_status_filter {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.completion_status_filter label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+.th{
+  background-color: #f5f5f5;
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left
+}
+.td{
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+  color: #555;
+  width: 35%;
+}

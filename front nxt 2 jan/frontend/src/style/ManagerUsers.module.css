@@ -1,0 +1,345 @@
+/* Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-x: hidden;
+  background-color: white !important;
+}
+
+/* Main Layout */
+.main {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  background-color: #fff;
+}
+.buttonedit{
+ background-color: #888;
+ color: white;
+}
+.maincontent {
+  flex-grow: 1;
+  padding: 15px;
+}
+
+.scrollable_container {
+  height: 80vh;
+  overflow-y: auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+/* Admin Header */
+.admin_headerM {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.admin_panel_image {
+  max-width: 200px;
+  height: auto;
+}
+
+/* Location Toggle Styles */
+.locations_container {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.location_section {
+  margin-bottom: 10px;
+}
+
+.location_toggle {
+  background-color: #bc171b;
+  color: white;
+  padding: 12px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 5px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.location_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.user_count {
+  margin-left: 10px;
+  font-weight: normal;
+}
+
+.toggle_icon {
+  margin-left: auto;
+  padding-left: 10px;
+}
+
+/* Table Styles */
+.container_fluid {
+  padding: 0 10px;
+}
+
+.table_responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 1.2rem; /* Increased font size for better readability */
+  margin-bottom: 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.table th, .table td {
+  padding: 15px 20px; /* Increased padding for better spacing */
+  border: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  color: #333;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: 15%; /* Set a specific width for header columns */
+}
+
+.table td {
+  color: #555;
+  width: 35%; /* Adjusted width for data columns to utilize space */
+}
+.table th:last-child,
+.table td:last-child {
+  width: 50%; /* Actions column takes more space to fill the empty area */
+}
+/* Action Buttons Container */
+.action_buttons {
+  display: flex;
+  gap: 5px;
+}
+
+/* Button Styles */
+.btngreen, .btndelete {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: background-color 0.3s;
+}
+
+.btngreen {
+  background-color: #888;
+  color: white;
+}
+
+.btngreen:hover {
+  background-color: #889;
+}
+
+.btndelete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btndelete:hover {
+  background-color: #c82333;
+}
+
+/* Modal Styles */
+.Modal_ManageUsers {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  max-width: 90%;
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.Modal_ManageUsers h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.Modal_ManageUsers .input-field {
+  margin-bottom: 15px;
+}
+
+.Modal_ManageUsers .label {
+  font-weight: bolder;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.Modal_ManageUsers input[type="text"],
+.Modal_ManageUsers input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  font-size: 1rem;
+}
+
+.Modal_ManageUsers .password-field {
+  position: relative;
+}
+
+.Modal_ManageUsers .toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #007bff;
+}
+
+.Modal_ManageUsers .toggle-password:hover {
+  text-decoration: underline;
+}
+
+.Modal_ManageUsers .update-button,
+.Modal_ManageUsers .cancel-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.Modal_ManageUsers .update-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.Modal_ManageUsers .cancel-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.Modal_ManageUsers .update-button:hover,
+.Modal_ManageUsers .cancel-button:hover {
+  opacity: 0.8;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .container_fluid {
+    padding: 0 5px;
+  }
+
+  .table th, .table td {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  .btngreen, .btndelete {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+
+  .admin_panel_image {
+    max-width: 150px;
+  }
+
+  .Modal_ManageUsers {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .Modal_ManageUsers h2 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container_fluid {
+    padding: 0 3px;
+  }
+
+  .table th, .table td {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+
+  .btngreen, .btndelete {
+    padding: 3px 6px;
+    font-size: 0.75rem;
+  }
+
+  .location_toggle {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .user_count {
+    font-size: 12px;
+  }
+}
+@media (max-width: 768px) {
+  .table {
+    font-size: 1rem; /* Slightly smaller font size for smaller screens */
+  }
+
+  .table th, .table td {
+    padding: 10px 15px; /* Adjusted padding for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .table {
+    font-size: 0.9rem; /* Further reduced font size for very small screens */
+  }
+
+  .table th, .table td {
+    padding: 8px 10px; /* Further adjusted padding */
+  }
+}
+
+.location_filter {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.location_dropdown {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  cursor: pointer;
+}
