@@ -173,10 +173,11 @@ const PatientForm = () => {
   const [procedureDone, setProcedureDone] = useState([])
   const [treatmentPlanInput, setTreatmentPlanInput] = useState('')
   const [procedureDoneInput, setProcedureDoneInput] = useState('')
-  const [moa,setMoa]=useState('')
-  const [moaSuggestion,setMoaSuggestion]=useState([])
-  const [editPrescriptionIndex, setEditPrescriptionIndex] = useState(null);
-
+  const [moa, setMoa] = useState('')
+  const [moaSuggestion, setMoaSuggestion] = useState([])
+  const [consultantName, setConsultantName] = useState('')
+  const [followUpTime, setFollowUpTime] = useState('')
+  const [reviewCall, setReviewCall] = useState()
   useEffect(() => {
     if (auth) {
       try {
@@ -436,6 +437,9 @@ const PatientForm = () => {
         setdental({});
       }
       console.log("all data=>", data)
+      setConsultantName(data.consultantName||"")
+      setReviewCall(data.reviewCall)
+      setFollowUpTime(data.followuptime)
       setTreatmentPlan(data.treatment_plan || [])
       setProcedureDone(data.procedure_done || [])
       setFinaldiagonsis(data.patient[data.patient.length - 1].FinalDiagnosis)
@@ -665,6 +669,9 @@ const PatientForm = () => {
       .map(([key]) => key);
 
     const formData = {
+      followUpTime,
+      consultantName,
+      reviewCall,
       procedureDone: finalProcedureDone,
       treatmentPlan: finalTreatmentPlan,
       bloodInvestigation: finalBloodInvestigation,
@@ -917,7 +924,7 @@ const PatientForm = () => {
       handleDeleteHistory(treatment, settreatment, item);
     };
 
-  const handleEditPrescription = (index) => {    
+  const handleEditPrescription = (index) => {
     setMoa(prescription[index].moa)
     setDuration(prescription[index].duration)
     setMedicine(prescription[index].medicine)
@@ -2501,6 +2508,26 @@ const PatientForm = () => {
                     />
                   </div>
                   <div className={style.vitals_column}>
+                    <label>Follow Up Time</label>
+                    <input
+                      disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                      type="time"
+                      value={followUpTime || ''}
+                      onChange={(e) => setFollowUpTime(e.target.value)}
+                      className={style.responsive_input}
+                    />
+                  </div>
+                  <div className={style.vitals_column}>
+                    <label>Consultant Name</label>
+                    <input
+                      type='text'
+                      disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                      value={consultantName || ''}
+                      onChange={(e) => setConsultantName(e.target.value)}
+                      className={style.responsive_input}
+                    />
+                  </div>
+                  <div className={style.vitals_column}>
                     <div className={style.input_with_suggestions}>
                       <label>Procedure to Done</label>
                       <textarea
@@ -2518,6 +2545,16 @@ const PatientForm = () => {
                         }}
                       />
                     </div>
+                  </div>
+                  <div >
+                    <input
+                      type="checkbox"
+                      disabled={basic.status === "billingcompleted" && tokendecode.roll !== "admin"}
+                      checked={reviewCall}
+                      onChange={(e) => setReviewCall(e.target.checked)}
+                      className={style.responsive_input}
+                    />
+                    <span>Review Call</span>
                   </div>
                 </div>
               )}

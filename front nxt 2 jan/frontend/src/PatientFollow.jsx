@@ -138,13 +138,13 @@ function PatientsFollowUpCommon() {
             setLoading(false);
         }
     };
-const [first,setFirst]=useState(true)
+    const [first, setFirst] = useState(true)
     useEffect(() => {
-        if(first){
-        getCookie();
-        fetchData();
-        setFirst(false)
-    }
+        if (first) {
+            getCookie();
+            fetchData();
+            setFirst(false)
+        }
     }, [type, name, phone, patientId, fromDate, toDate, status]);
 
     const handleRowClick = (row) => {

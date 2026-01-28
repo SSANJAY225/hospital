@@ -102,6 +102,10 @@ const CONFIG = {
         title:'MOA',
         apiUrl:'http://localhost:5000/moa',
         fieldName:'moa'
+    },particular:{
+        title:'Particular',
+        apiUrl:'http://localhost:5000/particular',
+        fieldName:'particular_text'
     }
 };
 

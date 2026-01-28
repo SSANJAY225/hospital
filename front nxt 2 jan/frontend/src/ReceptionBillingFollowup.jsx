@@ -128,9 +128,9 @@ function ReceptionBillingFollowup() {
     const name = encodeURIComponent(business.full_name)
     const visited = encodeURIComponent(business.visted)
     const id = encodeURIComponent(business.id);
-    const req=await axios.get(`http://localhost:5000/billingdoc/${businessname}/${name}/${visited}`)
-    console.log(req.data)
-    navigate(`/ReceptionBillingform?loginlocation=${username}&businessname=${businessname}&name=${name}&id=${id}&visited=${visited}&doctorname=${req.data}&nursename=${nurseName}&MemberType=${MemberType}&belongedlocation=${belongedlocation}`);
+    // const req=await axios.get(`http://localhost:5000/billingdoc/${businessname}/${name}/${visited}`)
+    // // console.log(req.data)
+    navigate(`/ReceptionBillingform?loginlocation=${username}&businessname=${businessname}&name=${name}&id=${id}&visited=${visited}&MemberType=${MemberType}&belongedlocation=${belongedlocation}`);
     setSelectedBusiness(business);
   };
 

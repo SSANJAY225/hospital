@@ -308,6 +308,20 @@ app.post('/addComplaints', (req, res) => {
     res.json({ message: 'Complaint added successfully', id: results.insertId });
   });
 });
+app.post('/addparticular', (req, res) => {
+  const { particular } = req.body;
+  // console.log('Request body:', req.body);  // Log the request body
+
+  if (!particular) {
+    return res.status(400).json({ error: 'Complaint is required' });
+  }
+
+  const sql = 'INSERT INTO particular (particular_text) VALUES (?)';
+  db.query(sql, [particular], (err, results) => {
+    if (err) return handleError(err, res, 'Failed to add particular');
+    res.json({ message: 'particular added successfully', id: results.insertId });
+  });
+});
 // get compalintsq
 app.get('/getRoA', (req, res) => {
   const sql = "SELECT name FROM roa"
@@ -321,7 +335,7 @@ app.get('/getRoA', (req, res) => {
   })
 })
 // moa
-app.post('/addmoa',(req,res)=>{
+app.post('/addmoa', (req, res) => {
   const { moa } = req.body;
   // console.log('Request body:', req.body);  // Log the request body
   if (!moa) {
@@ -725,7 +739,36 @@ app.get('/complaints', (req, res) => {
     res.json(results);
   });
 });
+app.get('/particular', (req, res) => {
+  const sql = 'SELECT * FROM particular';
+  db.query(sql, (err, results) => {
+    if (err) return handleError(err, res, 'Failed to fetch particular');
+    res.json(results);
+  });
+});
+app.put('/particular/:id', (req, res) => {
+  const { id } = req.params;
+  const { particular_text } = req.body;
 
+  if (!particular_text) {
+    return res.status(400).json({ error: 'particular text is required' });
+  }
+
+  const sql = 'UPDATE particular SET particular_text = ? WHERE id = ?';
+  db.query(sql, [particular_text, id], (err, results) => {
+    if (err) return handleError(err, res, 'Failed to update particular');
+    res.json({ message: 'particular updated successfully' });
+  });
+});
+app.delete('/particular/:id', (req, res) => {
+  const { id } = req.params;
+
+  const sql = 'DELETE FROM particular WHERE id = ?';
+  db.query(sql, [id], (err, results) => {
+    if (err) return handleError(err, res, 'Failed to delete particular');
+    res.json({ message: 'particular deleted successfully' });
+  });
+});
 // Update a complaint
 app.put('/complaints/:id', (req, res) => {
   const { id } = req.params;
@@ -2120,7 +2163,6 @@ app.get('/api/fetch-patients-out', (req, res) => {
   // PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, statusFilter, currentDate
   // });
 
-
   let query = `
     SELECT 
       p.id,
@@ -2139,8 +2181,7 @@ app.get('/api/fetch-patients-out', (req, res) => {
       p.occupation,
       MAX(p.visted) AS visted
     FROM patients p
-    WHERE p.patient_type = 'Outpatient'
-  `;
+    WHERE p.patient_type = 'Outpatient'`
   const params = [];
 
   // Filter for doctorcompleted
@@ -2180,9 +2221,6 @@ app.get('/api/fetch-patients-out', (req, res) => {
   }
 
   query += ` GROUP BY p.phone_number ORDER BY p.queue DESC`;
-
-  // console.log('Executing query:', query);
-  // console.log('Query parameters:', params);
 
   db.query(query, params, (error, results) => {
     if (error) {
@@ -2547,6 +2585,7 @@ function createSuggestionRoute(path, tableName, columnName) {
 
 // Creating suggestion routes with the reusable function
 createSuggestionRoute('/api/dosage-suggestions', 'dosage', 'dosage_text');
+createSuggestionRoute('/api/particular-suggestion',"particular",'particular_text')
 // createSuggestionRoute('/api/dental-suggestions', 'dental_values', 'dental_text');
 createSuggestionRoute('/api/roa-suggestions', 'roa', 'name')
 createSuggestionRoute('/api/drugs-suggestions', 'drugs', 'drugs_text');
@@ -3071,6 +3110,9 @@ app.get('/get-data', async (req, res) => {
       });
     }
     const responseData = {
+      consultantName: results.patient.length > 0 && results.patient[results.patient.length - 1].consultant_name ? results.patient[results.patient.length - 1].consultant_name : 'Previous Value Missing',
+      reviewCall: results.patient.length > 0 && results.patient[results.patient.length - 1].review_call ? results.patient[results.patient.length - 1].review_call : null,
+      followuptime: results.patient.length > 0 && results.patient[results.patient.length - 1].followUpTime ? results.patient[results.patient.length - 1].followUpTime : 'Previous Value Missing',
       procedure_done: results.procedure_done.map(row => row.ProcedureDone),
       treatment_plan: results.treatment_plan.map(row => row.TreatmentPlan),
       blood_investigation: results.blood_investigation.map(row => row.Blood_Investigation),
@@ -3096,12 +3138,11 @@ app.get('/get-data', async (req, res) => {
       allergyHistory: results.allergyHistory.map((row) => row.Allergy_History),
       habitHistory: results.habitHistory.map((row) => row.Habit_History),
       patient: results.patient,
-      LocalExamination: results.patient.length > 0 && results.patient[0].LocalExamination ? results.patient[0].LocalExamination : 'Previous Value Missing',
       Dignosis: results.patient.length > 0 && results.patient[0].Dignosis ? results.patient[0].Dignosis : 'Previous Value Missing',
       Oral_Hygiene: results.patient.length > 0 && results.patient[0].Oral_Hygiene ? results.patient[0].Oral_Hygiene : 'Previous Value Missing',
       prescriptionForm: results.prescriptionForm.map(row => ({
         medicine: row.Medicine,
-        dosage: row.Dosage,
+        moa: row.moa,
         timing: row.Timing,
         duration: row.Duration
       })),
@@ -3467,14 +3508,16 @@ app.put("/update-datas", (req, res) => {
     const fieldsMap = {
       Dignosis: data.dignosis,
       Major_Complaints: data.majorComplaints,
-      LocalExamination: data.local,
       Advice_Given: data.advicegiven,
       FollowUpDate: data.followupdate,
       Name: identifiers.Name,
       Phone_Number: identifiers.Phone_number,
       Visted: identifiers.Visit,
       Oral_Hygiene: data.oralHygiene,
-      FinalDiagnosis: data.finaldiagonsis
+      FinalDiagnosis: data.finaldiagonsis,
+      followUpTime: data.followUpTime,
+      consultant_name: data.consultantName,
+      review_call: data.reviewCall
     };
 
     // Filter only defined fields
@@ -3547,13 +3590,13 @@ app.put("/update-datas", (req, res) => {
     db.query(deleteSql_for_prescription, [identifiers.Name, identifiers.Phone_number, identifiers.Visit], (deleteErr) => {
 
       if (deleteErr) return res.status(500).json({ error: deleteErr });
-      const insertsql_for_prescription = `INSERT INTO prescription_form (Name, Phone_Number, Visited, Medicine, Dosage, Timing,Duration) VALUES ?`
+      const insertsql_for_prescription = `INSERT INTO prescription_form (Name, Phone_Number, Visited, Medicine, moa, Timing,Duration) VALUES ?`
       const values = prescription.map(item => [
         identifiers.Name,
         identifiers.Phone_number,
         identifiers.Visit,
         item.medicine,
-        item.dosage,
+        item.moa,
         item.timing,
         item.duration
       ])
@@ -4059,7 +4102,7 @@ app.put('/api/update_billing', (req, res) => {
 app.get("/billingdoc/:number/:name/:visited", (req, res) => {
   // console.log(req.params)
   const { number, name, visited } = req.params
-  const sql = 'select doctor_name FROM general_patient WHERE Phone_Number=? And Name=? AND Visted=?'
+  const sql = 'select doctor_name FROM general_patient WHERE Phone_Number=? AND Name=? AND Visted=?'
   db.query(sql, [number, name, visited], (err, result) => {
     if (err) return res.status(400).json(err)
     // console.log(result[result.length - 1].doctor_name)
@@ -4129,7 +4172,7 @@ app.get("/reception", (req, res) => {
     return res.json(result);
   });
 });
-app.get("/moa",(req,res)=>{
+app.get("/moa", (req, res) => {
   const { location } = req.query;
   let sql = "SELECT * FROM moa";
   let params = [];
@@ -4165,7 +4208,7 @@ app.put("/reception/:id", (req, res) => {
   });
 });
 
-app.put("/moa/:id",(req,res)=>{
+app.put("/moa/:id", (req, res) => {
   const { id } = req.params;
   const { moa } = req.body;
   console.log(req.body)
@@ -4204,7 +4247,7 @@ app.delete("/reception/:id", (req, res) => {
   });
 });
 
-app.delete("/moa/:id",(req,res)=>{
+app.delete("/moa/:id", (req, res) => {
   const { id } = req.params;
   const sql = "DELETE FROM moa WHERE id = ?";
   db.query(sql, [id], (err, result) => {

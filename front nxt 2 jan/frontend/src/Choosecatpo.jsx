@@ -37,6 +37,7 @@ function Choosecatpo() {
           <Link to={link("test")} className={style.nav_button}>Tests</Link>
           <Link to={link("reception")} className={style.nav_button}>Reception</Link>
           <Link to={link("moa")} className={style.nav_button}>MOA</Link>
+          <Link to={link('particular')} className={style.nav_button}>Particular</Link>
         </div>
       </div>
     </div>

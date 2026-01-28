@@ -28,7 +28,8 @@ function Add() {
     location: '',// Add location to state
     method: '',
     reception: '',
-    moa: ''
+    moa: '',
+    particular:'',
   });
   const navigate = useNavigate();
   const location = useLocation();
@@ -93,6 +94,7 @@ function Add() {
         method: 'method',
         reception: 'reception',
         moa: 'moa',
+        particular:'particular'
       };
       const apiEndpoint = `http://localhost:5000/add${endpoint}`;
       console.log('API Endpoint:', apiEndpoint);
@@ -178,6 +180,26 @@ function Add() {
               onClick={() => handleSubmit('moa', 'moa')}
             >
               Add MOA
+            </button>
+            {/* particular */}
+            <div className={style.form_group}>
+              <label htmlFor="particular">Particular</label>
+              <input
+                type="text"
+                placeholder='Enter particular'
+                name='particular'
+                value={values.particular}
+                onChange={handleInputChange}
+                className={style.form_control}
+              />
+              {errors.particular && <span className={style.text_danger}>{errors.particular}</span>}
+            </div>
+            <button
+              type='button'
+              className={style.buttonred}
+              onClick={() => handleSubmit('particular', 'particular')}
+            >
+              Add Complaints
             </button>
             {/* Complaints */}
             <div className={style.form_group}>

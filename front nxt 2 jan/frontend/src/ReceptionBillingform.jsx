@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
-
+import SuggestionList from './suggestionList';
 const ReceptionBillingform = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -34,9 +34,10 @@ const ReceptionBillingform = () => {
   const [membershipPrice, setMembershipPrice] = useState(0);
   const [membershipOffer, setMembershipOffer] = useState(0);
   const [optpaymnetmethod, setoptpaymentmethod] = useState([])
-  const [basic,setbasic]=useState({})
-
+  const [basic, setbasic] = useState({})
+  const [particulatSuggestion, setParticularSuggestion] = useState([])
   const inputRefs = useRef([]);
+  const [advance,setAdvance]=useState([])
 
   const getUrlParams = () => {
     const searchParams = new URLSearchParams(location.search);
@@ -53,12 +54,12 @@ const ReceptionBillingform = () => {
     };
   };
 
-  const basicData=async()=>{
+  const basicData = async () => {
     const searchParams = new URLSearchParams(location.search);
     // setUrlParams(getUrlParams());
     // console.log("sdfghsfjgn",urlParams)
-    const res= await axios.get(`http://localhost:5000/get-basic-detail/${searchParams.get('id')}/${searchParams.get('name')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
-    console.log(res)
+    const res = await axios.get(`http://localhost:5000/get-basic-detail/${searchParams.get('id')}/${searchParams.get('name')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
+    console.log("res data", res)
     setbasic(res.data)
   }
   const generateBillId = (params) => {
@@ -415,6 +416,39 @@ const ReceptionBillingform = () => {
 
     return { pdfData, filename };
   };
+  const fetchSuggestions = async (value, apiUrl, setSuggestionState) => {
+    try {
+      if (value.length > 0) {
+        const response = await axios.get(apiUrl, {
+          params: { term: value },
+        });
+        if (response.data && Array.isArray(response.data)) {
+          setSuggestionState(response.data);
+        } else {
+          console.error('Invalid response format from', apiUrl);
+          setSuggestionState([]);
+        }
+      } else {
+        setSuggestionState([]);
+      }
+    } catch (error) {
+      console.error(`Error fetching suggestions from ${apiUrl}:`, error);
+      setSuggestionState([]);
+    }
+  };
+  const handleParticular = async (e, index) => {
+  const value = e.target.value;
+
+  // update input value
+  handleServiceChange(index, 'service', value);
+
+  // fetch suggestions
+  fetchSuggestions(
+    value,
+    'http://localhost:5000/api/particular-suggestion',
+    setParticularSuggestion
+  );
+};
 
   const handleSubmit = async () => {
     const validation = validateServices();
@@ -539,7 +573,7 @@ const ReceptionBillingform = () => {
     <>
       <div className={style.billing_form_container}>
         <h5 className={style.title}>Billing Form</h5>
-
+        <p>{basic.patient_type}</p>
         {/* Billing Header */}
         <div className={style.billing_header}>
           <div className={style.header_left}>
@@ -604,6 +638,10 @@ const ReceptionBillingform = () => {
               <span className={style.info_value}>{basic.nursename}</span>
             </div>
             <div className={style.info_row}>
+              <span className={style.info_label}>Receptionist:</span>
+              <span className={style.info_value}>{basic.receptionistname}</span>
+            </div>
+            <div className={style.info_row}>
               <span className={style.info_label}>Member:</span>
               <span className={style.info_value}>{basic.id}</span>
             </div>
@@ -611,28 +649,41 @@ const ReceptionBillingform = () => {
               <span className={style.info_label}>Location:</span>
               <span className={style.info_value}>{basic.belongedlocation}</span>
             </div>
+            <div className={style.info_row}>
+              <span className={style.info_label}>Service:</span>
+              <span className={style.info_value}>{basic.services}</span>
+            </div>
           </div>
+
           <div className={style.details_right}>
             <div className={style.info_row}>
               <span className={style.info_label}>Name:</span>
               <span className={style.info_value}>{basic.full_name}</span>
             </div>
             <div className={style.info_row}>
+              <span className={style.info_label}>Patient Occupation:</span>
+              <span className={style.info_value}>{basic.occupation}</span>
+            </div>
+            <div className={style.info_row}>
               <span className={style.info_label}>Visited:</span>
               <span className={style.info_value}>{basic.visted}</span>
             </div>
             <div className={style.info_row}>
-              <span className={style.info_label}>Number:</span>
+              <span className={style.info_label}>Phone Number:</span>
               <span className={style.info_value}>{basic.phone_number}</span>
             </div>
-            {basic.room_number!=null&&(
-                  <div className={style.info_row}>
-                  <span className={style.info_label}>Room number:</span>
-                  <span className={style.info_value}>
-                    {basic.room_number ? basic.room_number:""}
-                  </span>
-                </div>
-                )}
+            <div className={style.info_row}>
+              <span className={style.info_label}>Membership:</span>
+              <span className={style.info_value}>{basic.membertype ? basic.membertype : "No membership"}</span>
+            </div>
+            {basic.room_number != null && (
+              <div className={style.info_row}>
+                <span className={style.info_label}>Room number:</span>
+                <span className={style.info_value}>
+                  {basic.room_number ? basic.room_number : ""}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -643,7 +694,6 @@ const ReceptionBillingform = () => {
               <tr>
                 <th>SNo</th>
                 <th>Particular</th>
-                <th>Details</th>
                 <th>Amount</th>
                 <th>Discount</th>
                 <th>Action</th>
@@ -655,33 +705,28 @@ const ReceptionBillingform = () => {
                   <td>{index + 1}</td>
                   <td>
                     {service.isEditing ? (
-                      <input
-                        type="text"
-                        placeholder="Particular"
-                        value={service.service}
-                        onChange={(e) => handleServiceChange(index, 'service', e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(e, index, 'service')}
-                        className={style.responsive_input}
-                        ref={inputRefs.current[index]?.service}
-                        onClick={(e) => e.target.focus()}
-                      />
+                      <div className={style.input_with_suggestions}>
+                        <input
+                          type="text"
+                          placeholder="Particular"
+                          value={service.service}
+                          onChange={(e) => handleParticular(e, index)}
+                          onKeyDown={(e) => handleKeyDown(e, index, 'service')}
+                          className={style.responsive_input}
+                          ref={inputRefs.current[index]?.service}
+                          onClick={(e) => e.target.focus()}
+                        />
+                        <SuggestionList
+                          suggestions={particulatSuggestion}
+                          onSuggestionClick={(suggestion) => {
+                            // setTreatmentgivenname(suggestion);
+                            handleServiceChange(index, 'service', suggestion)
+                            setParticularSuggestion([]);
+                          }}
+                        />
+                      </div>
                     ) : (
                       <span>{service.service}</span>
-                    )}
-                  </td>
-                  <td>
-                    {service.isEditing ? (
-                      <input
-                        type="text"
-                        placeholder="Details"
-                        value={service.details || ''}
-                        onChange={(e) => handleServiceChange(index, 'details', e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(e, index, 'details')}
-                        className={style.responsive_input}
-                        ref={inputRefs.current[index]?.details}
-                      />
-                    ) : (
-                      <span>{service.details || '-'}</span>
                     )}
                   </td>
                   <td>
