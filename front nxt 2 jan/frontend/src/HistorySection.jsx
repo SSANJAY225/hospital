@@ -36,7 +36,6 @@ const HistorySection = ({
           ))}
         </tbody>
       </table>
-
       <input
         type="text"
         placeholder={placeholder}

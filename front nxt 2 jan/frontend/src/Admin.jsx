@@ -116,7 +116,7 @@ function Admin() {
                 <Link to={`/add?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Add</Link>
                 <Link to={`/choosecatpo?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Manage</Link>
                 <Link to={`/createuser?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Users</Link>
-                <Link to={`/BillingHistory?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Billing History</Link>
+                <Link to={`/billing/admin?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Billing History</Link>
                 <button onClick={handleBackup} className='btn btn-dangergreen'>
                   Data Backup
                 </button>
@@ -128,8 +128,8 @@ function Admin() {
             {roll === 'reception' && (
               <>
                 <Link to={`/AddPatient?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Patient's Appointment</Link>
-                <Link to={`/ReceptionBillingFollowup?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Billing</Link>
-                <Link to={`/BillingHistory?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Billing History</Link>
+                <Link to={`/billing/common?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Billing</Link>
+                <Link to={`/billing/history?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Billing History</Link>
 
                 <button onClick={handleLogout} className='btn btn-danger'>
                   Logout

@@ -37,12 +37,13 @@ const AdminBillingForm = () => {
   const [optpaymnetmethod, setoptpaymentmethod] = useState([])
   const [apiData, setApiData] = useState({})
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const [basic,setbasic]=useState({})
+  const [basic, setbasic] = useState({})
   const inputRefs = useRef([]);
-
-  const basicData=async()=>{
+  const [advance, setAdvance] = useState([])
+  const [advanceInput, setAdvanceInput] = useState([])
+  const basicData = async () => {
     const searchParams = new URLSearchParams(location.search);
-    const res= await axios.get(`http://localhost:5000/get-basic-detail/${searchParams.get('id')}/${searchParams.get('user')}/${searchParams.get('phonenumber')}/${searchParams.get('visit')}`)
+    const res = await axios.get(`http://localhost:5000/get-basic-detail/${searchParams.get('id')}/${searchParams.get('user')}/${searchParams.get('phonenumber')}/${searchParams.get('visit')}`)
     console.log(res)
     setbasic(res.data)
   }
@@ -104,7 +105,7 @@ const AdminBillingForm = () => {
       const user = searchParams.get('user')
       const visit = searchParams.get('visit')
       const phonenumber = searchParams.get('phonenumber')
-      
+
       if (!user || !visit || !phonenumber) {
         console.log('Missing required parameters for API call');
         setIsDataLoaded(true);
@@ -112,15 +113,15 @@ const AdminBillingForm = () => {
       }
 
       console.log('Fetching API data with params:', { user, visit, phonenumber });
-      
+
       const req = await axios.get(`http://localhost:5000/get_billing/${phonenumber}/${visit}/${user}`)
       const api = req.data;
-      
+
       console.log("API response:", api);
-      
+
       // Set all the data at once to avoid timing issues
       setApiData(api);
-      
+
       // Set individual state values from API data with proper type conversion
       if (api.discount !== undefined) setOverallDiscount(parseFloat(api.discount) || 0);
       if (api.membership_type) setSelectedMembership(api.membership_type);
@@ -144,9 +145,9 @@ const AdminBillingForm = () => {
         console.log("Processed services:", updatedServiceArray);
         setServices(updatedServiceArray);
       }
-      
+
       setIsDataLoaded(true);
-      
+
     } catch (err) {
       console.log('Error fetching API data:', err);
       setIsDataLoaded(true);
@@ -157,24 +158,24 @@ const AdminBillingForm = () => {
   useEffect(() => {
     const params = getUrlParams();
     setUrlParams(params);
-    
+
     // Only generate new bill ID if not loading existing data
     const searchParams = new URLSearchParams(location.search);
     const hasExistingData = searchParams.get('user') && searchParams.get('visit') && searchParams.get('phonenumber');
-    
+
     if (!hasExistingData) {
       const newBillId = generateBillId(params);
       setBillId(newBillId);
     }
-    
+
     // Load static data
     fetchPaymentMethod();
     fetchMembershipTypes();
-    
+
     if (params.memberType && params.memberType !== 'null' && params.memberType !== 'undefined') {
       setSelectedMembership(params.memberType);
     }
-    
+
     if (params.businessName && params.visited) {
       fetchImage(params.businessName, params.visited);
     }
@@ -499,12 +500,12 @@ const AdminBillingForm = () => {
     const safeOverallDiscount = parseFloat(overallDiscount) || 0;
 
     const billingData = {
-      userId: urlParams.id || apiData.user_id,
-      userName: urlParams.name || apiData.user_name,
-      phoneNumber: urlParams.phonenumber || apiData.phone_number,
-      visitNumber: urlParams.visited || apiData.visit_number,
-      nurseName: urlParams.nursename || apiData.nurse_name,
-      doctorName: urlParams.doctorname || apiData.doctorname,
+      userId: apiData.user_id,
+      userName: apiData.user_name,
+      phoneNumber:apiData.phone_number,
+      visitNumber: apiData.visit_number,
+      nurseName:apiData.nurse_name,
+      doctorName:apiData.doctorname,
       billId,
       paymentMode,
       reviewDate,
@@ -546,7 +547,7 @@ const AdminBillingForm = () => {
           console.log('Membership updated successfully:', selectedMembership);
         }
       }
-      
+
       const { pdfData, filename } = generatePDF();
       const pdfResponse = await axios.post('http://localhost:5000/api/save-bill-pdf', {
         pdfData,
@@ -575,9 +576,9 @@ const AdminBillingForm = () => {
         text: 'The billing information has been saved successfully, and the bill has been downloaded and stored.',
         confirmButtonText: 'OK',
       });
-      
+
       navigate(`/ReceptionBillingFollowup?loginlocation=${urlParams.loginLocation}&franchiselocation=${urlParams.belongedlocation}`, { replace: true });
-      
+
     } catch (error) {
       console.error('Error:', error);
       await Swal.fire({
@@ -591,7 +592,25 @@ const AdminBillingForm = () => {
 
   const currentDate = new Date().toISOString().split('T')[0];
   const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const handleAddHistoryItem = (newHistoryItem, historyList, setHistoryList) => {
+    const value = String(newHistoryItem).trim();
 
+    if (value !== '' && !isNaN(value)) {
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+      const newEntry = {
+        amount: value,
+        date: today,
+        method: paymentMode
+      };
+
+      setHistoryList([...historyList, newEntry]);
+    }
+  };
+
+  const handleDeleteHistory = (history, setHistory, item) => {
+    setHistory(history.filter((entry) => entry !== item));
+  };
   // Show loading state while data is being fetched
   if (!isDataLoaded) {
     return (
@@ -668,6 +687,10 @@ const AdminBillingForm = () => {
               <span className={style.info_value}>{basic.nursename}</span>
             </div>
             <div className={style.info_row}>
+              <span className={style.info_label}>Receptionist:</span>
+              <span className={style.info_value}>{basic.receptionistname}</span>
+            </div>
+            <div className={style.info_row}>
               <span className={style.info_label}>Member:</span>
               <span className={style.info_value}>{basic.id}</span>
             </div>
@@ -675,28 +698,41 @@ const AdminBillingForm = () => {
               <span className={style.info_label}>Location:</span>
               <span className={style.info_value}>{basic.belongedlocation}</span>
             </div>
+            <div className={style.info_row}>
+              <span className={style.info_label}>Service:</span>
+              <span className={style.info_value}>{basic.services}</span>
+            </div>
           </div>
+
           <div className={style.details_right}>
             <div className={style.info_row}>
               <span className={style.info_label}>Name:</span>
               <span className={style.info_value}>{basic.full_name}</span>
             </div>
             <div className={style.info_row}>
+              <span className={style.info_label}>Patient Occupation:</span>
+              <span className={style.info_value}>{basic.occupation}</span>
+            </div>
+            <div className={style.info_row}>
               <span className={style.info_label}>Visited:</span>
               <span className={style.info_value}>{basic.visted}</span>
             </div>
             <div className={style.info_row}>
-              <span className={style.info_label}>Number:</span>
+              <span className={style.info_label}>Phone Number:</span>
               <span className={style.info_value}>{basic.phone_number}</span>
             </div>
-            {basic.room_number!=null&&(
-                  <div className={style.info_row}>
-                  <span className={style.info_label}>Room number:</span>
-                  <span className={style.info_value}>
-                    {basic.room_number ? basic.room_number:""}
-                  </span>
-                </div>
-                )}
+            <div className={style.info_row}>
+              <span className={style.info_label}>Membership:</span>
+              <span className={style.info_value}>{basic.membertype ? basic.membertype : "No membership"}</span>
+            </div>
+            {basic.room_number != null && (
+              <div className={style.info_row}>
+                <span className={style.info_label}>Room number:</span>
+                <span className={style.info_value}>
+                  {basic.room_number ? basic.room_number : ""}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -783,7 +819,7 @@ const AdminBillingForm = () => {
                       const details = document.querySelector('input[placeholder="Details"]').value;
                       const amount = document.querySelector('input[placeholder="Amount"]').value;
                       const discount = document.querySelector('input[placeholder="Discount"]').value;
-                      
+
                       if (!particular.trim() || !amount || parseFloat(amount) <= 0) {
                         Swal.fire({
                           icon: 'error',
@@ -793,7 +829,7 @@ const AdminBillingForm = () => {
                         });
                         return;
                       }
-                      
+
                       const newService = {
                         service: particular.trim(),
                         detail: details || '',
@@ -801,9 +837,9 @@ const AdminBillingForm = () => {
                         discount: parseFloat(discount) || 0,
                         isEditing: false
                       };
-                      
+
                       setServices([...services, newService]);
-                      
+
                       // Clear the input fields
                       document.querySelector('input[placeholder="Particular"]').value = '';
                       document.querySelector('input[placeholder="Details"]').value = '';
@@ -872,7 +908,58 @@ const AdminBillingForm = () => {
             )}
           </div>
         </div>
+        {/*advance section */}
 
+        <div className={style.billing_financial_adjustments}>
+          <div className={style.info_row}>
+            <div className={style.history_section}>
+              <h5>Advance</h5>
+              <table className={style.responsive_table}>
+                <thead>
+                  <tr>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Payment Method</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {advance.map((item, index) => (
+                    <tr key={index}>
+                      <td>₹{item.amount}</td>
+                      <td>{item.date}</td>
+                      <td>{item.method}</td>
+                      <td>
+                        <button
+                          className={`${style.buttondelete} ${style.responsive_button}`}
+                          onClick={() =>
+                            handleDeleteHistory(advance, setAdvance, item)
+                          }
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <input
+                type="text"
+                placeholder='Add advance'
+                className={style.responsive_input}
+                value={advanceInput}
+                onChange={(e) => setAdvanceInput(e.target.value)}
+                // disabled={disabled}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleAddHistoryItem(advanceInput, advance, setAdvance);
+                    setAdvanceInput("");
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </div>
         {/* Billing Footer */}
         <div className={style.billing_footer}>
           <div className={style.footer_left}>
@@ -903,9 +990,11 @@ const AdminBillingForm = () => {
           </div>
         </div>
 
-        <div className={style.title} style={{ marginTop: '2rem' }}>
-          <button className={style.save_billing_button} onClick={handleSubmit}>
-            Save Billing
+        <div className={style.button_container} style={{ marginTop: '2rem' }}>
+          <button className={style.save_billing_button} onClick={() => handleSubmit('save')}>save</button>
+          <button className={style.save_billing_button} onClick={() => handleSubmit('Generate_Invoice')}>generate Invoice</button>
+          <button className={style.save_billing_button} onClick={() => handleSubmit('Final_Bill')}>
+            Final Bill
           </button>
         </div>
       </div>

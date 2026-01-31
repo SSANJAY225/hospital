@@ -18,7 +18,7 @@ app.use(cors());
 const allowedOrigins = [
   "http://localhost:3000", // Development
   "https://app.amirthaahospital.com", // Production
-  "http://localhost:5173"
+  "http://localhost:5173", "http://localhost:4173"
 ];
 
 app.use(cors({
@@ -2231,15 +2231,9 @@ app.get('/api/fetch-patients-out', (req, res) => {
   });
 });
 
-app.post("/api/save-billing", (req, res) => {
+app.post("/api/final-save-billing", (req, res) => {
   const billingData = req.body;
-  // console.log("Received billing data:", billingData);
-  // console.log("Phone Number:", billingData.phoneNumber);
-  // console.log("Visit Number:", billingData.visitNumber);
-  // console.log("Received Date:", billingData.date);
-  // console.log("all data", req.body)
-
-  // Ensure date is in correct format (YYYY-MM-DD HH:MM:SS)
+  console.log(billingData)
   let formattedDate = billingData.date;
   if (formattedDate.includes('T')) {
     formattedDate = new Date(formattedDate).toISOString().slice(0, 19).replace('T', ' ');
@@ -2247,9 +2241,7 @@ app.post("/api/save-billing", (req, res) => {
   // console.log("Formatted Date:", formattedDate);
 
   // Insert into billing_headers
-  const insertHeaderSql = `
-    INSERT INTO billing_headers (
-    id,
+  const insertHeaderSql = `INSERT INTO billing_headers (id,
       user_id, 
       user_name, 
       phone_number, 
@@ -2305,7 +2297,7 @@ app.post("/api/save-billing", (req, res) => {
         service_name, 
         price,
         discount,
-        detail
+        detail,
       ) VALUES (?,?, ?, ?,?)
     `;
 
@@ -2331,18 +2323,18 @@ app.post("/api/save-billing", (req, res) => {
 
       const updateStatusValues = [phoneNumber, visitNumber];
 
-      db.query(updateStatusSql, updateStatusValues, (err, updateResult) => {
-        if (err) {
-          console.error("Error updating patient status:", err);
-          return res.status(500).json({ message: "Error updating status", error: err });
-        }
+      // db.query(updateStatusSql, updateStatusValues, (err, updateResult) => {
+      //   if (err) {
+      //     console.error("Error updating patient status:", err);
+      //     return res.status(500).json({ message: "Error updating status", error: err });
+      //   }
 
-        // console.log("Status updated...");
-        res.status(200).json({
-          message: "Billing information saved, status updated to 'billingcompleted'",
-          success: true
-        });
-      });
+      //   // console.log("Status updated...");
+      //   res.status(200).json({
+      //     message: "Billing information saved, status updated to 'billingcompleted'",
+      //     success: true
+      //   });
+      // });
       return;
     }
 
@@ -2354,7 +2346,9 @@ app.post("/api/save-billing", (req, res) => {
         service.service.trim(),
         parseFloat(service.price),
         service.discount,
-        service.details
+        service.details,
+
+
       ];
 
       db.query(insertDetailsSql, insertDetailsValues, (err, detailResult) => {
@@ -2585,7 +2579,7 @@ function createSuggestionRoute(path, tableName, columnName) {
 
 // Creating suggestion routes with the reusable function
 createSuggestionRoute('/api/dosage-suggestions', 'dosage', 'dosage_text');
-createSuggestionRoute('/api/particular-suggestion',"particular",'particular_text')
+createSuggestionRoute('/api/particular-suggestion', "particular", 'particular_text')
 // createSuggestionRoute('/api/dental-suggestions', 'dental_values', 'dental_text');
 createSuggestionRoute('/api/roa-suggestions', 'roa', 'name')
 createSuggestionRoute('/api/drugs-suggestions', 'drugs', 'drugs_text');
@@ -3300,6 +3294,58 @@ app.post('/addDoctorName', (req, res) => {
 //     res.status(404).json({ error: 'File not found' });
 //   }
 // });
+app.get('/advance', (req, res) => {
+  const { Phone_number, visited, user } = req.query
+  const sql = `SELECT * FROM advance WHERE Phone_Number=? AND Name=? AND Visit=?`
+  db.query(sql, [Phone_number, user, visited], (err, result) => {
+    console.log(sql)
+    console.log(req.body)
+    if (err) return res.status(400).json({ err })
+    return res.status(200).json({ result })
+  })
+})
+app.post('/advance', (req, res) => {
+  const { finaladvance, Phone_number, visited, user, method } = req.body;
+  console.log(req.body)
+  // 1️⃣ Delete existing advance records
+  const deleteSql = `
+    DELETE FROM advance
+    WHERE Name = ? AND Phone_Number = ? AND Visit = ?
+  `;
+
+  db.query(deleteSql, [user, Phone_number, visited], (delErr) => {
+    if (delErr) {
+      console.error("Delete error:", delErr);
+      return res.status(500).json({ message: "Failed to delete old advance" });
+    }
+
+    // 2️⃣ Insert new advance records
+    if (!finaladvance || finaladvance.length === 0) {
+      return res.json({ message: "Old advance deleted, no new advance to insert" });
+    }
+
+    const insertSql = `INSERT INTO advance (Name, Phone_Number, Visit, advance, date_paid,method) VALUES ?`;
+
+    const values = finaladvance.map(amount => ([
+      user,
+      Phone_number,
+      visited,
+      amount.amount,
+      new Date(),
+      method
+    ]));
+
+    db.query(insertSql, [values], (insErr, result) => {
+      console.log(values)
+      if (insErr) {
+        console.error("Insert error:", insErr);
+        return res.status(500).json({ message: "Failed to insert advance" });
+      }
+
+      return res.json({ message: "Advance updated successfully", result });
+    });
+  });
+});
 
 app.put("/update-datas", (req, res) => {
   // vitals
@@ -3707,7 +3753,7 @@ app.get("/get-adminfiles", (req, res) => {
   });
 });
 
-app.get("/get-files", isauth, (req, res) => {
+app.get("/get-files",isauth, (req, res) => {
   const { full_name, Phone_number, visted, from_date, to_date } = req.query;
   // console.log("request---->", req)
   let sql = `
@@ -3822,13 +3868,13 @@ app.get('/get_billing/:phone_number/:visit_number/:user_name', (req, res) => {
   const sql = 'SELECT * FROM billing_headers WHERE phone_number=? AND visit_number=? AND user_name=?';
 
   db.query(sql, [phone_number, visit_number, user_name], (err, result) => {
+    console.log(req.data)
     if (err) {
       console.error("Header Query Error:", err);
       return res.status(400).json(err);
     }
-
     if (result.length === 0) {
-      return res.status(404).json({ message: "No data found" });
+      return res.json({ message: "No data found" });
     }
 
     const out = result[result.length - 1]; // last record
@@ -3856,9 +3902,9 @@ app.get('/get_billing/:phone_number/:visit_number/:user_name', (req, res) => {
     });
   });
 });
+
 app.put('/api/update_billing', (req, res) => {
   // console.log('Request body:', req.body);
-
   const {
     userId,
     userName,
@@ -3876,9 +3922,11 @@ app.put('/api/update_billing', (req, res) => {
     services,
     totalPrice,
     overallDiscount,
-    date
+    date,
+    status,
   } = req.body;
   // Validation: Check if required fields are provided
+  console.log(req.body)
   if (!billId) {
     return res.status(400).json({
       success: false,
@@ -3989,7 +4037,6 @@ app.put('/api/update_billing', (req, res) => {
           error: transErr.message
         });
       }
-
       // 🔁 rollback helper
       const handleError = (error, message) => {
         connection.rollback(() => {
@@ -4002,72 +4049,147 @@ app.put('/api/update_billing', (req, res) => {
           });
         });
       };
-
       // 🔹 Update billing table
-      const updateBillingTable = (callback) => {
-        if (updateFields.length === 0) {
-          return callback(null, { affectedRows: 0 });
-        }
+      const upsertBillingHeader = (callback) => {
+        const checkSql = `
+    SELECT COUNT(*) AS count
+    FROM billing_headers
+    WHERE id = ?
+  `;
 
-        const values = [...updateValues, billId];
+        connection.query(checkSql, [billId], (err, result) => {
+          if (err) return callback(err);
 
-        const billingUpdateSql = `
+          const exists = result[0].count > 0;
+
+          // 🔹 UPDATE
+          if (exists) {
+            if (updateFields.length === 0) {
+              return callback(null, { affectedRows: 0 });
+            }
+
+            const updateSql = `
         UPDATE billing_headers
         SET ${updateFields.join(', ')}
         WHERE id = ?
       `;
 
-        connection.query(billingUpdateSql, values, callback);
+            const values = [...updateValues, billId];
+            return connection.query(updateSql, values, callback);
+          }
+
+          // 🔹 INSERT
+          const insertSql = `
+      INSERT INTO billing_headers (
+        id,
+        user_id,
+        user_name,
+        phone_number,
+        visit_number,
+        nurse_name,
+        doctor_name,
+        payment_method,
+        review_date,
+        reference,
+        membership_type,
+        membership_price,
+        membership_offer,
+        total_price,
+        discount,
+        billing_date
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+          const insertValues = [
+            billId,
+            req.body.userId,
+            userName || null,
+            phoneNumber || null,
+            visitNumber || null,
+            nurseName || null,
+            doctorName || null,
+            paymentMode || null,
+            reviewDate || null,
+            reference || null,
+            membershipType || null,
+            Number(membershipPrice) || 0,
+            Number(membershipOffer) || 0,
+            Number(totalPrice) || 0,
+            Number(overallDiscount) || 0,
+            date || null
+          ];
+
+          connection.query(insertSql, insertValues, callback);
+        });
       };
+
 
       // 🔹 Update services (delete + insert one by one)
       const updateServicesTableOneByOne = (callback) => {
-        if (!services || !Array.isArray(services) || services.length === 0) {
+        if (!Array.isArray(services) || services.length === 0) {
           return callback(null, { affectedRows: 0 });
         }
 
-        const deleteSql = 'DELETE FROM billing_details WHERE billing_id = ?';
+        // 🔹 Update patient status only for Final_Bill
+        const updatePatientStatus = (cb) => {
+          if (status !== 'Final_Bill') return cb();
 
-        connection.query(deleteSql, [billId], (deleteErr) => {
-          if (deleteErr) return callback(deleteErr);
+          const sql = `UPDATE patients SET status = ? WHERE full_name = ? AND phone_number = ? AND visted = ?`;
 
-          let inserted = 0;
-          let failed = false;
+          connection.query(
+            sql,
+            ['billingcompleted', userName, phoneNumber, visitNumber],
+            cb
+          );
+        };
 
-          const insertSql = `
-          INSERT INTO billing_details
-          (billing_id, service_name, detail, price, discount)
-          VALUES (?, ?, ?, ?, ?)
-        `;
+        // 🔹 Insert services
+        const insertServices = (cb) => {
+          const insertSql = `INSERT INTO billing_details (billing_id, service_name, detail, price, discount) VALUES ?`;
 
-          services.forEach((service) => {
-            if (failed) return;
+          const values = services.map(s => [
+            billId,
+            s.service || '',
+            s.details || s.detail || '',
+            Number(s.price) || 0,
+            Number(s.discount) || 0
+          ]);
 
-            const values = [
-              billId,
-              service.service || '',
-              service.details || service.detail || '',
-              parseFloat(service.price) || 0,
-              parseFloat(service.discount) || 0
-            ];
+          connection.query(insertSql, [values], cb);
+        };
 
-            connection.query(insertSql, values, (err) => {
-              if (err && !failed) {
-                failed = true;
-                return callback(err);
-              }
+        // 🔹 Check existing services
+        const checkSql = `SELECT COUNT(*) AS count FROM billing_details WHERE billing_id = ?`;
 
-              inserted++;
-              if (inserted === services.length && !failed) {
-                callback(null, { affectedRows: inserted });
-              }
+        connection.query(checkSql, [billId], (err, result) => {
+          if (err) return callback(err);
+
+          const exists = result[0].count > 0;
+
+          updatePatientStatus((err) => {
+            if (err) return callback(err);
+
+            if (!exists) {
+              // ✅ No old data → insert directly
+              return insertServices(callback);
+            }
+
+            // 🔁 Exists → delete then insert
+            const deleteSql = `DELETE FROM billing_details WHERE billing_id = ?`;
+
+            connection.query(deleteSql, [billId], (err) => {
+              if (err) return callback(err);
+              insertServices(callback);
             });
           });
         });
       };
 
+
+
       // 🔹 Execute billing update
-      updateBillingTable((billingErr, billingResults) => {
+      upsertBillingHeader((billingErr, billingResults) => {
         if (billingErr) {
           return handleError(billingErr, 'Error updating billing table');
         }

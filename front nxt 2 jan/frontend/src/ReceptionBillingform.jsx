@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
+import HistorySection from './HistorySection';
 import SuggestionList from './suggestionList';
 const ReceptionBillingform = () => {
   const location = useLocation();
@@ -37,7 +38,8 @@ const ReceptionBillingform = () => {
   const [basic, setbasic] = useState({})
   const [particulatSuggestion, setParticularSuggestion] = useState([])
   const inputRefs = useRef([]);
-  const [advance,setAdvance]=useState([])
+  const [advance, setAdvance] = useState([])
+  const [advanceInput, setAdvanceInput] = useState([])
 
   const getUrlParams = () => {
     const searchParams = new URLSearchParams(location.search);
@@ -437,20 +439,21 @@ const ReceptionBillingform = () => {
     }
   };
   const handleParticular = async (e, index) => {
-  const value = e.target.value;
+    const value = e.target.value;
 
-  // update input value
-  handleServiceChange(index, 'service', value);
+    // update input value
+    handleServiceChange(index, 'service', value);
 
-  // fetch suggestions
-  fetchSuggestions(
-    value,
-    'http://localhost:5000/api/particular-suggestion',
-    setParticularSuggestion
-  );
-};
-
-  const handleSubmit = async () => {
+    // fetch suggestions
+    fetchSuggestions(
+      value,
+      'http://localhost:5000/api/particular-suggestion',
+      setParticularSuggestion
+    );
+  };
+  
+  const handleSubmit = async (saving) => {
+    console.log("action", saving)
     const validation = validateServices();
     if (!validation.isValid) {
       Swal.fire({
@@ -478,7 +481,6 @@ const ReceptionBillingform = () => {
         details: details || '',
         discount: parseFloat(discount) || 0,
       }));
-
     const billingData = {
       userId: urlParams.id,
       userName: urlParams.name,
@@ -497,11 +499,13 @@ const ReceptionBillingform = () => {
       totalPrice,
       overallDiscount: parseFloat(overallDiscount) || 0,
       date: formatDateToMySQL(new Date()),
+      saving,
+      advanceInput
     };
 
     try {
       // console.log(billingData)
-      const billingResponse = await axios.post('http://localhost:5000/api/save-billing', billingData);
+      const billingResponse = await axios.post('http://localhost:5000/api/final-save-billing', billingData);
       if (!billingResponse.data.success) {
         throw new Error('Failed to save billing');
       }
@@ -554,7 +558,7 @@ const ReceptionBillingform = () => {
         text: 'The billing information has been saved successfully, and the bill has been downloaded and stored.',
         confirmButtonText: 'OK',
       });
-      navigate(`/ReceptionBillingFollowup?loginlocation=${urlParams.loginLocation}&franchiselocation=${urlParams.belongedlocation}`, { replace: true });
+      // navigate(`/ReceptionBillingFollowup?loginlocation=${urlParams.loginLocation}&franchiselocation=${urlParams.belongedlocation}`, { replace: true });
     } catch (error) {
       console.error('Error:', error);
       await Swal.fire({
@@ -565,10 +569,141 @@ const ReceptionBillingform = () => {
       });
     }
   };
+  // const handlesave=async ()=>{
+  //   console.log("just save")
+  //   const validation = validateServices();
+  //   if (!validation.isValid) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Invalid Input',
+  //       text: validation.message,
+  //       confirmButtonText: 'OK',
+  //     });
+  //     return;
+  //   }
+  //   const urlParams = getUrlParams();
+  //   const validServices = services
+  //     .filter(
+  //       (service) =>
+  //         service.service.trim() ||
+  //         service.price ||
+  //         service.details.trim() ||
+  //         service.discount
+  //     )
+  //     .map(({ service, price, details, discount }) => ({
+  //       service: service.trim(),
+  //       price: parseFloat(price).toFixed(2),
+  //       details: details || '',
+  //       discount: parseFloat(discount) || 0,
+  //     }));
+  //   const billingData = {
+  //     userId: urlParams.id,
+  //     userName: urlParams.name,
+  //     phoneNumber: urlParams.businessName,
+  //     visitNumber: urlParams.visited,
+  //     nurseName: urlParams.nursename,
+  //     doctorName: urlParams.doctorname,
+  //     billId,
+  //     paymentMode,
+  //     reviewDate,
+  //     reference,
+  //     membershipType: selectedMembership,
+  //     membershipPrice: membershipPrice.toFixed(2),
+  //     membershipOffer: parseFloat(membershipOffer).toFixed(2),
+  //     services: validServices,
+  //     totalPrice,
+  //     overallDiscount: parseFloat(overallDiscount) || 0,
+  //     date: formatDateToMySQL(new Date()),
+  //   };
+  //   try {
+  //     const billingResponse = await axios.post('http://localhost:5000/api/save-billing', billingData);
+  //     if (!billingResponse.data.success) {
+  //       throw new Error('Failed to save billing');
+  //     }
+  //     if (selectedMembership && selectedMembership !== urlParams.memberType) {
+  //       const membershipUpdateData = {
+  //         id: urlParams.id,
+  //         phoneNumber: urlParams.businessName,
+  //         visited: urlParams.visited,
+  //         membership: selectedMembership,
+  //       };
+  //       const membershipResponse = await axios.post('http://localhost:5000/api/Update-membership', membershipUpdateData)
+  //       if (!membershipResponse.data.success) {
+  //         console.error('Failed to update membership:', membershipResponse.data.message);
+  //         await Swal.fire({
+  //           icon: 'warning',
+  //           title: 'Membership Update Failed',
+  //           text: 'Billing saved, but failed to update membership. Please update the membership manually.',
+  //           confirmButtonText: 'OK',
+  //         });
+  //       } else {
+  //         console.log('Membership updated successfully:', selectedMembership);
+  //       }
+  //     }
 
+  //     const { pdfData, filename } = generatePDF();
+  //     const pdfResponse = await axios.post('http://localhost:5000/api/save-bill-pdf', {
+  //       pdfData,
+  //       filename,
+  //       userId: urlParams.id,
+  //       visitNumber: urlParams.visited,
+  //     }, {
+  //       headers: { 'Content-Type': 'application/json' },
+  //     });
+
+  //     if (!pdfResponse.data.success) {
+  //       console.error('Failed to save PDF:', pdfResponse.data.message);
+  //       await Swal.fire({
+  //         icon: 'warning',
+  //         title: 'PDF Save Failed',
+  //         text: 'Billing saved, but failed to store the PDF. Please try again manually.',
+  //         confirmButtonText: 'OK',
+  //       });
+  //     } else {
+  //       console.log('PDF saved successfully:', filename);
+  //     }
+
+  //     await Swal.fire({
+  //       icon: 'success',
+  //       title: 'Billing Saved!',
+  //       text: 'The billing information has been saved successfully, and the bill has been downloaded and stored.',
+  //       confirmButtonText: 'OK',
+  //     });
+  //     // navigate(`/ReceptionBillingFollowup?loginlocation=${urlParams.loginLocation}&franchiselocation=${urlParams.belongedlocation}`, { replace: true });
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //     await Swal.fire({
+  //       icon: 'error',
+  //       title: 'Billing Failed!',
+  //       text: 'Something went wrong while saving the billing or PDF. Please try again.',
+  //       confirmButtonText: 'OK',
+  //     });
+  //   }
+  // }
+  // const handleGenerate=()=>{
+  //   console.log("Generate Bill")
+  // }
   const currentDate = new Date().toISOString().split('T')[0];
   const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const handleAddHistoryItem = (newHistoryItem, historyList, setHistoryList) => {
+    const value = String(newHistoryItem).trim();
 
+    if (value !== '' && !isNaN(value)) {
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+      const newEntry = {
+        amount: value,
+        date: today,
+        method: paymentMode
+      };
+
+      setHistoryList([...historyList, newEntry]);
+    }
+  };
+
+  const handleDeleteHistory = (history, setHistory, item) => {
+    setHistory(history.filter((entry) => entry !== item));
+  };
   return (
     <>
       <div className={style.billing_form_container}>
@@ -597,10 +732,6 @@ const ReceptionBillingform = () => {
                 {optpaymnetmethod.map((itm) =>
                   <option key={itm.payment_id} value={itm.method}>{itm.method}</option>
                 )}
-                {/* <option value="">Select Payment Mode</option>
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-                <option value="Online">Online</option> */}
               </select>
             </div>
           </div>
@@ -844,7 +975,56 @@ const ReceptionBillingform = () => {
             )}
           </div>
         </div>
-
+        <div className={style.billing_financial_adjustments}>
+          <div className={style.info_row}>
+            <div className={style.history_section}>
+              <h5>Advance</h5>
+              <table className={style.responsive_table}>
+                <thead>
+                  <tr>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Payment Method</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {advance.map((item, index) => (
+                    <tr key={index}>
+                      <td>₹{item.amount}</td>
+                      <td>{item.date}</td>
+                      <td>{item.method}</td>
+                      <td>
+                        <button
+                          className={`${style.buttondelete} ${style.responsive_button}`}
+                          onClick={() =>
+                            handleDeleteHistory(advance, setAdvance, item)
+                          }
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <input
+                type="text"
+                placeholder='Add advance'
+                className={style.responsive_input}
+                value={advanceInput}
+                onChange={(e) => setAdvanceInput(e.target.value)}
+                // disabled={disabled}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleAddHistoryItem(advanceInput, advance, setAdvance);
+                    setAdvanceInput("");
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </div>
         {/* Billing Footer */}
         <div className={style.billing_footer}>
           <div className={style.footer_left}>
@@ -875,9 +1055,11 @@ const ReceptionBillingform = () => {
           </div>
         </div>
 
-        <div className={style.title} style={{ marginTop: '2rem' }}>
-          <button className={style.save_billing_button} onClick={handleSubmit}>
-            Save Billing
+        <div className={style.button_container} style={{ marginTop: '2rem' }}>
+          <button className={style.save_billing_button} onClick={() => handleSubmit('save')}>save</button>
+          <button className={style.save_billing_button} onClick={() => handleSubmit('Generate_Invoice')}>generate Invoice</button>
+          <button className={style.save_billing_button} onClick={() => handleSubmit('Final_Bill')}>
+            Final Bill
           </button>
         </div>
       </div>

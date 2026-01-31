@@ -14,9 +14,9 @@ import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import * as XLSX from 'xlsx';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 
-function BusinessList({ onBusinessClick, businesses }) {
+function BusinessList({ onBusinessClick, data }) {
   // Sort by id in descending order
-  const sortedBusinesses = [...businesses].sort((a, b) => b.id - a.id);
+  const sortedBusinesses = [...data].sort((a, b) => b.id - a.id);
 
   return (
     <div className={style.container_fluid}>
@@ -405,7 +405,7 @@ function ReceptionBillingFollowup() {
             {/* </button> */}
           </div>
         </div>
-        <BusinessList onBusinessClick={handleBusinessClick} businesses={businesses} />
+        <BusinessList onBusinessClick={handleBusinessClick} data={businesses} />
         {selectedBusiness && <BusinessDetails selectedBusiness={selectedBusiness} />}
       </div>
     </>

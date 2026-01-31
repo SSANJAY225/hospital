@@ -17,6 +17,8 @@ import ReceptionBillingform from './ReceptionBillingform.jsx';
 import NurseFollow from './NurseFollow.jsx';
 import PatientsFollowUpCommon from './PatientFollow.jsx'
 import PatientForm from './PatientDetails.jsx';
+import Billing from './Billing.jsx';
+import BillingFrom from './BillingForm.jsx';
 function App() {
 
   return (
@@ -34,12 +36,13 @@ function App() {
         <Route path='/BillingHistory' element={<BillingHistory />} />
         <Route path='/AdminBillingForm' element={<AdminBillingForm/>}/>
         <Route path="/AddPatient" element={<AddPatient />} />
-        <Route path='/ReceptionBillingFollowup' element={<ReceptionBillingFollowup />} />
+        {/* <Route path='/ReceptionBillingFollowup' element={<ReceptionBillingFollowup />} /> */}
         <Route path='/ReceptionBillingform' element={<ReceptionBillingform />} />
         <Route path='/nursefollow' element={<NurseFollow />} />
         <Route path="/patients-followup/:type" element={<PatientsFollowUpCommon />}></Route>
         <Route path="/patient-follow/:type" element={<PatientForm/>} />
-
+        <Route path="/billing/:type" element={<Billing/>}/>
+        <Route path="/BillingForm/:type" element={<BillingFrom/>}/>
         </Routes>
       </Router>
     </>
