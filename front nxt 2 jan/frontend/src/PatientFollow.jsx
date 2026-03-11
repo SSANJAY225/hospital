@@ -60,6 +60,8 @@ function PatientsFollowUpCommon() {
     const [selectedDoctor, setSelectedDoctor] = useState('');
     const [PatientType, setPatientType] = useState('')
     const [selectedDate, setSelectedDate] = useState(null);
+    const [filter,setfilter]=useState();
+    const [filterData,setFilterData]=useState()
     const [currentDate, setCurrentDate] = useState(() => {
         const today = new Date();
         return today.toISOString().split('T')[0];
@@ -130,6 +132,7 @@ function PatientsFollowUpCommon() {
             })
             console.log("get patient", res.data)
             setData(res.data);
+            setFilterData(data)
             setLoading(true);
         } catch (err) {
             Swal.fire("Error", "Failed to load data", "error");
@@ -254,7 +257,11 @@ function PatientsFollowUpCommon() {
             console.log("params=>", queryParams)
             const response = await axios.get(`http://localhost:5000/api/getpatients?${queryString}`);
             const sortedPatients = response.data.sort((a, b) => b.id - a.id);
-            setBusinesses(response.data);
+            if (type == 'admin') {
+                setBusinesses(sortedPatients)
+            } else {
+                setBusinesses(response.data)
+            }
         } catch (error) {
             console.error('Error fetching business names:', error);
         }
@@ -281,6 +288,9 @@ function PatientsFollowUpCommon() {
         return `${day}-${month}-${year}`;
     };
 
+    const membershipRenewal=()=>{
+        // const filter=
+    }
 
     return (<>
         <div className={style.admin_header}>
@@ -451,8 +461,13 @@ function PatientsFollowUpCommon() {
                         <HiMiniCalendarDateRange />
                     </span>
                 </div>
+                <div className={style.button_row}>
+                    <button className={style.renewal_button}>MemberShip Renewal</button>
+                    <button className={style.month_folloup_button}>6 Month Follow-up</button>
+                    <button className={style.followup_call}>Follow-up call</button>
+                </div>
             </div>
-            <BusinessList onBusinessClick={handleRowClick} businesses={data}></BusinessList>
+            <BusinessList onBusinessClick={handleRowClick} businesses={data} type={type} ></BusinessList>
         </div>
     </>);
 }

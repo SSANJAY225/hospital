@@ -19,6 +19,7 @@ import PatientsFollowUpCommon from './PatientFollow.jsx'
 import PatientForm from './PatientDetails.jsx';
 import Billing from './Billing.jsx';
 import BillingFrom from './BillingForm.jsx';
+import ManageMembership from './ManageMembership.jsx';
 function App() {
 
   return (
@@ -43,6 +44,7 @@ function App() {
         <Route path="/patient-follow/:type" element={<PatientForm/>} />
         <Route path="/billing/:type" element={<Billing/>}/>
         <Route path="/BillingForm/:type" element={<BillingFrom/>}/>
+        <Route path="/membership" element={<ManageMembership/>}/>
         </Routes>
       </Router>
     </>

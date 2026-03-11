@@ -1897,73 +1897,85 @@ app.get('/api/getpatients', (req, res) => {
 
   // Base query
   let query = `
-    SELECT 
-      id,
-      full_name,
-      fathers_name,
-      age,
-      gender,
-      city,
-      phone_number,
-      appointment_date,
-      appointment_time,
-      services,
-      queue,
-      status,
-      nursename,
-      doctorname,
-      occupation,
-      MAX(visted) AS visted
-    FROM patients
-    WHERE 1=1 `;
+  SELECT 
+    p.id,
+    p.full_name,
+    p.fathers_name,
+    p.age,
+    p.gender,
+    p.city,
+    p.phone_number,
+    p.appointment_date,
+    p.appointment_time,
+    p.services,
+    p.queue,
+    p.status,
+    p.nursename,
+    p.doctorname,
+    p.occupation,
+    p.belongedlocation,
+    MAX(p.visted) AS visted,
+
+    -- follow-up fields from general_patient
+    gp.FollowUpDate,
+    gp.followUpTime,
+    gp.review_call,
+    gp.consultant_name
+
+  FROM patients p
+  LEFT JOIN general_patient gp
+    ON p.phone_number = gp.Phone_Number
+  WHERE 1=1
+`;
+
   // AND status = 'billingcompleted'
 
   const params = [];
   // console.log("location=>>>>>>>>>.", Location)
   // Add conditions based on provided query parameters
   if (PatientType) {
-    query += ' AND patient_type = ?';
+    query += ' AND p.patient_type = ?';
     params.push(PatientType);
   }
   if (PhoneNumber) {
-    query += ' AND phone_number = ?';
+    query += ' AND p.phone_number = ?';
     params.push(PhoneNumber);
   }
   if (BusinessName) {
-    query += ' AND full_name LIKE ?';
+    query += ' AND p.full_name LIKE ?';
     params.push(`%${BusinessName}%`);
   }
   if (BusinessID) {
-    query += ' AND id = ?';
+    query += ' AND p.id = ?';
     params.push(BusinessID);
   }
   if (fromDate) {
-    query += ' AND appointment_date >= ?';
+    query += ' AND p.appointment_date >= ?';
     params.push(fromDate);
   }
   if (toDate) {
-    query += ' AND appointment_date <= ?';
+    query += ' AND p.appointment_date <= ?';
     params.push(toDate);
   }
   if (Services) {
-    query += ' AND services LIKE ?';
+    query += ' AND p.services LIKE ?';
     params.push(`%${Services}%`);
   }
   if (Location) {
-    query += ' AND belongedlocation = ?';
+    query += ' AND p.belongedlocation = ?';
     params.push(Location);
     // console.log("fetch location", Location)
   }
   if (NurseName) {
-    query += ' AND nursename = ?';
+    query += ' AND p.nursename = ?';
     params.push(NurseName);
   }
   if (DoctorName) {
-    query += ' AND doctorname = ?';
+    query += ' AND p.doctorname = ?';
     params.push(DoctorName);
   }
 
-  query += ' GROUP BY phone_number ORDER BY queue DESC'; // Changed from 'id DESC' to 'queue DESC'
+  query += ' GROUP BY p.phone_number ORDER BY p.queue DESC'; // Changed from 'id DESC' to 'queue DESC'
 
   // Log the constructed query and parameters for debugging
   // console.log("Executing query:", query);

@@ -65,6 +65,7 @@ const BillingFrom = () => {
     const [advance, setAdvance] = useState([])
     const [advanceInput, setAdvanceInput] = useState('')
     const [particulatSuggestion, setParticularSuggestion] = useState([])
+    const [particularInput, setParticularInput] = useState('');
 
     const basicData = async () => {
         const searchParams = new URLSearchParams(location.search);
@@ -209,11 +210,12 @@ const BillingFrom = () => {
         // Load static data
         fetchPaymentMethod();
         fetchMembershipTypes();
-        // fetchSuggestions(
-        //     value,
-        //     'http://localhost:5000/api/particular-suggestion',
-        //     setParticularSuggestion
-        // );
+        console.log("particular=>", document.querySelector('input[placeholder="Particular"]'))
+        fetchSuggestions(
+            document.querySelector('input[placeholder="Particular"]'),
+            'http://localhost:5000/api/particular-suggestion',
+            setParticularSuggestion
+        );
         if (params.memberType && params.memberType !== 'null' && params.memberType !== 'undefined') {
             setSelectedMembership(params.memberType);
         }
@@ -752,7 +754,6 @@ const BillingFrom = () => {
                         <span className={style.info_value}>{basic.services}</span>
                     </div>
                 </div>
-
                 <div className={style.details_right}>
                     <div className={style.info_row}>
                         <span className={style.info_label}>Name:</span>
@@ -784,7 +785,6 @@ const BillingFrom = () => {
                     )}
                 </div>
             </div>
-
             {/* Services Table */}
             <div className={style.services_container}>
                 <table className={style.services_table}>
@@ -830,12 +830,20 @@ const BillingFrom = () => {
                                     placeholder="Particular"
                                     className={style.responsive_input}
                                     onClick={(e) => e.target.focus()}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        setParticularInput(value);
+                                        fetchSuggestions(
+                                            value,
+                                            'http://localhost:5000/api/particular-suggestion',
+                                            setParticularSuggestion
+                                        );
+                                    }}
                                 />
                                 <SuggestionList
                                     suggestions={particulatSuggestion}
                                     onSuggestionClick={(suggestion) => {
-                                        // setTreatmentgivenname(suggestion);
-                                        handleServiceChange(index, 'service', suggestion)
+                                        document.querySelector('input[placeholder="Particular"]').value = suggestion
                                         setParticularSuggestion([]);
                                     }}
                                 />
@@ -865,7 +873,6 @@ const BillingFrom = () => {
                                         const particular = document.querySelector('input[placeholder="Particular"]').value;
                                         const amount = document.querySelector('input[placeholder="Amount"]').value;
                                         const discount = document.querySelector('input[placeholder="Discount"]').value;
-
                                         if (!particular.trim() || !amount || parseFloat(amount) <= 0) {
                                             Swal.fire({
                                                 icon: 'error',
@@ -875,16 +882,13 @@ const BillingFrom = () => {
                                             });
                                             return;
                                         }
-
                                         const newService = {
                                             service: particular.trim(),
                                             price: parseFloat(amount),
                                             discount: parseFloat(discount) || 0,
                                             isEditing: false
                                         };
-
                                         setServices([...services, newService]);
-
                                         // Clear the input fields
                                         document.querySelector('input[placeholder="Particular"]').value = '';
                                         document.querySelector('input[placeholder="Amount"]').value = '';

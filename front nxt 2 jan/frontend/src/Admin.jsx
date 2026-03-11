@@ -130,7 +130,7 @@ function Admin() {
                 <Link to={`/AddPatient?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Patient's Appointment</Link>
                 <Link to={`/billing/common?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Billing</Link>
                 <Link to={`/billing/history?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Billing History</Link>
-
+                <Link to={`/membership?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Manage Membership</Link>
                 <button onClick={handleLogout} className='btn btn-danger'>
                   Logout
                 </button>
