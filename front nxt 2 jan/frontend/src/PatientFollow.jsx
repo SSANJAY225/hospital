@@ -15,22 +15,24 @@ import { faCalendarAlt, faPlus, faBroom, faSignOutAlt } from '@fortawesome/free-
 import style from './style/PatientFollow.module.css'
 import { jwtDecode } from "jwt-decode";
 import BusinessList from "./Table";
+import TableMembership from "./TableMembership";
+import SixFollowUp from "./SixFollowUp";
 const CONFIG = {
     in: {
         title: "Appointments (InPatients)",
-        apiUrl: "http://localhost:5000/api/fetch-patients-in",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-in",
         showStatus: true,
 
     },
     out: {
         title: "Appointments (OutPatients)",
-        apiUrl: "http://localhost:5000/api/fetch-patients-out",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-out",
         showStatus: true,
 
     },
     admin: {
         title: "Patients",
-        apiUrl: "http://localhost:5000/api/getpatients",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/getpatients",
         showStatus: false,
 
     },
@@ -60,12 +62,17 @@ function PatientsFollowUpCommon() {
     const [selectedDoctor, setSelectedDoctor] = useState('');
     const [PatientType, setPatientType] = useState('')
     const [selectedDate, setSelectedDate] = useState(null);
-    const [filter,setfilter]=useState();
-    const [filterData,setFilterData]=useState()
+    const [filter, setfilter] = useState();
+    const [filterData, setFilterData] = useState()
+    const [display, setDisplay] = useState('common')
     const [currentDate, setCurrentDate] = useState(() => {
         const today = new Date();
         return today.toISOString().split('T')[0];
     });
+    const handleDisplay = (value) => {
+        setDisplay(prev => prev === value ? "common" : value);
+
+    }
     const getCookie = () => {
         const token = localStorage.getItem("authToken");
         console.log(token);
@@ -89,6 +96,9 @@ function PatientsFollowUpCommon() {
     const handleDateChange = (date) => {
         setSelectedDate(date);
     };
+    useEffect(() => {
+        fetchData();
+    }, [display]);
     const fetchData = async () => {
         try {
             const today = new Date();
@@ -97,7 +107,19 @@ function PatientsFollowUpCommon() {
             const formattedDate = formatDateToYYMMDD(selectedDate);
             const formattedFromDate = formatDateToYYMMDD(fromDate);
             const formattedToDate = formatDateToYYMMDD(toDate);
-            const res = await axios.get(config.apiUrl, {
+            let url = ''
+            if (display === 'common')
+                url = config.apiUrl
+            else if (display === 'membership')
+                url = 'https://amrithaahospitals.visualplanetserver.in/membershipren'
+            else if(display ==='followup6')
+                url='https://amrithaahospitals.visualplanetserver.in/sixfollowup'
+            else if(display==='followupcall')
+                url='https://amrithaahospitals.visualplanetserver.in/followupcall'
+            else
+                url = config.apiUrl
+            console.log("url", url)
+            const res = await axios.get(url, {
                 params: {
                     BusinessName: name,
                     PhoneNumber: phone,
@@ -115,21 +137,6 @@ function PatientsFollowUpCommon() {
                     currentDate: currentDate,
                 },
             });
-            console.log({
-                BusinessName: name,
-                PhoneNumber: phone,
-                BusinessID: patientId,
-                fromDate: formattedFromDate,
-                toDate: formattedToDate,
-                selectedDate: formattedDate,
-                // loginlocation: username,
-                franchiselocation,
-                NurseName: selectedNurse,
-                DoctorName: selectedDoctor,
-                PatientType,
-                Services: selectedServices,
-                statusFilter: status,
-            })
             console.log("get patient", res.data)
             setData(res.data);
             setFilterData(data)
@@ -190,10 +197,10 @@ function PatientsFollowUpCommon() {
         const fetchNursesAndDoctors = async () => {
             try {
                 const [nurseResponse, doctorResponse] = await Promise.all([
-                    axios.get('http://localhost:5000/api/nurse-suggestions', {
+                    axios.get('https://amrithaahospitals.visualplanetserver.in/api/nurse-suggestions', {
                         params: { franchiselocation }
                     }),
-                    axios.get('http://localhost:5000/api/doctor-suggestions', {
+                    axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
                         params: { franchiselocation }
                     })
                 ]);
@@ -255,7 +262,7 @@ function PatientsFollowUpCommon() {
             }
             const queryString = new URLSearchParams(queryParams).toString();
             console.log("params=>", queryParams)
-            const response = await axios.get(`http://localhost:5000/api/getpatients?${queryString}`);
+            const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/getpatients?${queryString}`);
             const sortedPatients = response.data.sort((a, b) => b.id - a.id);
             if (type == 'admin') {
                 setBusinesses(sortedPatients)
@@ -288,9 +295,6 @@ function PatientsFollowUpCommon() {
         return `${day}-${month}-${year}`;
     };
 
-    const membershipRenewal=()=>{
-        // const filter=
-    }
 
     return (<>
         <div className={style.admin_header}>
@@ -424,7 +428,7 @@ function PatientsFollowUpCommon() {
                         className={`${style.action_icon} ${style.add_appointment}`}
                         onClick={() => {
                             if (username === 'admin') {
-                                navigate(`/AddPatientsadmin?loginlocation=${username}`)
+                                navigate(`/AddPatient?loginlocation=${username}`)
                             } else {
                                 navigate(`/AddPatient?loginlocation=${username}&franchiselocation=${franchiselocation}`)
                             }
@@ -462,12 +466,15 @@ function PatientsFollowUpCommon() {
                     </span>
                 </div>
                 <div className={style.button_row}>
-                    <button className={style.renewal_button}>MemberShip Renewal</button>
-                    <button className={style.month_folloup_button}>6 Month Follow-up</button>
-                    <button className={style.followup_call}>Follow-up call</button>
+                    <button className={style.renewal_button} onClick={() => { handleDisplay("membership") }}>{display === 'membership' ? "Patients" : "Membership Renewal"}</button>
+                    <button className={style.month_folloup_button} onClick={() => { handleDisplay("followup6") }}>{display === 'followup6' ? "Patients" : "6 Month Follow-up"}</button>
+                    <button className={style.followup_call} onClick={() => { handleDisplay("followupcall") }}>{display === 'followupcall' ? "Patients" : "Follow-up call"}</button>
                 </div>
             </div>
-            <BusinessList onBusinessClick={handleRowClick} businesses={data} type={type} ></BusinessList>
+            {display === 'common' && <BusinessList onBusinessClick={handleRowClick} businesses={data} type={type} ></BusinessList>}
+            {display === 'membership' && <TableMembership data={data}></TableMembership>}
+            {(display==='followup6'|| display=='followupcall') &&<SixFollowUp data={data}></SixFollowUp>}
+            
         </div>
     </>);
 }

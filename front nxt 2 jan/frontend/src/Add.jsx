@@ -96,7 +96,7 @@ function Add() {
         moa: 'moa',
         particular:'particular'
       };
-      const apiEndpoint = `http://localhost:5000/add${endpoint}`;
+      const apiEndpoint = `https://amrithaahospitals.visualplanetserver.in/add${endpoint}`;
       console.log('API Endpoint:', apiEndpoint);
       const payload = field === 'membership'
         ? { membership_type: values.membership_type, price: values.price }

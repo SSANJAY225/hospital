@@ -128,7 +128,7 @@ function ReceptionBillingFollowup() {
     const name = encodeURIComponent(business.full_name)
     const visited = encodeURIComponent(business.visted)
     const id = encodeURIComponent(business.id);
-    // const req=await axios.get(`http://localhost:5000/billingdoc/${businessname}/${name}/${visited}`)
+    // const req=await axios.get(`https://amrithaahospitals.visualplanetserver.in/billingdoc/${businessname}/${name}/${visited}`)
     // // console.log(req.data)
     navigate(`/ReceptionBillingform?loginlocation=${username}&businessname=${businessname}&name=${name}&id=${id}&visited=${visited}&MemberType=${MemberType}&belongedlocation=${belongedlocation}`);
     setSelectedBusiness(business);
@@ -196,7 +196,7 @@ function ReceptionBillingFollowup() {
       const queryString = new URLSearchParams(queryParams).toString();
       const queryStringCount = new URLSearchParams(queryParamsCount).toString();
 
-      const response = await axios.get(`http://localhost:5000/api/fetch-patients-receptionbilling?${queryString}`);
+      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-receptionbilling?${queryString}`);
       const sortedPatients = response.data.sort((a, b) => b.id - a.id); // Sort in descending order
 
       setBusinesses(sortedPatients); // Update state with fetched patients

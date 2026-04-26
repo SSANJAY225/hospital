@@ -23,8 +23,8 @@ const AddPatient = () => {
     patientOccupation: '',
     parentName: '',
     parentOccupation: '',
-    referred:'',
-    address:'',
+    referred: '',
+    address: '',
   });
   const [newreceptionName, setNewreceptionName] = useState('');
   const [nurseSuggestions, setNurseSuggestions] = useState([]);
@@ -36,22 +36,34 @@ const AddPatient = () => {
   const [stream, setStream] = useState(null);
   const [services, setServices] = useState([]);
   const [isNewPatient, setIsNewPatient] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState("");
   const videoRef = useRef(null);
   const navigate = useNavigate();
-  const auth = localStorage.getItem('authToken');
+  const auth = jwtDecode(localStorage.getItem('authToken'));
   const [searchParams] = useSearchParams();
-  const franchiseLocation = searchParams.get('franchiselocation');
+  const franchiseLocation = selectedLocation || searchParams.get('franchiselocation');
   const nurse_name = useState("")
   const today = new Date();
   const minDate = today.toISOString().split('T')[0];
+  const [userRole, setUserRole] = useState("");
+  const [locationsuggestion, SetSuggestionLocation] = useState([])
 
-
+  const fetchToken = () => {
+    const tok = localStorage.getItem("authToken");
+    const decoded = jwtDecode(tok);
+    setToken(decoded);
+    setUserRole(decoded.roll);
+    if (decoded.role !== "admin") {
+      setSelectedLocation(decoded.frachiselocation);
+    }
+  };
+  
   const fetchServices = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/getservices');
+      const res = await axios.get('https://amrithaahospitals.visualplanetserver.in/getservices');
       setServices(res.data);
-      const decode = jwtDecode(auth)
-      const nurse = await axios.get(`http://localhost:5000/getnurse/${decode.frachiselocation}`);
+      const decode = auth
+      const nurse = await axios.get(`https://amrithaahospitals.visualplanetserver.in/getnurse/${decode.frachiselocation}`);
     } catch (error) {
       console.error('Error fetching services:', error);
     }
@@ -59,7 +71,7 @@ const AddPatient = () => {
 
   const fetchVisitCount = async (phoneNumber) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/checkpatient/${phoneNumber}`);
+      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/checkpatient/${phoneNumber}`);
       const visitCount = response.data.exists ? response.data.visitCount + 1 : 1;
       return visitCount;
     } catch (error) {
@@ -70,7 +82,7 @@ const AddPatient = () => {
 
   const fetchPatientDetails = async (phoneNumber) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/patient-details/${phoneNumber}`);
+      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/patient-details/${phoneNumber}`);
       const data = response.data;
       console.log(response)
       setIsNewPatient(false);
@@ -134,6 +146,7 @@ const AddPatient = () => {
   };
 
   useEffect(() => {
+    setSelectedLocation(searchParams.get('franchiselocation'))
     if (!auth) {
       Swal.fire({
         icon: 'warning',
@@ -143,7 +156,6 @@ const AddPatient = () => {
       navigate('/');
     }
     fetchServices();
-
     return () => {
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
@@ -151,8 +163,13 @@ const AddPatient = () => {
       }
     };
   }, [auth, navigate, stream]);
-
+  const fetchAllLocation = async () => {
+    const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/location`)
+    SetSuggestionLocation(res.data)
+    console.log("all location", res)
+  }
   useEffect(() => {
+    fetchAllLocation();
     if (patient.phoneNumber.length === 10) {
       fetchPatientDetails(patient.phoneNumber);
       fetchVisitCount(patient.phoneNumber).then((visitCount) => {
@@ -251,7 +268,15 @@ const AddPatient = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log(selectedLocation)
+    if (!selectedLocation) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Location Required',
+        text: 'Please select a franchise location.',
+      });
+      return;
+    }
     const requiredFields = {
       fullName: 'Full Name',
       age: 'Age',
@@ -264,8 +289,8 @@ const AddPatient = () => {
       patientOccupation: 'Patient Occupation',
       parentName: ' Parent / Spouse Occupation',
       parentOccupation: 'Parent / Spouse Occupation',
-      address:'Address',
-      referred:'Referred  By'
+      address: 'Address',
+      referred: 'Referred  By'
     };
 
     const missingFields = [];
@@ -302,9 +327,8 @@ const AddPatient = () => {
       return;
     }
 
-
     try {
-      const checkResponse = await axios.get(`http://localhost:5000/api/checkpatient/${patient.phoneNumber}`);
+      const checkResponse = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/checkpatient/${patient.phoneNumber}`);
       const isExistingPatient = checkResponse.data.exists;
 
       const selectedPhoto = cameraPhoto || photo;
@@ -337,7 +361,7 @@ const AddPatient = () => {
         formData.append('receptionistName', receptionName)
       }
       if (franchiseLocation) {
-        formData.append('franchiseLocation', franchiseLocation);
+        formData.append('franchiseLocation', selectedLocation);
       } else {
         Swal.fire({
           icon: 'error',
@@ -353,7 +377,7 @@ const AddPatient = () => {
       for (let [key, value] of formData.entries()) {
         console.log(key, value);
       }
-      const response = await axios.post('http://localhost:5000/api/patients', formData, {
+      const response = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/patients', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -379,8 +403,8 @@ const AddPatient = () => {
     }
   };
   const fetchNurseSuggestions = async () => {
-    const req = await axios.get(`http://localhost:5000/reception?location=${franchiseLocation}`)
-    setNurseSuggestions(req.data.map((itm)=>itm.name))
+    const req = await axios.get(`https://amrithaahospitals.visualplanetserver.in/reception?location=${franchiseLocation}`)
+    setNurseSuggestions(req.data.map((itm) => itm.name))
   }
 
   const handleAddreceptionName = async (name) => {
@@ -394,7 +418,7 @@ const AddPatient = () => {
       return;
     }
     try {
-      await axios.post('http://localhost:5000/addreception', {
+      await axios.post('https://amrithaahospitals.visualplanetserver.in/addreception', {
         reception: name,
         location: franchiseLocation // Include location from urlParams
       });
@@ -416,7 +440,23 @@ const AddPatient = () => {
       <section className={style.patient_registration_container}>
         <header className={style.registration_form_header}>
           <h2>Add New Patient</h2>
-          {franchiseLocation && <p>Franchise Location: {franchiseLocation}</p>}
+          {auth.roll === "admin" ? (
+            <div className={style.registration_form_field}>
+              <label>Select Franchise Location</label>
+              <select
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+              >
+                <option value="">Select Location</option>
+                {locationsuggestion.map((l, index) => (
+                  <option key={index} value={l}>
+                    {l}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (selectedLocation && <p>Franchise Location: {selectedLocation}</p>)}
+          {/* {franchiseLocation && <p>Franchise Location: {franchiseLocation}</p>} */}
           <div className={style.nurse}>
             <div onClick={() => {
               setIsNurseModalOpen(true);
@@ -445,8 +485,8 @@ const AddPatient = () => {
                     ))
                   ) : (
                     <div className={`${style.nurse_listbox_item} ${style.disabled}`}>
-                      {franchiseLocation
-                        ? `No Receptionist available for ${franchiseLocation}`
+                      {selectedLocation
+                        ? `No Receptionist available for ${selectedLocation}`
                         : 'No location specified'}
                     </div>
                   )}

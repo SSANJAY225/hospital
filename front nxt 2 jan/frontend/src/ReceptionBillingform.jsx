@@ -60,7 +60,7 @@ const ReceptionBillingform = () => {
     const searchParams = new URLSearchParams(location.search);
     // setUrlParams(getUrlParams());
     // console.log("sdfghsfjgn",urlParams)
-    const res = await axios.get(`http://localhost:5000/get-basic-detail/${searchParams.get('id')}/${searchParams.get('name')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
+    const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-basic-detail/${searchParams.get('id')}/${searchParams.get('name')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
     console.log("res data", res)
     setbasic(res.data)
   }
@@ -81,7 +81,7 @@ const ReceptionBillingform = () => {
 
   const fetchMembershipTypes = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/membership-types');
+      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/membership-types');
       // console.log('Membership Types Response:', response.data);
       setMembershipTypes(response.data);
     } catch (error) {
@@ -91,7 +91,7 @@ const ReceptionBillingform = () => {
   };
   const fetchPaymentMethod = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/get-paymentMethod')
+      const res = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-paymentMethod')
       // console.log(res.data.map((i)=>i.method))
       setoptpaymentmethod(res.data)
       console.log(optpaymnetmethod)
@@ -139,7 +139,7 @@ const ReceptionBillingform = () => {
 
   const fetchImage = async (phoneNumber, visited) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/user-photo`, {
+      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/user-photo`, {
         params: { phoneNumber, visited },
       });
       setImageUrl(response.data.imageUrl);
@@ -447,7 +447,7 @@ const ReceptionBillingform = () => {
     // fetch suggestions
     fetchSuggestions(
       value,
-      'http://localhost:5000/api/particular-suggestion',
+      'https://amrithaahospitals.visualplanetserver.in/api/particular-suggestion',
       setParticularSuggestion
     );
   };
@@ -505,7 +505,7 @@ const ReceptionBillingform = () => {
 
     try {
       // console.log(billingData)
-      const billingResponse = await axios.post('http://localhost:5000/api/final-save-billing', billingData);
+      const billingResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/final-save-billing', billingData);
       if (!billingResponse.data.success) {
         throw new Error('Failed to save billing');
       }
@@ -516,7 +516,7 @@ const ReceptionBillingform = () => {
           visited: urlParams.visited,
           membership: selectedMembership,
         };
-        const membershipResponse = await axios.post('http://localhost:5000/api/Update-membership', membershipUpdateData)
+        const membershipResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/Update-membership', membershipUpdateData)
         if (!membershipResponse.data.success) {
           console.error('Failed to update membership:', membershipResponse.data.message);
           await Swal.fire({
@@ -531,7 +531,7 @@ const ReceptionBillingform = () => {
       }
 
       const { pdfData, filename } = generatePDF();
-      const pdfResponse = await axios.post('http://localhost:5000/api/save-bill-pdf', {
+      const pdfResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/save-bill-pdf', {
         pdfData,
         filename,
         userId: urlParams.id,
@@ -616,7 +616,7 @@ const ReceptionBillingform = () => {
   //     date: formatDateToMySQL(new Date()),
   //   };
   //   try {
-  //     const billingResponse = await axios.post('http://localhost:5000/api/save-billing', billingData);
+  //     const billingResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/save-billing', billingData);
   //     if (!billingResponse.data.success) {
   //       throw new Error('Failed to save billing');
   //     }
@@ -627,7 +627,7 @@ const ReceptionBillingform = () => {
   //         visited: urlParams.visited,
   //         membership: selectedMembership,
   //       };
-  //       const membershipResponse = await axios.post('http://localhost:5000/api/Update-membership', membershipUpdateData)
+  //       const membershipResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/Update-membership', membershipUpdateData)
   //       if (!membershipResponse.data.success) {
   //         console.error('Failed to update membership:', membershipResponse.data.message);
   //         await Swal.fire({
@@ -642,7 +642,7 @@ const ReceptionBillingform = () => {
   //     }
 
   //     const { pdfData, filename } = generatePDF();
-  //     const pdfResponse = await axios.post('http://localhost:5000/api/save-bill-pdf', {
+  //     const pdfResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/save-bill-pdf', {
   //       pdfData,
   //       filename,
   //       userId: urlParams.id,

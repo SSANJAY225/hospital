@@ -14,19 +14,19 @@ import { TbFilterCheck } from "react-icons/tb";
 const CONFIG = {
     common: {
         title: "common billing",
-        apiUrl: "http://localhost:5000/api/fetch-patients-receptionbilling",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-receptionbilling",
         showStatus: true,
 
     },
     history: {
         title: "history",
-        apiUrl: "http://localhost:5000/get-files",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/get-files",
         showStatus: false,
 
     },
     admin: {
         title: "admin billing",
-        apiUrl: "http://localhost:5000/get-adminfiles",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/get-adminfiles",
         showStatus: false,
 
     },
@@ -56,8 +56,8 @@ const Billing = () => {
                 const role = decoded.roll;
                 console.log(role);
                 // let link = ''
-                // if (role === 'admin') { link = "http://localhost:5000/get-adminfiles" }
-                // else { link = "http://localhost:5000/get-files" }
+                // if (role === 'admin') { link = "https://amrithaahospitals.visualplanetserver.in/get-adminfiles" }
+                // else { link = "https://amrithaahospitals.visualplanetserver.in/get-files" }
                 const res = await axios.get(config.apiUrl, { headers: { Authorization: `Bearer ${token}` } })
                 const reversed = res.data.reverse();
                 console.log(reversed)
@@ -202,7 +202,7 @@ const Billing = () => {
         const name = encodeURIComponent(business.full_name)
         const visited = encodeURIComponent(business.visted)
         const id = encodeURIComponent(business.id);
-        // const req=await axios.get(`http://localhost:5000/billingdoc/${businessname}/${name}/${visited}`)
+        // const req=await axios.get(`https://amrithaahospitals.visualplanetserver.in/billingdoc/${businessname}/${name}/${visited}`)
         // // console.log(req.data)
         // loginlocation=${username}&
         navigate(`/BillingForm/${type}?user=${name}&businessname=${businessname}&name=${name}&id=${id}&visited=${visited}&MemberType=${MemberType}&belongedlocation=${belongedlocation}`);
@@ -422,7 +422,7 @@ const Billing = () => {
                                     <td>{item.Visted}</td>
                                     <td>₹{parseFloat(item.total_price || 0).toFixed(2)}</td>
                                     <td>
-                                        <a href={`http://localhost:5000/downloadbill/${item.Phone_number}_${item.Visted}.pdf`}
+                                        <a href={`https://amrithaahospitals.visualplanetserver.in/downloadbill/${item.Phone_number}_${item.Visted}.pdf`}
                                         // download
                                         >
                                             <button>Download</button>

@@ -9,6 +9,7 @@ const fs = require('fs');
 const archiver = require('archiver');
 const { exec } = require('child_process');
 const util = require('util');
+const { error } = require("console");
 
 const app = express();
 
@@ -1364,7 +1365,16 @@ app.delete('/getRoA/:id', (req, res) => {
     res.json({ message: 'ROA entry deleted successfully' });
   });
 });
-
+app.get("/location", (req, res) => {
+  const sql = 'select distinct Location from users_database'
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching location suggestions:', err);
+      return res.status(500).json({ message: 'Failed to fetch location suggestions', error: err.message });
+    }
+    res.json(results.map(res => res.Location));
+  });
+})
 
 app.get('/locationsuggestion', (req, res) => {
   // console.log('Received request for /locationsuggestion at:', new Date().toISOString());
@@ -2405,25 +2415,38 @@ app.post("/api/final-save-billing", (req, res) => {
 
 // Update patient's membership in the patients table
 app.post('/api/update-membership', (req, res) => {
-  const { id, phoneNumber, visited, membership } = req.body;
-
-  if (!id || !phoneNumber || !visited || !membership) {
-    return res.status(400).json({ success: false, message: 'id, phoneNumber, visited, and membership are required' });
+  console.log("api hit")
+  const { Name, phoneNumber, visited, membership_type, valid_from } = req.body;
+  console.log(Name, phoneNumber, membership_type)
+  if (!Name || !phoneNumber || !visited) {
+    return res.status(400).json({ message: "Required fields missing" });
   }
+  // calculate valid_thru (1 year)
+  const fromDate = new Date(valid_from);
+  const thruDate = new Date(fromDate);
+  thruDate.setFullYear(thruDate.getFullYear() + 1);
+  const query = `
+    INSERT INTO manage_membership 
+    (Name, Phone_Number, visit, membership_type, valid_from, valid_thru)
+    VALUES (?, ?, ?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
+    ON DUPLICATE KEY UPDATE
+      membership_type = VALUES(membership_type),
+      valid_from = CURDATE(),
+      valid_thru = DATE_ADD(CURDATE(), INTERVAL 1 YEAR)
+  `;
 
-  const query = 'UPDATE patients SET membertype = ? WHERE id = ? AND phone_number = ? AND visted = ?';
-  db.query(query, [membership, id, phoneNumber, visited], (error, results) => {
-    if (error) {
-      console.error('Error updating membership:', error);
-      return res.status(500).json({ success: false, message: 'Failed to update membership' });
+  db.query(query, [Name, phoneNumber, visited, membership_type], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Database error" });
     }
 
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Patient not found' });
-    }
+    res.json({
+      success: "Inserted or Updated successfully"
+    });
+  }
+  );
 
-    res.json({ success: true, message: 'Membership updated successfully' });
-  });
 });
 
 app.get('/api/membership-types', (req, res) => {
@@ -2692,7 +2715,7 @@ const insertData = async (tableName, columns, dataArray) => {
 
 app.get('/api/fetch-patients-nurse', (req, res) => {
   const { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, completionStatus, currentDate } = req.query;
-
+  console.log(currentDate)
   // Base query
   let query = `
     SELECT 
@@ -2758,12 +2781,13 @@ app.get('/api/fetch-patients-nurse', (req, res) => {
   // console.log('Parameters:', params);
 
   // Execute the query with parameters
+  console.log(query, params)
   db.query(query, params, (error, results) => {
     if (error) {
       console.error('Error executing query:', error);
       return res.status(500).send({ message: 'Error fetching data', error: error.message });
     }
-    // console.log('Query Results:', results);
+    console.log('Query Results:', results);
     res.json(results);
   });
 });
@@ -3106,11 +3130,27 @@ app.get('/get-data', async (req, res) => {
 
     // Map dental data to sequential numbers (1-32), excluding non-dental fields
     // console.log('dental data=>', results.dentalData)
+    const dentalraw = results.dentalData.map(row => {
+      const newRow = {};
+
+      Object.keys(row).forEach(key => {
+        // console.log(key)
+        if (key.startsWith('t')) {
+          // remove only 't' prefix 
+          const newKey = key.slice(1);
+          newRow[newKey] = row[key];
+        } else {
+          newRow[key] = row[key];
+        }
+      });
+
+      return newRow;
+    });
     const dentalMapped = {};
-    if (results.dentalData.length > 0) {
-      const dentalRecord = results.dentalData[results.dentalData.length - 1];
+    if (dentalraw.length > 0) {
+      const dentalRecord = dentalraw[dentalraw.length - 1];
       Object.keys(dentalRecord).forEach((key) => {
-        if (/^\d+$/.test(key) && parseInt(key) >= 1 && parseInt(key) <= 75) {
+        if (/^\d+$/.test(key) && parseInt(key) >= 1 && parseInt(key) <= 85) {
           dentalMapped[key] = dentalRecord[key] || "";
         }
       });
@@ -3163,6 +3203,7 @@ app.get('/get-data', async (req, res) => {
     };
 
     // console.log('Response Data ->', responseData);
+    console.log("dental", dentalraw)
     res.json(responseData);
   } catch (err) {
     console.error('Error ->', err);
@@ -3702,7 +3743,7 @@ app.put("/update-datas", (req, res) => {
       const valuesArray = keysArray.map((key) => dental[key]);
 
       // Include Name, Phone, Visit in the final keys and values "Name", "Phone_Number", "Visit",
-      const allKeys = [...keysArray.map(k => `\`${k}\``), "Name", "Phone_Number", "Visit"];
+      const allKeys = [...keysArray.map(k => `\`t${k}\``), "Name", "Phone_Number", "Visit"];
       // identifiers.Name, identifiers.Phone_number, identifiers.Visit,
       const allValues = [...valuesArray, identifiers.Name, identifiers.Phone_number, identifiers.Visit];
       // console.log(allKeys)
@@ -3765,7 +3806,7 @@ app.get("/get-adminfiles", (req, res) => {
   });
 });
 
-app.get("/get-files",isauth, (req, res) => {
+app.get("/get-files", isauth, (req, res) => {
   const { full_name, Phone_number, visted, from_date, to_date } = req.query;
   // console.log("request---->", req)
   let sql = `
@@ -4380,7 +4421,178 @@ app.delete("/reception/:id", (req, res) => {
     return res.json({ message: "Reception deleted successfully" });
   });
 });
+app.get("/sixfollowup", (req, res) => {
+  const { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, Location, Services, NurseName, DoctorName, PatientType } = req.query;
+  console.log(req.query)
+  let query = `SELECT * FROM general_patient g 
+  JOIN patients p ON
+   p.full_name = g.Name AND p.phone_number = g.Phone_Number AND p.visted = g.Visted 
+   WHERE g.FollowUpDate >= CURDATE()
+  AND g.FollowUpDate <= DATE_ADD(CURDATE(), INTERVAL 6 MONTH)`
+  const params = [];
+  // console.log("location=>>>>>>>>>.", Location)
+  // Add conditions based on provided query parameters
+  if (PatientType) {
+    query += ' AND p.patient_type = ?';
+    params.push(PatientType);
+  }
+  if (PhoneNumber) {
+    query += ' AND p.phone_number = ?';
+    params.push(PhoneNumber);
+  }
+  if (BusinessName) {
+    query += ' AND p.full_name LIKE ?';
+    params.push(`%${BusinessName}%`);
+  }
+  if (BusinessID) {
+    query += ' AND p.id = ?';
+    params.push(BusinessID);
+  }
+  if (fromDate) {
+    query += ' AND p.appointment_date >= ?';
+    params.push(fromDate);
+  }
+  if (toDate) {
+    query += ' AND p.appointment_date <= ?';
+    params.push(toDate);
+  }
+  if (Services) {
+    query += ' AND p.services LIKE ?';
+    params.push(`%${Services}%`);
+  }
+  if (Location) {
+    query += ' AND p.belongedlocation = ?';
+    params.push(Location);
+    // console.log("fetch location", Location)
+  }
+  if (NurseName) {
+    query += ' AND p.nursename = ?';
+    params.push(NurseName);
+  }
+  if (DoctorName) {
+    query += ' AND p.doctorname = ?';
+    params.push(DoctorName);
+  }
+  query+=`ORDER BY g.FollowUpDate ASC;`
+  db.query(query, params, (err, result) => {
+    if (err) return res.status(500).json({ error: err })
+    return res.json(result)
+  })
+})
+app.get('/followupcall',(req,res)=>{
+  const { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, Location, Services, NurseName, DoctorName, PatientType } = req.query;
+  console.log(req.query)
+  let query = `SELECT * FROM general_patient g 
+  JOIN patients p ON
+   p.full_name = g.Name AND p.phone_number = g.Phone_Number AND p.visted = g.Visted 
+   WHERE g.FollowUpDate < CURDATE()`
+  const params = [];
+  // console.log("location=>>>>>>>>>.", Location)
+  // Add conditions based on provided query parameters
+  if (PatientType) {
+    query += ' AND p.patient_type = ?';
+    params.push(PatientType);
+  }
+  if (PhoneNumber) {
+    query += ' AND p.phone_number = ?';
+    params.push(PhoneNumber);
+  }
+  if (BusinessName) {
+    query += ' AND p.full_name LIKE ?';
+    params.push(`%${BusinessName}%`);
+  }
+  if (BusinessID) {
+    query += ' AND p.id = ?';
+    params.push(BusinessID);
+  }
+  if (fromDate) {
+    query += ' AND p.appointment_date >= ?';
+    params.push(fromDate);
+  }
+  if (toDate) {
+    query += ' AND p.appointment_date <= ?';
+    params.push(toDate);
+  }
+  if (Services) {
+    query += ' AND p.services LIKE ?';
+    params.push(`%${Services}%`);
+  }
+  if (Location) {
+    query += ' AND p.belongedlocation = ?';
+    params.push(Location);
+    // console.log("fetch location", Location)
+  }
+  if (NurseName) {
+    query += ' AND p.nursename = ?';
+    params.push(NurseName);
+  }
+  if (DoctorName) {
+    query += ' AND p.doctorname = ?';
+    params.push(DoctorName);
+  }
+  query+=`ORDER BY g.FollowUpDate ASC;`
+  db.query(query, params, (err, result) => {
+    if (err) return res.status(500).json({ error: err })
+    return res.json(result)
+  })
+})
+app.get("/membershipren", (req, res) => {
+  const { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, Location, Services, NurseName, DoctorName, PatientType } = req.query;
 
+  let query = 'select * from manage_membership WHERE 1=1 '
+  const params = [];
+  // console.log("location=>>>>>>>>>.", Location)
+  // Add conditions based on provided query parameters
+  if (!toDate && !fromDate) {
+    query += ' and valid_thru >= DATE_SUB(CURDATE(), INTERVAL 2 DAY)'
+  }
+  if (PhoneNumber) {
+    query += ' AND Phone_Number = ?';
+    params.push(PhoneNumber);
+  }
+  if (BusinessName) {
+    query += ' AND Name LIKE ?';
+    params.push(`%${BusinessName}%`);
+  }
+  if (fromDate) {
+    query += ' AND valid_thru >= ?';
+    params.push(fromDate);
+  }
+  if (toDate) {
+    query += ' AND valid_thru <= ?';
+    params.push(toDate);
+  }
+  db.query(query, params, (err, result) => {
+    if (err) return res.status(500).json({ error: err })
+    return res.json(result)
+  })
+})
+app.put("/reason_update", (req, res) => {
+  const { name, phonenumber, visit, reason, followupdate } = req.body.params;
+  console.log(req.body.params);
+  const sql = `UPDATE patients SET reason=? WHERE full_name=? AND phone_number=? AND visted=?`;
+  if (followupdate) {
+    console.log("inner hit");
+    const formattedDate = followupdate.split("T")[0];
+    const qu = `UPDATE general_patient 
+                SET FollowUpDate=? 
+                WHERE Name=? AND Phone_Number=? AND Visted=?`;
+    db.query(qu, [formattedDate, name, phonenumber, visit], (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(400).json({ err });
+      }
+    });
+  }
+
+  db.query(sql, [reason, name, phonenumber, visit], (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.status(400).json({ err });
+    }
+    return res.status(200).json({ success: "updated" });
+  });
+});
 app.delete("/moa/:id", (req, res) => {
   const { id } = req.params;
   const sql = "DELETE FROM moa WHERE id = ?";

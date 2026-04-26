@@ -168,15 +168,15 @@ function NurseFollow() {
         BusinessName: BusinessName.trim(),
         franchiselocation,
         completionStatus,
-        currentDate: overrideCurrentDate || currentDate || '',
-        nextDate: overrideNextDate || nextDate || '',
+        currentDate: currentDate || '',
+        nextDate: nextDate || '',
       };
 
       console.log('Query Parameters:', queryParams);
       const queryString = new URLSearchParams(queryParams).toString();
 
       const response = await axios.get(
-        `http://localhost:5000/api/fetch-patients-nurse?${queryString}`
+        `https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-nurse?${queryString}`
       );
       console.log(response.data)
       setBusinesses(response.data);

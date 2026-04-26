@@ -9,19 +9,19 @@ import SuggestionList from './suggestionList';
 const CONFIG = {
     common: {
         title: "common billing",
-        apiUrl: "http://localhost:5000/api/fetch-patients-out",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-out",
         showStatus: true,
 
     },
     history: {
         title: "history",
-        apiUrl: "http://localhost:5000/api/getpatients",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/getpatients",
         showStatus: false,
 
     },
     admin: {
         title: "admin billing",
-        apiUrl: "http://localhost:5000/get_billing",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/get_billing",
         showStatus: false,
 
     },
@@ -69,7 +69,7 @@ const BillingFrom = () => {
 
     const basicData = async () => {
         const searchParams = new URLSearchParams(location.search);
-        const res = await axios.get(`http://localhost:5000/get-basic-detail/${searchParams.get('id')}/${searchParams.get('user')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
+        const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-basic-detail/${searchParams.get('id')}/${searchParams.get('user')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
         console.log("basic=>", res)
         setbasic(res.data)
     }
@@ -107,7 +107,7 @@ const BillingFrom = () => {
 
     const fetchMembershipTypes = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/membership-types');
+            const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/membership-types');
             console.log('Membership Types Response:', response.data);
             setMembershipTypes(response.data);
         } catch (error) {
@@ -118,7 +118,7 @@ const BillingFrom = () => {
 
     const fetchPaymentMethod = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/get-paymentMethod')
+            const res = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-paymentMethod')
             setoptpaymentmethod(res.data);
             console.log('Payment methods loaded:', res.data);
         } catch (e) {
@@ -141,7 +141,7 @@ const BillingFrom = () => {
 
             console.log('Fetching API data with params:', { user, visit, phonenumber });
 
-            const req = await axios.get(`http://localhost:5000/get_billing/${phonenumber}/${visit}/${user}`)
+            const req = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get_billing/${phonenumber}/${visit}/${user}`)
             const api = req.data;
 
             console.log("API response:", api);
@@ -171,7 +171,7 @@ const BillingFrom = () => {
                 console.log("Processed services:", updatedServiceArray);
                 setServices(updatedServiceArray);
             }
-            const adv = await axios.get('http://localhost:5000/advance', {
+            const adv = await axios.get('https://amrithaahospitals.visualplanetserver.in/advance', {
                 params: {
                     Phone_number: phonenumber,
                     visited: visit,
@@ -213,7 +213,7 @@ const BillingFrom = () => {
         console.log("particular=>", document.querySelector('input[placeholder="Particular"]'))
         fetchSuggestions(
             document.querySelector('input[placeholder="Particular"]'),
-            'http://localhost:5000/api/particular-suggestion',
+            'https://amrithaahospitals.visualplanetserver.in/api/particular-suggestion',
             setParticularSuggestion
         );
         if (params.memberType && params.memberType !== 'null' && params.memberType !== 'undefined') {
@@ -259,7 +259,7 @@ const BillingFrom = () => {
 
     const fetchImage = async (phoneNumber, visited) => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/user-photo`, {
+            const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/user-photo`, {
                 params: { phoneNumber, visited },
             });
             setImageUrl(response.data.imageUrl);
@@ -567,23 +567,24 @@ const BillingFrom = () => {
         console.log(billingData)
         try {
             console.log("data advance=>", finaladvance)
-            const req = await axios.post('http://localhost:5000/advance', data)
+            const req = await axios.post('https://amrithaahospitals.visualplanetserver.in/advance', data)
             console.log("advance=>", req)
-            const billingResponse = await axios.put('http://localhost:5000/api/update_billing', billingData);
+            const billingResponse = await axios.put('https://amrithaahospitals.visualplanetserver.in/api/update_billing', billingData);
             if (!billingResponse.data.success) {
                 throw new Error('Failed to save billing');
             }
-
+            // const mem=await axios.post('https://amrithaahospitals.visualplanetserver.in/api/update-membership',)
             if (selectedMembership && selectedMembership !== urlParams.memberType) {
+                console.log("api name=>",apiData.user_name)
                 const membershipUpdateData = {
-                    id: urlParams.id || apiData.user_id,
+                    Name: basic.full_name,
                     phoneNumber: urlParams.businessName || apiData.phone_number,
                     visited: urlParams.visited || apiData.visit_number,
-                    membership: selectedMembership,
+                    membership_type: selectedMembership,
                 };
 
-                const membershipResponse = await axios.post('http://localhost:5000/api/Update-membership', membershipUpdateData);
-
+                const membershipResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/update-membership', membershipUpdateData);
+                console.log("membership api=>",membershipResponse)
                 if (!membershipResponse.data.success) {
                     console.error('Failed to update membership:', membershipResponse.data.message);
                     await Swal.fire({
@@ -598,7 +599,7 @@ const BillingFrom = () => {
             }
             if (status == 'Generate_Invoice' || status == 'Final_Bill') {
                 const { pdfData, filename } = generatePDF();
-                const pdfResponse = await axios.post('http://localhost:5000/api/save-bill-pdf', {
+                const pdfResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/save-bill-pdf', {
                     pdfData,
                     filename,
                     userId: urlParams.id || apiData.user_id,
@@ -835,7 +836,7 @@ const BillingFrom = () => {
                                         setParticularInput(value);
                                         fetchSuggestions(
                                             value,
-                                            'http://localhost:5000/api/particular-suggestion',
+                                            'https://amrithaahospitals.visualplanetserver.in/api/particular-suggestion',
                                             setParticularSuggestion
                                         );
                                     }}

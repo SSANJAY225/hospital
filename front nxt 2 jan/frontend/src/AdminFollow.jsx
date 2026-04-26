@@ -22,7 +22,7 @@ import BusinessList from './Table.jsx';
 
 const handleDownloadBill = async (business) => {
   try {
-    const response = await axios.get('http://localhost:5000/api/get-billing-details', {
+    const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/get-billing-details', {
       params: {
         phone_number: business.phone_number,
         visted: business.visted,
@@ -137,7 +137,7 @@ function AdminFollow() {
     const doctorname = encodeURIComponent(business.doctorname);
 
     try {
-      const response = await axios.get('http://localhost:5000/get-data', {
+      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-data', {
         params: {
           businessname,
           name,
@@ -165,10 +165,10 @@ function AdminFollow() {
     const fetchNursesAndDoctors = async () => {
       try {
         const [nurseResponse, doctorResponse] = await Promise.all([
-          axios.get('http://localhost:5000/api/nurse-suggestions', {
+          axios.get('https://amrithaahospitals.visualplanetserver.in/api/nurse-suggestions', {
             params: { franchiselocation }
           }),
-          axios.get('http://localhost:5000/api/doctor-suggestions', {
+          axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
             params: { franchiselocation }
           })
         ]);
@@ -246,7 +246,7 @@ function AdminFollow() {
         console.log("frm submit", PatientType)
       }
       const queryString = new URLSearchParams(queryParams).toString();
-      const response = await axios.get(`http://localhost:5000/api/getpatients?${queryString}`);
+      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/getpatients?${queryString}`);
       const sortedPatients = response.data.sort((a, b) => b.id - a.id);
       setBusinesses(response.data);
     } catch (error) {
@@ -262,10 +262,10 @@ function AdminFollow() {
     const fetchNursesAndDoctors = async () => {
       try {
         const [nurseResponse, doctorResponse] = await Promise.all([
-          axios.get('http://localhost:5000/api/nurse-suggestions', {
+          axios.get('https://amrithaahospitals.visualplanetserver.in/api/nurse-suggestions', {
             params: { franchiselocation }
           }),
-          axios.get('http://localhost:5000/api/doctor-suggestions', {
+          axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
             params: { franchiselocation }
           })
         ]);

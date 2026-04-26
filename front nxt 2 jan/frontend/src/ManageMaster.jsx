@@ -10,101 +10,101 @@ Modal.setAppElement("#root");
 const CONFIG = {
     complaints: {
         title: "Complaints",
-        apiUrl: "http://localhost:5000/complaints",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/complaints",
         fieldName: "complaint_text",
     },
     vitals: {
         title: "Vitals",
-        apiUrl: "http://localhost:5000/Vitals-for-manage",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/Vitals-for-manage",
         fieldName: "vitals",
     },
     dosage: {
         title: "Dosage",
-        apiUrl: "http://localhost:5000/dosage",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/dosage",
         fieldName: "dosage_text",
     },
     timing: {
         title: "Timing",
-        apiUrl: "http://localhost:5000/timing",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/timing",
         fieldName: "timing_text",
     },
     duration: {
         title: "Duration",
-        apiUrl: "http://localhost:5000/duration",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/duration",
         fieldName: "duration_text",
     }, examinations: {
         title: "On Examination",
-        apiUrl: "http://localhost:5000/examinations",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/examinations",
         fieldName: "onexam_text"
     }, sysexam: {
         title: "Systematic Examination",
-        apiUrl: "http://localhost:5000/sysexaminations",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/sysexaminations",
         fieldName: "sysexam_text"
     }, treatment: {
         title: "Treatment Given",
-        apiUrl: "http://localhost:5000/treatmentgiven",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/treatmentgiven",
         fieldName: "treatment_name_text",
     }, drugs: {
         title: "Drugs",
-        apiUrl: "http://localhost:5000/drugs",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/drugs",
         fieldName: "drugs_text"
     }, advice_given: {
         title: "Advice Given",
-        apiUrl: "http://localhost:5000/advicegiven",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/advicegiven",
         fieldName: "advicegiven_text"
     }, vaccine: {
         title: "Vaccine",
-        apiUrl: "http://localhost:5000/vaccine",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/vaccine",
         fieldName: "vaccine_text"
     }, RoA: {
         title: "ROA",
-        apiUrl: "http://localhost:5000/getRoA",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/getRoA",
         fieldName: "name"
     }, dental: {
         title: "Dental",
-        apiUrl: "http://localhost:5000/dental",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/dental",
         fieldName: "treatment_name"
     }, service: {
         title: "Service",
-        apiUrl: "http://localhost:5000/services",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/services",
         fieldName: "service_name"
     }, doctor: {
         title: "Doctor",
-        apiUrl: "http://localhost:5000/doctors_names",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/doctors_names",
         fieldName: "name"
     }, location: {
         title: "Location",
-        apiUrl: "http://localhost:5000/locations",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/locations",
         fieldName: "location_name",
     }, memberShip: {
         title: "Membership",
-        apiUrl: "http://localhost:5000/memberships",
+        apiUrl: "https://amrithaahospitals.visualplanetserver.in/memberships",
         fieldName: "membership_type",
         fieldName2: "price",
         isMultiField: true
     },nurse:{
         title:"Nurse",
-        apiUrl:"http://localhost:5000/nurses_name",
+        apiUrl:"https://amrithaahospitals.visualplanetserver.in/nurses_name",
         fieldName:"name"
     },paymentmethod:{
         title:"Payment Method",
-        apiUrl:"http://localhost:5000/get-paymentMethod",
+        apiUrl:"https://amrithaahospitals.visualplanetserver.in/get-paymentMethod",
         fieldName:"method",
     },test:{
         title:"Test",
-        apiUrl:"http://localhost:5000/tests",
+        apiUrl:"https://amrithaahospitals.visualplanetserver.in/tests",
         fieldName:"tests_text",
     },reception:{
         title:"Reception",
-        apiUrl:'http://localhost:5000/reception',
+        apiUrl:'https://amrithaahospitals.visualplanetserver.in/reception',
         fieldName:'name'
     },moa:{
         title:'MOA',
-        apiUrl:'http://localhost:5000/moa',
+        apiUrl:'https://amrithaahospitals.visualplanetserver.in/moa',
         fieldName:'moa'
     },particular:{
         title:'Particular',
-        apiUrl:'http://localhost:5000/particular',
+        apiUrl:'https://amrithaahospitals.visualplanetserver.in/particular',
         fieldName:'particular_text'
     }
 };

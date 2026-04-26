@@ -7,7 +7,7 @@ const SuggestionList = ({ suggestions, onSuggestionClick }) => {
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
-              onClick={() => onSuggestionClick(suggestion)}
+              onMouseDown={() => onSuggestionClick(suggestion)}
               className={style.suggestion_item}
             >
               {suggestion}

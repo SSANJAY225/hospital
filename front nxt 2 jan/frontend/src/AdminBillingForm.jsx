@@ -43,7 +43,7 @@ const AdminBillingForm = () => {
   const [advanceInput, setAdvanceInput] = useState([])
   const basicData = async () => {
     const searchParams = new URLSearchParams(location.search);
-    const res = await axios.get(`http://localhost:5000/get-basic-detail/${searchParams.get('id')}/${searchParams.get('user')}/${searchParams.get('phonenumber')}/${searchParams.get('visit')}`)
+    const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-basic-detail/${searchParams.get('id')}/${searchParams.get('user')}/${searchParams.get('phonenumber')}/${searchParams.get('visit')}`)
     console.log(res)
     setbasic(res.data)
   }
@@ -80,7 +80,7 @@ const AdminBillingForm = () => {
 
   const fetchMembershipTypes = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/membership-types');
+      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/membership-types');
       console.log('Membership Types Response:', response.data);
       setMembershipTypes(response.data);
     } catch (error) {
@@ -91,7 +91,7 @@ const AdminBillingForm = () => {
 
   const fetchPaymentMethod = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/get-paymentMethod')
+      const res = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-paymentMethod')
       setoptpaymentmethod(res.data);
       console.log('Payment methods loaded:', res.data);
     } catch (e) {
@@ -114,7 +114,7 @@ const AdminBillingForm = () => {
 
       console.log('Fetching API data with params:', { user, visit, phonenumber });
 
-      const req = await axios.get(`http://localhost:5000/get_billing/${phonenumber}/${visit}/${user}`)
+      const req = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get_billing/${phonenumber}/${visit}/${user}`)
       const api = req.data;
 
       console.log("API response:", api);
@@ -209,7 +209,7 @@ const AdminBillingForm = () => {
 
   const fetchImage = async (phoneNumber, visited) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/user-photo`, {
+      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/user-photo`, {
         params: { phoneNumber, visited },
       });
       setImageUrl(response.data.imageUrl);
@@ -520,7 +520,7 @@ const AdminBillingForm = () => {
     };
 
     try {
-      const billingResponse = await axios.put('http://localhost:5000/api/update_billing', billingData);
+      const billingResponse = await axios.put('https://amrithaahospitals.visualplanetserver.in/api/update_billing', billingData);
       if (!billingResponse.data.success) {
         throw new Error('Failed to save billing');
       }
@@ -533,7 +533,7 @@ const AdminBillingForm = () => {
           membership: selectedMembership,
         };
 
-        const membershipResponse = await axios.post('http://localhost:5000/api/Update-membership', membershipUpdateData);
+        const membershipResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/Update-membership', membershipUpdateData);
 
         if (!membershipResponse.data.success) {
           console.error('Failed to update membership:', membershipResponse.data.message);
@@ -549,7 +549,7 @@ const AdminBillingForm = () => {
       }
 
       const { pdfData, filename } = generatePDF();
-      const pdfResponse = await axios.post('http://localhost:5000/api/save-bill-pdf', {
+      const pdfResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/save-bill-pdf', {
         pdfData,
         filename,
         userId: urlParams.id || apiData.user_id,

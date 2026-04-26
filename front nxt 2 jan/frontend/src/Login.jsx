@@ -61,40 +61,38 @@ function Login() {
     setShowSuggestions(false);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setErrors(Validation(values));
+    console.log(values)
+    try {
+      const res = await axios.post('https://amrithaahospitals.visualplanetserver.in/login', values)
+      if (res.data.success) {
+        const franchiselocation = res.data.franchiselocation;
+        const role = res.data.roll;
+        localStorage.setItem('authToken', res.data.token);
 
-    axios
-      .post('http://localhost:5000/login', values)
-      .then((res) => {
-        if (res.data.success) {
-          const franchiselocation = res.data.franchiselocation;
-          const role = res.data.roll;
-          localStorage.setItem('authToken', res.data.token);
-
-          if (role === 'nurse') {
-            navigate(`/nursefollow?loginlocation=${values.loginLocation}&franchiselocation=${franchiselocation}`);
-          } else {
-            navigate(`/admin?loginlocation=${values.loginLocation}&franchiselocation=${franchiselocation}`);
-          }
-
-          Swal.fire({
-            icon: 'success',
-            title: 'Logged In Successfully!',
-            text: 'Welcome to Virtual Planet!',
-          });
+        if (role === 'nurse') {
+          navigate(`/nursefollow?loginlocation=${values.loginLocation}&franchiselocation=${franchiselocation}`);
         } else {
-          handleErrorResponse(res);
+          navigate(`/admin?loginlocation=${values.loginLocation}&franchiselocation=${franchiselocation}`);
         }
-      })
-      .catch((err) => {
-        if (err.response) {
-          handleErrorResponse(err.response);
-        } else {
-          console.log('Error:', err.message);
-        }
-      });
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Logged In Successfully!',
+          text: 'Welcome to Virtual Planet!',
+        });
+      } else {
+        handleErrorResponse(res);
+      }
+    } catch (err) {
+      if (err.response) {
+        handleErrorResponse(err.response);
+      } else {
+        console.log('Error:', err);
+      }
+    };
   };
 
   function handleErrorResponse(response) {
