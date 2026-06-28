@@ -1,4 +1,15 @@
 /* Modal styles */
+.submit{
+  background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.submit:hover {
+    background-color: #c82333;
+}
 .Modal_AdminFollow {
   position: fixed;
   top: 50%;

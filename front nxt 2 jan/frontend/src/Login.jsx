@@ -66,7 +66,7 @@ function Login() {
     setErrors(Validation(values));
     console.log(values)
     try {
-      const res = await axios.post('https://amrithaahospitals.visualplanetserver.in/login', values)
+      const res = await axios.post('http://localhost:5000/login', values)
       if (res.data.success) {
         const franchiselocation = res.data.franchiselocation;
         const role = res.data.roll;

@@ -177,7 +177,8 @@ const PatientForm = () => {
   const [moaSuggestion, setMoaSuggestion] = useState([])
   const [consultantName, setConsultantName] = useState('')
   const [followUpTime, setFollowUpTime] = useState('')
-  const [reviewCall, setReviewCall] = useState()
+  const [reviewCall, setReviewCall] = useState(false)
+  const [docinput,setDocinput]=useState("");
   useEffect(() => {
     if (auth) {
       try {
@@ -243,7 +244,7 @@ const PatientForm = () => {
 
   const fetchDentalOptions = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/dental-suggestions');
+      const response = await axios.get('http://localhost:5000/api/dental-suggestions');
       setDentalOptions(response.data);
     } catch (error) {
       console.error('Error fetching dental options:', error);
@@ -254,7 +255,7 @@ const PatientForm = () => {
     const searchParams = new URLSearchParams(location.search);
     // setUrlParams(getUrlParams());
     // console.log("sdfghsfjgn",urlParams)
-    const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-basic-detail/${searchParams.get('id')}/${searchParams.get('name')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
+    const res = await axios.get(`http://localhost:5000/get-basic-detail/${searchParams.get('id')}/${searchParams.get('name')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
     // console.log("basic", res)
     setbasic(res.data)
     const token = localStorage.getItem('authToken')
@@ -331,7 +332,7 @@ const PatientForm = () => {
 
   const fetchImage = async (phoneNumber, visited) => {
     try {
-      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/user-photo`, {
+      const response = await axios.get(`http://localhost:5000/api/user-photo`, {
         params: { phoneNumber, visited },
       });
       setImageUrl(response.data.imageUrl);
@@ -344,7 +345,7 @@ const PatientForm = () => {
 
   const fetchvitalsinput = async () => {
     try {
-      const response = await fetch('https://amrithaahospitals.visualplanetserver.in/column-vitals', {
+      const response = await fetch('http://localhost:5000/column-vitals', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -365,7 +366,7 @@ const PatientForm = () => {
       setUrlParams(params);
       const searchParams = new URLSearchParams(location.search);
       // console.log("url->>", searchParams.get('name'))
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-data', {
+      const response = await axios.get('http://localhost:5000/get-data', {
         params: {
           businessname: searchParams.get('businessname'),
           name: searchParams.get('name'),
@@ -375,7 +376,7 @@ const PatientForm = () => {
       console.log("tofind->>", response.data)
       setnurseName(response.data.input[response.data.input.length - 1].nursename)
       setDoctorName(response.data.input[response.data.input.length - 1].doctorname)
-      const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/getvitals/${searchParams.get('name')}/${searchParams.get('visited')}/${searchParams.get('businessname')}`);
+      const res = await axios.get(`http://localhost:5000/getvitals/${searchParams.get('name')}/${searchParams.get('visited')}/${searchParams.get('businessname')}`);
       const result = Object.fromEntries(vitalinput.map(key => [key, ""]))
       // setVitals(res.data[res.data.length - 1] || result);
       const vit = res.data
@@ -390,7 +391,7 @@ const PatientForm = () => {
       const data = response.data;
       setapidata(data);
       // console.log("api=>", data)
-      const visit = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-visited', {
+      const visit = await axios.get('http://localhost:5000/get-visited', {
         params: {
           phone_number: searchParams.get('businessname'),
           full_name: searchParams.get('name'),
@@ -437,8 +438,8 @@ const PatientForm = () => {
         setdental({});
       }
       console.log("all data=>", data)
-      setConsultantName(data.consultantName||"")
-      setReviewCall(data.reviewCall)
+      setConsultantName(data.consultantName || "")
+      setReviewCall(Boolean(data.reviewCall))
       setFollowUpTime(data.followuptime)
       setTreatmentPlan(data.treatment_plan || [])
       setProcedureDone(data.procedure_done || [])
@@ -473,7 +474,7 @@ const PatientForm = () => {
       // console.log('On Examination Checkbox State:', onExamCheckboxState);
       setselectsystematic(convertArrayToCheckboxState(data.sysexam_forms));
       setselectavailableTests(convertArrayToCheckboxState(data.testtotake));
-      const fileResponse = await axios.get(`https://amrithaahospitals.visualplanetserver.in/files/${searchParams.get('businessname')}/${searchParams.get('visited')}/${searchParams.get('name')}`);
+      const fileResponse = await axios.get(`http://localhost:5000/files/${searchParams.get('businessname')}/${searchParams.get('visited')}/${searchParams.get('name')}`);
       if (fileResponse.data.files) {
         setUploadedFiles(fileResponse.data.files);
       }
@@ -496,10 +497,10 @@ const PatientForm = () => {
     // fetchvitalsinput();
     basicData()
     apifetchData();
-    fetchData('https://amrithaahospitals.visualplanetserver.in/api/onexamination', setOnExamination);
-    fetchData('https://amrithaahospitals.visualplanetserver.in/api/onsystem', setOnSystem);
-    fetchData('https://amrithaahospitals.visualplanetserver.in/tests', setavalableTests);
-    fetchData('https://amrithaahospitals.visualplanetserver.in/column-vitals', setvitalinput);
+    fetchData('http://localhost:5000/api/onexamination', setOnExamination);
+    fetchData('http://localhost:5000/api/onsystem', setOnSystem);
+    fetchData('http://localhost:5000/tests', setavalableTests);
+    fetchData('http://localhost:5000/column-vitals', setvitalinput);
 
     if (params.businessName && params.visited) {
       fetchImage(params.businessName, params.visited);
@@ -729,7 +730,7 @@ const PatientForm = () => {
       formData.vitals.Visit = urlParams.visited;
       formData.tooth = dental
 
-      const vitalsColumnsResponse = await axios.get('https://amrithaahospitals.visualplanetserver.in/column-vitals');
+      const vitalsColumnsResponse = await axios.get('http://localhost:5000/column-vitals');
       const validColumns = vitalsColumnsResponse.data;
 
       const replaceSpacesInKeys = (obj) => {
@@ -750,10 +751,10 @@ const PatientForm = () => {
       formData.vitals = updatedVitals;
       console.log("update data=>", formData)
 
-      const response = await axios.put('https://amrithaahospitals.visualplanetserver.in/update-datas', { formData, vitals })
+      const response = await axios.put('http://localhost:5000/update-datas', { formData, vitals })
       console.log(response)
       // Save form data
-      // const response = await fetch('https://amrithaahospitals.visualplanetserver.in/save-data', {
+      // const response = await fetch('http://localhost:5000/save-data', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(formData),
@@ -769,22 +770,28 @@ const PatientForm = () => {
         const fileData = new FormData();
         multipleFiles.forEach((file) => fileData.append('upload', file));
         const fileUploadResponse = await axios.post(
-          `https://amrithaahospitals.visualplanetserver.in/upload/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`,
+          `http://localhost:5000/upload/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`,
           fileData,
           { headers: { 'Content-Type': 'multipart/form-data' } }
         );
         console.log("Uploaded Files:", fileUploadResponse.data.fileData);
       }
-
       // const data = await response.json()
       // Refresh uploaded files
       // const fileResponse = await axios.get(
-      //   `https://amrithaahospitals.visualplanetserver.in/files/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`
+      //   `http://localhost:5000/files/${urlParams.businessName}/${urlParams.visited}/${urlParams.name}`
       // );
       // if (fileResponse.data.files) {
       //   setUploadedFiles(fileResponse.data.files);
       // }
       setMultipleFiles([]);
+      const status = await axios.put('http://localhost:5000/update-status', {
+        name:urlParams.name,
+        businessName:urlParams.businessName,
+        visited: urlParams.visited || 0,
+        status: 'doctorsaved'
+      });
+      console.log("saved",status)
       Swal.fire({
         icon: 'success',
         title: 'Success!',
@@ -801,9 +808,7 @@ const PatientForm = () => {
       });
     }
   };
-  // useEffect(() => {
-  //   console.log("Updated vitals:", vitals);
-  // }, [vitals]);
+  
 
   const handleVitalsChange = (e) => {
     const { name, value } = e.target;
@@ -915,14 +920,13 @@ const PatientForm = () => {
     }
   };
 
-  const
-    handleEditTreatment = (index) => {
-      const item = treatment[index];
-      document.querySelector('input[placeholder="Name"]').value = item.treatmentgivenname
-      document.querySelector('input[placeholder="Dosage"]').value = item.treatmentdosage
-      document.querySelector('input[placeholder="Route of Administration"]').value = item.treatmentrout
-      handleDeleteHistory(treatment, settreatment, item);
-    };
+  const handleEditTreatment = (index) => {
+    const item = treatment[index];
+    document.querySelector('input[placeholder="Name"]').value = item.treatmentgivenname
+    document.querySelector('input[placeholder="Dosage"]').value = item.treatmentdosage
+    document.querySelector('input[placeholder="Route of Administration"]').value = item.treatmentrout
+    handleDeleteHistory(treatment, settreatment, item);
+  };
 
   const handleEditPrescription = (index) => {
     setMoa(prescription[index].moa)
@@ -989,7 +993,7 @@ const PatientForm = () => {
 
     const { name, businessName, visited, loginLocation, franchiselocation } = urlParams;
     try {
-      const response = await axios.put('https://amrithaahospitals.visualplanetserver.in/update-status', {
+      const response = await axios.put('http://localhost:5000/update-status', {
         name,
         businessName,
         visited: visited || 0,
@@ -1017,7 +1021,7 @@ const PatientForm = () => {
 
   const fetchNurseSuggestions = async () => {
     try {
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/nurse-suggestions', {
+      const response = await axios.get('http://localhost:5000/api/nurse-suggestions', {
         params: { franchiselocation: urlParams.franchiselocation }
       });
       setNurseSuggestions(response.data);
@@ -1030,22 +1034,26 @@ const PatientForm = () => {
     try {
       console.log(urlParams)
       console.log("Fetching doctors for location:", urlParams.franchiselocation);
-      const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
+      const response = await axios.get(`http://localhost:5000/suggestion-doctor?location=${urlParams.franchiselocation}&name=${docinput}`, {
         params: { franchiselocation: urlParams.franchiselocation }
       });
+      console.log(response.data)
       setDocSuggestions(response.data);
     } catch (error) {
       console.error('Error fetching doctor suggestions:', error);
       setDocSuggestions([]);
     }
   };
+  useEffect(()=>{
+    fetchDocSuggestions()
+  },[docinput])
   const nursecss = (doctor) => {
     return `${style.nurse_listbox_item} ${doctorName === doctor ? style.selected : ''}`
   }
 
   const handleAddNurseName = async (name) => {
     try {
-      const req = await axios.post("https://amrithaahospitals.visualplanetserver.in/addNurseName", { nurseName: name, location: urlParams.franchiselocation })
+      const req = await axios.post("http://localhost:5000/addNurseName", { nurseName: name, location: urlParams.franchiselocation })
       Swal.fire({
         icon: 'success',
         title: 'Success!',
@@ -1064,7 +1072,7 @@ const PatientForm = () => {
   }
   const handleAddDoctorName = async (name) => {
     try {
-      const req = await axios.post("https://amrithaahospitals.visualplanetserver.in/addDoctorName", { doctorName: name, location: urlParams.franchiselocation })
+      const req = await axios.post("http://localhost:5000/addDoctorName", { doctorName: name, location: urlParams.franchiselocation })
       Swal.fire({
         icon: 'success',
         title: 'Success!',
@@ -1120,7 +1128,7 @@ const PatientForm = () => {
       console.log("Vitals Data to Send:", vitalsData);
 
       const vitalsResponse = await axios.post(
-        `https://amrithaahospitals.visualplanetserver.in/adddata-vitals/`,
+        `http://localhost:5000/adddata-vitals/`,
         vitalsData
       );
 
@@ -1133,7 +1141,7 @@ const PatientForm = () => {
       formData.location = urlParams.franchiselocation;
       console.log("Nurse Form Data to Send:", formData);
       const response = await axios.post(
-        'https://amrithaahospitals.visualplanetserver.in/save-data-nurse',
+        'http://localhost:5000/save-data-nurse',
         formData,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -1186,7 +1194,7 @@ const PatientForm = () => {
     setTreatmentgivenname(value);
     fetchSuggestions(
       value,
-      'https://amrithaahospitals.visualplanetserver.in/api/treatment-name-suggestions',
+      'http://localhost:5000/api/treatment-name-suggestions',
       setTreatmentgivennameSuggestions
     );
   };
@@ -1194,49 +1202,55 @@ const PatientForm = () => {
   const handleMedicineChange = (e) => {
     const value = e.target.value;
     setMedicine(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/drugs-suggestions', setMedicineSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/drugs-suggestions', setMedicineSuggestions);
   };
 
   const handleDosageChange = (e) => {
     const value = e.target.value;
     setTreatmentdosage(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/dosage-suggestions', setDosageSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/dosage-suggestions', setDosageSuggestions);
   };
 
   const handleRoa = (e) => {
     const value = e.target.value;
     setTreatmentrout(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/roa-suggestions', setRoaSuggestion);
+    fetchSuggestions(value, 'http://localhost:5000/api/roa-suggestions', setRoaSuggestion);
   };
 
   const handlePrescriptionMoaChange = (e) => {
     const value = e.target.value;
     setMoa(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/Moa-suggestions', setMoaSuggestion);
+    fetchSuggestions(value, 'http://localhost:5000/api/Moa-suggestions', setMoaSuggestion);
   };
 
   const handleTiming = (e) => {
     const value = e.target.value;
     setTiming(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/timing-suggestions', setTimingSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/timing-suggestions', setTimingSuggestions);
   };
 
   const handleDuration = (e) => {
     const value = e.target.value;
     setDuration(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/duration-suggestions', setDurationsuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/duration-suggestions', setDurationsuggestions);
   };
 
   const handleAdvicegiven = (e) => {
     const value = e.target.value;
     setadvicegiven(value);
-    fetchSuggestions(value, 'https://amrithaahospitals.visualplanetserver.in/api/advicegiven-suggestions', setAdvicegivenSuggestions);
+    fetchSuggestions(value, 'http://localhost:5000/api/advicegiven-suggestions', setAdvicegivenSuggestions);
   };
   const isDisabled =
     basic.status === "billingcompleted" && tokendecode.roll !== "admin";
   const handleDignosis = (e) => {
     setdignosis(e.target.value)
   }
+
+  const handleDocinput=(e)=>{
+    setDocinput(e.target.value)
+
+  }
+
   return (
     <>
       <div className={style.main}>
@@ -1344,19 +1358,19 @@ const PatientForm = () => {
                 <div className={style.nurse_input_overlay}>
                   <label>Select Doctor Name</label>
                   <div className={style.nurse_listbox}>
-                    {docSuggestions === null ? (
-                      <div className={style.nurse_listbox_item}>Loading doctors...</div>
-                    ) : docSuggestions.length > 0 ? (
+                    <input type='text' value={docinput} onChange={handleDocinput}/>
+                    {docSuggestions.length > 0 ? (
                       docSuggestions.map((doctor, index) => (
                         <div
                           key={index}
-                          className={nursecss(doctor)}
+                          className={nursecss(doctor.name)}
                           onClick={() => {
-                            setDoctorName(doctor);
+                            setDoctorName(doctor.name);
                             setIsDocModalOpen(false);
+                            setDocinput("")
                           }}
                         >
-                          {doctor}
+                          {doctor.name}
                         </div>
                       ))
                     ) : (
@@ -1719,146 +1733,6 @@ const PatientForm = () => {
                 </div>
               )}
             </div>
-            {/* files */}
-            <div className={style.section_container}>
-              {type != 'nurse' && (
-                <div className={style.section_header} onClick={() => toggleSection("file")}>
-                  <span className={style.section_toggle}>{isOpen.file ? "-" : "+"}</span> View Reports
-                </div>
-              )}
-              {isOpen.file && (
-                <div className={style.vitals_container}>
-                  <div className={style.file_section}>
-                    <button
-                      className={`${style.buttonblack} ${style.responsive_button}`}
-                      onClick={() => setIsModalOpen(true)}
-                      disabled={uploadedFiles.length === 0}
-                    >
-                      View Files
-                    </button>
-                  </div>
-                  <div className={style.file_upload_section}>
-                    {!useCamera && (
-                      <div className={style.file_upload_controls}>
-                        <input
-                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                          type="file"
-                          multiple
-                          onChange={handleMultipleFilesChange}
-                          accept="image/*"
-                          className={style.responsive_file_input}
-                        />
-                        <button
-                          type="button"
-                          onClick={startCamera}
-                          className={`${style.buttonblack} ${style.responsive_button}`}
-                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                        >
-                          Use Camera
-                        </button>
-                      </div>
-                    )}
-                    {useCamera && (
-                      <div className={style.camera_section}>
-                        <video
-                          ref={videoRef}
-                          autoPlay
-                          playsInline
-                          className={style.responsive_video}
-                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                        />
-                        <button
-                          type="button"
-                          onClick={capturePhoto}
-                          className={`${style.buttonblack} ${style.responsive_button}`}
-                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                        >
-                          Capture Photo
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  {multipleFiles.length > 0 && (
-                    <div className={style.file_list_section}>
-                      <h3>Selected Files/Images:</h3>
-                      <ul className={style.file_list}>
-                        {multipleFiles.map((file, index) => (
-                          <li key={index} className={style.file_item}>
-                            <span>{file.name}</span>
-                            <button
-                              onClick={() => removeFile(index)}
-                              className={style.remove_file_button}
-                              disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                            >
-                              Remove
-                            </button>
-                            <img
-                              src={URL.createObjectURL(file)}
-                              alt={file.name}
-                              className={style.file_preview}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            {isModalOpen && (
-              <div className={style.modal_overlay}>
-                <div className={style.modal_content}>
-                  {uploadedFiles.length > 0 ? (
-                    <>
-                      <div className={style.modal_file_name}>
-                        <p>{uploadedFiles[currentImageIndex].File_Name}</p>
-                      </div>
-                      <div className={style.modal_image_container}>
-                        <img
-                          src={`https://amrithaahospitals.visualplanetserver.in/${uploadedFiles[currentImageIndex].FilePath}`}
-                          alt={uploadedFiles[currentImageIndex].File_Name}
-                          className={style.modal_image}
-                          onError={(e) => {
-                            console.error('Error loading image:', e.target.src);
-                            e.target.src = 'https://amrithaahospitals.visualplanetserver.in/150?text=Image+Not+Found';
-                            Swal.fire({
-                              icon: 'error',
-                              title: 'Image Load Error',
-                              text: 'Failed to load the image. Displaying placeholder.',
-                            });
-                          }}
-                          onLoad={() => console.log('Image loaded successfully:', `https://amrithaahospitals.visualplanetserver.in/${uploadedFiles[currentImageIndex].FilePath}`)}
-                        />
-                      </div>
-                    </>
-                  ) : (
-                    <p>No images available</p>
-                  )}
-                  <div className={style.modal_buttons}>
-                    <button
-                      onClick={handlePrevImage}
-                      // disabled={uploadedFiles.length <= 1}
-                      className={style.modal_button}
-                    >
-                      Previous
-                    </button>
-                    <button
-                      onClick={handleCloseModal}
-                      className={`${style.modal_button} ${style.close_button}`}
-                    >
-                      Close
-                    </button>
-                    <button
-                      onClick={handleNextImage}
-                      // disabled={uploadedFiles.length <= 1}
-                      className={style.modal_button}
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
             {/* local Examination */}
             <div className={style.section_container}>
               {type != 'nurse' && (
@@ -2221,119 +2095,121 @@ const PatientForm = () => {
                       style={style}
                     />
                   </div>
-                  <div className={style.treatment_section}>
+                  <div className={style.prescription_section}>
                     <h5>Treatment Given</h5>
-                    <table className={style.responsive_table}>
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Dosage</th>
-                          <th>Route of Administration</th>
-                          <th>Delete</th>
-                          <th>Edit</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {treatment.map((item, index) => (
-                          <tr key={index}>
-                            <td data-title="Name">{item.treatmentgivenname}</td>
-                            <td data-title="Dosage">{item.treatmentdosage}</td>
-                            <td data-title="Route of Administration">{item.treatmentrout}</td>
-                            <td data-title="Delete">
-                              <button
-                                className={`${style.buttondelete} ${style.responsive_button}`}
-                                onClick={() => handleDeleteHistory(treatment, settreatment, item)}
-                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                              >
-                                Delete
-                              </button>
+                    <div className={style.tables}>
+                      <table className={style.responsive_table}>
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Dosage</th>
+                            <th>Route of Administration</th>
+                            <th>Delete</th>
+                            <th>Edit</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {treatment.map((item, index) => (
+                            <tr key={index}>
+                              <td data-title="Name">{item.treatmentgivenname}</td>
+                              <td data-title="Dosage">{item.treatmentdosage}</td>
+                              <td data-title="Route of Administration">{item.treatmentrout}</td>
+                              <td data-title="Delete">
+                                <button
+                                  className={`${style.buttondelete} ${style.responsive_button}`}
+                                  onClick={() => handleDeleteHistory(treatment, settreatment, item)}
+                                  disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                                >
+                                  Delete
+                                </button>
+                              </td>
+                              <td data-title="Edit">
+                                <button
+                                  className={`${style.buttongrey} ${style.responsive_button}`}
+                                  onClick={() => handleEditTreatment(index)}
+                                  disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                                >
+                                  Edit
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                          <tr>
+                            <td data_title="Name">
+                              <div className={style.input_with_suggestions}>
+                                <input
+                                  onChange={handleTreatmentNameChange}
+                                  onBlur={() => setTimeout(() => setTreatmentgivennameSuggestions([]), 200)}
+                                  type="text"
+                                  placeholder="Name"
+                                  value={treatmentgivenname}
+                                  className={style.responsive_input}
+                                  disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                                />
+                                <SuggestionList
+                                  suggestions={treatmentgivennameSuggestions}
+                                  onSuggestionClick={(suggestion) => {
+                                    setTreatmentgivenname(suggestion);
+                                    setTreatmentgivennameSuggestions([]);
+                                  }}
+                                />
+                              </div>
                             </td>
-                            <td data-title="Edit">
-                              <button
-                                className={`${style.buttongrey} ${style.responsive_button}`}
-                                onClick={() => handleEditTreatment(index)}
-                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                              >
-                                Edit
-                              </button>
+                            <td data-title="Dosage">
+                              <div className={style.input_with_suggestions}>
+                                <input
+                                  type="text"
+                                  placeholder="Dosage"
+                                  onChange={handleDosageChange}
+                                  value={treatmentdosage}
+                                  onBlur={() => setTimeout(() => setDosageSuggestions([]), 200)}
+                                  className={style.responsive_input}
+                                  disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                                />
+                                <SuggestionList
+                                  suggestions={dosageSuggestions}
+                                  onSuggestionClick={(suggestion) => {
+                                    setTreatmentdosage(suggestion);
+                                    setDosageSuggestions([]);
+                                  }}
+                                />
+                              </div>
+                            </td>
+                            <td data-title="Route of Administration">
+                              <div className={style.input_with_suggestions}>
+                                <input
+                                  type="text"
+                                  placeholder="Route of Administration"
+                                  className={style.responsive_input}
+                                  onChange={handleRoa}
+                                  value={treatmentrout}
+                                  onBlur={() => setTimeout(() => setRoaSuggestion([]), 200)}
+                                  disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                                />
+                                <SuggestionList
+                                  suggestions={roaSuggestion}
+                                  onSuggestionClick={(suggestion) => {
+                                    setTreatmentrout(suggestion);
+                                    setRoaSuggestion([]);
+                                  }}
+                                />
+                              </div>
+                            </td>
+                            <td colSpan={2} data-title="Add">
+                              <div className={style.button_wrapper}>
+                                <button
+                                  className={`${style.buttonblack} ${style.responsive_button}`}
+                                  onClick={handleAddTreatment}
+                                  disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                                >
+                                  Add Treatment
+                                </button>
+                              </div>
                             </td>
                           </tr>
-                        ))}
-                        <tr>
-                          <td data_title="Name">
-                            <div className={style.input_with_suggestions}>
-                              <input
-                                onChange={handleTreatmentNameChange}
-                                onBlur={() => setTimeout(() => setTreatmentgivennameSuggestions([]), 200)}
-                                type="text"
-                                placeholder="Name"
-                                value={treatmentgivenname}
-                                className={style.responsive_input}
-                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                              />
-                              <SuggestionList
-                                suggestions={treatmentgivennameSuggestions}
-                                onSuggestionClick={(suggestion) => {
-                                  setTreatmentgivenname(suggestion);
-                                  setTreatmentgivennameSuggestions([]);
-                                }}
-                              />
-                            </div>
-                          </td>
-                          <td data-title="Dosage">
-                            <div className={style.input_with_suggestions}>
-                              <input
-                                type="text"
-                                placeholder="Dosage"
-                                onChange={handleDosageChange}
-                                value={treatmentdosage}
-                                onBlur={() => setTimeout(() => setDosageSuggestions([]), 200)}
-                                className={style.responsive_input}
-                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                              />
-                              <SuggestionList
-                                suggestions={dosageSuggestions}
-                                onSuggestionClick={(suggestion) => {
-                                  setTreatmentdosage(suggestion);
-                                  setDosageSuggestions([]);
-                                }}
-                              />
-                            </div>
-                          </td>
-                          <td data-title="Route of Administration">
-                            <div className={style.input_with_suggestions}>
-                              <input
-                                type="text"
-                                placeholder="Route of Administration"
-                                className={style.responsive_input}
-                                onChange={handleRoa}
-                                value={treatmentrout}
-                                onBlur={() => setTimeout(() => setRoaSuggestion([]), 200)}
-                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                              />
-                              <SuggestionList
-                                suggestions={roaSuggestion}
-                                onSuggestionClick={(suggestion) => {
-                                  setTreatmentrout(suggestion);
-                                  setRoaSuggestion([]);
-                                }}
-                              />
-                            </div>
-                          </td>
-                          <td colSpan={2} data-title="Add">
-                            <div className={style.button_wrapper}>
-                              <button
-                                className={`${style.buttonblack} ${style.responsive_button}`}
-                                onClick={handleAddTreatment}
-                                disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
-                              >
-                                Add Treatment
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               )}
@@ -2487,6 +2363,146 @@ const PatientForm = () => {
                 </div>
               )}
             </div>
+            {/* files */}
+            <div className={style.section_container}>
+              {type != 'nurse' && (
+                <div className={style.section_header} onClick={() => toggleSection("file")}>
+                  <span className={style.section_toggle}>{isOpen.file ? "-" : "+"}</span> View Reports
+                </div>
+              )}
+              {isOpen.file && (
+                <div className={style.vitals_container}>
+                  <div className={style.file_section}>
+                    <button
+                      className={`${style.buttonblack} ${style.responsive_button}`}
+                      onClick={() => setIsModalOpen(true)}
+                      disabled={uploadedFiles.length === 0}
+                    >
+                      View Files
+                    </button>
+                  </div>
+                  <div className={style.file_upload_section}>
+                    {!useCamera && (
+                      <div className={style.file_upload_controls}>
+                        <input
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                          type="file"
+                          multiple
+                          onChange={handleMultipleFilesChange}
+                          accept="image/*"
+                          className={style.responsive_file_input}
+                        />
+                        <button
+                          type="button"
+                          onClick={startCamera}
+                          className={`${style.buttonblack} ${style.responsive_button}`}
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                        >
+                          Use Camera
+                        </button>
+                      </div>
+                    )}
+                    {useCamera && (
+                      <div className={style.camera_section}>
+                        <video
+                          ref={videoRef}
+                          autoPlay
+                          playsInline
+                          className={style.responsive_video}
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                        />
+                        <button
+                          type="button"
+                          onClick={capturePhoto}
+                          className={`${style.buttonblack} ${style.responsive_button}`}
+                          disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                        >
+                          Capture Photo
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {multipleFiles.length > 0 && (
+                    <div className={style.file_list_section}>
+                      <h3>Selected Files/Images:</h3>
+                      <ul className={style.file_list}>
+                        {multipleFiles.map((file, index) => (
+                          <li key={index} className={style.file_item}>
+                            <span>{file.name}</span>
+                            <button
+                              onClick={() => removeFile(index)}
+                              className={style.remove_file_button}
+                              disabled={basic.status === "billingcompleted" && tokendecode.roll != "admin"}
+                            >
+                              Remove
+                            </button>
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={file.name}
+                              className={style.file_preview}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            {isModalOpen && (
+              <div className={style.modal_overlay}>
+                <div className={style.modal_content}>
+                  {uploadedFiles.length > 0 ? (
+                    <>
+                      <div className={style.modal_file_name}>
+                        <p>{uploadedFiles[currentImageIndex].File_Name}</p>
+                      </div>
+                      <div className={style.modal_image_container}>
+                        <img
+                          src={`http://localhost:5000/${uploadedFiles[currentImageIndex].FilePath}`}
+                          alt={uploadedFiles[currentImageIndex].File_Name}
+                          className={style.modal_image}
+                          onError={(e) => {
+                            console.error('Error loading image:', e.target.src);
+                            e.target.src = 'http://localhost:5000/150?text=Image+Not+Found';
+                            Swal.fire({
+                              icon: 'error',
+                              title: 'Image Load Error',
+                              text: 'Failed to load the image. Displaying placeholder.',
+                            });
+                          }}
+                          onLoad={() => console.log('Image loaded successfully:', `http://localhost:5000/${uploadedFiles[currentImageIndex].FilePath}`)}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <p>No images available</p>
+                  )}
+                  <div className={style.modal_buttons}>
+                    <button
+                      onClick={handlePrevImage}
+                      // disabled={uploadedFiles.length <= 1}
+                      className={style.modal_button}
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={handleCloseModal}
+                      className={`${style.modal_button} ${style.close_button}`}
+                    >
+                      Close
+                    </button>
+                    <button
+                      onClick={handleNextImage}
+                      // disabled={uploadedFiles.length <= 1}
+                      className={style.modal_button}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* follow update */}
             <div className={style.section_container}>
               {type != 'nurse' && (
@@ -2567,7 +2583,7 @@ const PatientForm = () => {
               <button className={`${style.buttonblue} ${style.responsive_button} ${style.btn_bill}`} onClick={handleSendToBill}>Send to Bill</button>
             )}
             {cookie.roll === 'nurse' && (
-              <button className={style.button_forwardtodoctor} onClick={handleForward}>Forward to Doctor</button>
+              <button className={`${style.responsive_button} ${style.buttonred}`} onClick={handleForward}>Forward to Doctor</button>
             )}
             {(cookie.roll === 'doctor' || cookie.roll === 'admin') && (
               <button

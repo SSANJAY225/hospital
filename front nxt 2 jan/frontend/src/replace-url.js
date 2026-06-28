@@ -2,9 +2,10 @@ import fs from 'fs';
 import path from 'path';
 let file = 0
 const [, , srcDir] = process.argv;
-const targetUrl = 'https://amrithaahospitals.visualplanetserver.in';
-const newUrl = 'https://amrithaahospitals.visualplanetserver.in';
+const targetUrl = 'http://localhost:5000';
+const newUrl = 'http://localhost:5000';
 // amrithaahospitals.visualplanetserver.in
+
 if (!srcDir) {
   console.error("Usage: node replace-url.js <src-folder>");
   process.exit(1);//.88y7878777

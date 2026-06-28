@@ -20,7 +20,7 @@ const SixFollowUp = (data) => {
 
         formattedDate = `${year}-${month}-${day}`
         }
-        const req=await axios.put(`https://amrithaahospitals.visualplanetserver.in/reason_update`,{params:{name,phonenumber,visit,reason:reason||r,followupdate:formattedDate}})
+        const req=await axios.put(`http://localhost:5000/reason_update`,{params:{name,phonenumber,visit,reason:reason||r,followupdate:formattedDate}})
         console.log(req)
         if(req.data.success){
             Swal.fire({
@@ -82,7 +82,7 @@ const SixFollowUp = (data) => {
                                     <input 
                                     onChange={(e)=>setReason(e.target.value)}
                                     value={d.reason||reason}/>
-                                    <button onClick={()=>handlesubmit(d.Name,d.Phone_Number,d.Visted,d.reason)}>submit</button>
+                                    <button className={style.submit} onClick={()=>handlesubmit(d.Name,d.Phone_Number,d.Visted,d.reason)}>submit</button>
                                 </td>
                                 <td className={style.td}>{d.Phone_Number} <FaWhatsapp
                                     color="#25D366"

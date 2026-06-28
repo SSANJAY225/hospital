@@ -1728,7 +1728,7 @@ app.get('/api/patient-details/:phoneNumber', (req, res) => {
   });
 });
 // POST route to add a new patient
-app.post('/api/patients', uploadphoto.single('photo'), (req, res) => {
+app.post('/api/patients', uploadphoto.fields([{ name: 'photo', maxCount: 1 }, { name: 'idProof', maxCount: 1 }]), (req, res) => {
   const {
     fullName,
     fathersName,
@@ -1750,8 +1750,9 @@ app.post('/api/patients', uploadphoto.single('photo'), (req, res) => {
     nursename,
     referred,
     address,
+    idProof,
   } = req.body;
-
+  console.log(req.body)
   const servicesStr = Array.isArray(services) ? services.join(',') : '';
   const patientTypeStr = patientType || '';
 
@@ -1785,14 +1786,14 @@ app.post('/api/patients', uploadphoto.single('photo'), (req, res) => {
       }
 
       let photoPath = null;
-
-      if (req.file) {
-        const ext = path.extname(req.file.originalname);
+      const photoFile = req.files?.photo?.[0];
+      if (photoFile) {
+        const ext = path.extname(photoFile.originalname);
         photoPath = `userphotos/${phoneNumber}_${visitCount}${ext}`;
         const newFilePath = path.join(photoDir, `${phoneNumber}_${visitCount}${ext}`);
 
         try {
-          fs.renameSync(req.file.path, newFilePath);
+          fs.renameSync(photoFile.path, newFilePath);
         } catch (fileErr) {
           console.error('Error moving uploaded file:', fileErr);
           return res.status(500).json({ error: 'Failed to save uploaded photo' });
@@ -1800,12 +1801,35 @@ app.post('/api/patients', uploadphoto.single('photo'), (req, res) => {
       } else if (photoResults.length > 0) {
         photoPath = photoResults[0].photo_path;
       }
-      console.log(nursename)
       const insertQuery = `
         INSERT INTO patients 
-        (id, full_name, fathers_name, age, gender, city, phone_number, appointment_date, appointment_time, services, receptionistname, visted, status, patient_type, belongedlocation, room_number,occupation ,parent_name ,parent_occupation,nursename,refference,address )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'receptioncompleted', ?, ?, ?,?,?,?,?,?,?)
+        (id, full_name, fathers_name, age, gender, city, phone_number, appointment_date, appointment_time, services, receptionistname, visted, status, patient_type, belongedlocation, room_number,occupation ,parent_name ,parent_occupation,nursename,refference,address,id_proof_path )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'receptioncompleted', ?, ?, ?,?,?,?,?,?,?,?)
       `;
+
+      const idProofDir = path.join(__dirname, 'idproofs');
+      if (!fs.existsSync(idProofDir)) {
+        fs.mkdirSync(idProofDir, { recursive: true });
+      }
+
+      let idProofPath = null;
+      const idProofFile = req.files?.idProof?.[0];
+      if (idProofFile) {
+        const ext = path.extname(idProofFile.originalname);
+        idProofPath = `idproofs/${phoneNumber}_${visitCount}${ext}`;
+        const newIdProofPath = path.join(
+          idProofDir,
+          `${phoneNumber}_${visitCount}${ext}`
+        );
+        try {
+          fs.renameSync(idProofFile.path, newIdProofPath);
+        } catch (err) {
+          console.error('Error saving ID proof:', err);
+          return res.status(500).json({
+            error: 'Failed to save ID proof'
+          });
+        }
+      }
 
       const values = [
         id,
@@ -1829,9 +1853,9 @@ app.post('/api/patients', uploadphoto.single('photo'), (req, res) => {
         nursename,
         referred,
         address,
+        idProofPath,
       ];
-      console.log("val", values)
-      console.log(req.body)
+
       db.query(insertQuery, values, (err, result) => {
         if (err) {
           console.error('Error inserting patient data:', err);
@@ -2119,8 +2143,8 @@ app.get('/api/fetch-patients-in', (req, res) => {
   console.log(statusFilter, currentDate)
   // Add status condition based on statusFilter
   if (statusFilter === 'completed') {
-    query += ' AND LOWER(status) = ? AND DATE(entrydate) = ?';
-    params.push('doctorcompleted', currentDate);
+    query += ' AND LOWER(status) = ? OR LOWER(status) = ? AND DATE(entrydate) = ? ';
+    params.push('doctorcompleted','doctorsaved', currentDate);
   } else {
     query += ' AND LOWER(status) IN (?, ?)';
     params.push('receptioncompleted', 'nursecompleted');
@@ -2206,13 +2230,14 @@ app.get('/api/fetch-patients-out', (req, res) => {
     WHERE p.patient_type = 'Outpatient'`
   const params = [];
 
-  // Filter for doctorcompleted
-  if (statusFilter === 'completed' && currentDate) {
-    query += ` AND LOWER(p.status) = ? AND DATE(p.entrydate) = ? `;
-    params.push('doctorcompleted', currentDate);
+  // Filter for doctorcompleted && currentDate
+  if (statusFilter === 'completed' ) {
+    // AND DATE(p.entrydate) = ? currentDate
+    query += ` AND LOWER(p.status) IN (?, ?) `;
+    params.push('doctorcompleted','doctorsaved');
   } else {
     // fallback: nursecompleted or receptioncompleted
-    query += ` AND LOWER(p.status) IN (?, ?) `;
+    query += ` AND LOWER(p.status) IN (?, ?)  `;
     params.push('receptioncompleted', 'nursecompleted');
   }
 
@@ -2245,10 +2270,12 @@ app.get('/api/fetch-patients-out', (req, res) => {
   query += ` GROUP BY p.phone_number ORDER BY p.queue DESC`;
 
   db.query(query, params, (error, results) => {
+    console.log(query,"+",params)
     if (error) {
       console.error('Error executing query:', error);
       return res.status(500).send({ message: 'Error fetching data', error: error.message });
     }
+    console.log("results",results)
     res.json(results);
   });
 });
@@ -2796,18 +2823,8 @@ app.get('/api/fetch-patients-nurse', (req, res) => {
 app.put('/update-status', (req, res) => {
   const { name, businessName, visited, status } = req.body;
   console.log(req.body)
-  const updateStatusSql = `
-    UPDATE patients
-    SET status = ?
-    WHERE full_name = ? AND Phone_Number = ? AND Visted = ?;
-  `;
-
-  const updateStatusValues = [
-    status,
-    name,
-    businessName,
-    visited ?? 0,
-  ];
+  const updateStatusSql = `UPDATE patients SET status = ? WHERE full_name = ? AND Phone_Number = ? AND Visted = ?;`;
+  const updateStatusValues = [status,name,businessName,visited ?? 0,];
   db.query(updateStatusSql, updateStatusValues, (err, result) => {
     if (err) {
       console.error('Error updating patient status:', err);
@@ -3403,8 +3420,6 @@ app.post('/advance', (req, res) => {
 app.put("/update-datas", (req, res) => {
   // vitals
   const vitals = req.body.vitals;
-  // console.log("vitals =>", vitals);
-  // console.log("data", req.body)
 
   if (!vitals || !vitals.Name || !vitals.Phone_number || !vitals.Visit) {
     return res.status(400).json({
@@ -3432,13 +3447,6 @@ app.put("/update-datas", (req, res) => {
   const placeholders = [];
   const sqlValues = [];
 
-  // for (const {key,value} in updateKeys) {
-  //   if (["Name", "Phone_number", "Visit"].includes(key)) continue;
-
-  //   columns.push(`\`${key}\``);   // backticks for safety (Blood Type)
-  //   placeholders.push("?");
-  //   sqlValues.push(value);
-  // }
   for (const [key, value] of Object.entries(updateFields)) {
     if (["Name", "Phone_number", "Visit"].includes(key)) continue;
 
@@ -3450,13 +3458,6 @@ app.put("/update-datas", (req, res) => {
 
   // Replace _ with space in field names only for SQL
   const sqlSetClause = columns.map(col => `${col} = ?`).join(", ");
-  // Object.entries(req.body.vitals).forEach(([key, value], index) => {
-  //   console.log(index, key, value);
-  // });
-
-
-
-  // const sqlValues = updateKeys.map(key => updateFields[key]);
   const checkSql = `SELECT 1 FROM vitals WHERE Name = ? AND Phone_number = ? AND Visit = ? LIMIT 1`;
 
   db.query(checkSql, [identifiers.Name, identifiers.Phone_number, identifiers.Visit], (err, rows) => {
@@ -3466,9 +3467,7 @@ app.put("/update-datas", (req, res) => {
     }
 
     if (rows.length > 0) {
-      // 🔁 DATA EXISTS → UPDATE
       const updateSql = `UPDATE vitals SET ${sqlSetClause} WHERE Name = ? AND Phone_number = ? AND Visit = ?`;
-
       const updateValues = [
         ...sqlValues,
         identifiers.Name,
@@ -3519,7 +3518,7 @@ app.put("/update-datas", (req, res) => {
     if (result[result.length - 1].status == 'nursecompleted') {
       up = 'doctorcompleted'
     }
-    db.query('UPDATE patients SET doctorname=? WHERE full_name=? AND phone_number=? AND visted=?', [req.body.formData.doctorName, identifiers.Name, identifiers.Phone_number, identifiers.Visit], (err, result) => {
+    db.query("UPDATE patients SET doctorname=?,reviewCall=? WHERE full_name=? AND phone_number=? AND visted=? AND status='doctorsaved'", [req.body.formData.doctorName,req.body.formData.reviewCall, identifiers.Name, identifiers.Phone_number, identifiers.Visit], (err, result) => {
       if (err) {
         console.error("Error updating doctor name:", err);
         res.status(500).json({ message: "Failed to update doctor name" });
@@ -4330,7 +4329,43 @@ app.post("/addreception", (req, res) => {
     return res.json(result)
   })
 })
-
+app.get("/suggestion-doctor",(req,res)=>{
+  const{location,name}=req.query;
+  let sql = "SELECT * FROM doctors_name WHERE 1=1"
+  let params = []
+  if (location && location.trim() !== "") {
+    sql += " AND location = ?"
+    params.push(location);
+  }
+  sql += "AND name LIKE ?"
+  params.push(`%${name}%`)
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      console.log(err)
+      return res.status(500).json({ err: "Database err", er: err })
+    }
+    return res.json(result)
+  })
+})
+app.get("/suggestion-reception", (req, res) => {
+  const { location, name } = req.query;
+  console.log(req.query)
+  let sql = "SELECT * FROM reception WHERE 1=1"
+  let params = []
+  if (location && location.trim() !== "") {
+    sql += " AND location = ?"
+    params.push(location);
+  }
+  sql += "AND name LIKE ?"
+  params.push(`%${name}%`)
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      console.log(err)
+      return res.status(500).json({ err: "Database err", er: err })
+    }
+    return res.json(result)
+  })
+})
 app.get("/reception", (req, res) => {
   const { location } = req.query;
   let sql = "SELECT * FROM reception";
@@ -4473,19 +4508,19 @@ app.get("/sixfollowup", (req, res) => {
     query += ' AND p.doctorname = ?';
     params.push(DoctorName);
   }
-  query+=`ORDER BY g.FollowUpDate ASC;`
+  query += `ORDER BY g.FollowUpDate ASC;`
   db.query(query, params, (err, result) => {
     if (err) return res.status(500).json({ error: err })
     return res.json(result)
   })
 })
-app.get('/followupcall',(req,res)=>{
+app.get('/followupcall', (req, res) => {
   const { PhoneNumber, BusinessName, BusinessID, fromDate, toDate, franchiselocation, Location, Services, NurseName, DoctorName, PatientType } = req.query;
   console.log(req.query)
   let query = `SELECT * FROM general_patient g 
   JOIN patients p ON
    p.full_name = g.Name AND p.phone_number = g.Phone_Number AND p.visted = g.Visted 
-   WHERE g.FollowUpDate < CURDATE()`
+   WHERE g.FollowUpDate < CURDATE() AND p.reviewCall=TRUE `
   const params = [];
   // console.log("location=>>>>>>>>>.", Location)
   // Add conditions based on provided query parameters
@@ -4530,7 +4565,7 @@ app.get('/followupcall',(req,res)=>{
     query += ' AND p.doctorname = ?';
     params.push(DoctorName);
   }
-  query+=`ORDER BY g.FollowUpDate ASC;`
+  query += `ORDER BY g.FollowUpDate ASC;`
   db.query(query, params, (err, result) => {
     if (err) return res.status(500).json({ error: err })
     return res.json(result)
@@ -4606,6 +4641,27 @@ app.delete("/moa/:id", (req, res) => {
     }
     return res.json({ message: "Reception deleted successfully" });
   });
+})
+
+app.get("/get-all-membership",(req,res)=>{
+  const {name,phonenumber}=req.body
+  let sql='SELECT * FROM manage_membership WHERE 1=1'
+  let value=[]
+  if(name){
+    sql+=' AND Name=?'
+    value.push(name)
+  }
+  if(phonenumber){
+    sql+=' AND Phone_Number=?'
+    value.push(phonenumber)
+  }
+  db.query(sql,value,(err,result)=>{
+    if(err){
+      console.log(err)
+      return res.json({err,"message":"error"})
+    }
+    return res.json(result)
+  })
 })
 
 // Start the server

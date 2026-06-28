@@ -7,6 +7,20 @@
   border: 1px solid #ccc;
 }
 
+.button_display{
+  display:flex;
+  width:100%;
+  justify-content: space-between;
+}
+.renewal_button{
+  width:20%;
+}
+
+.active_button{
+  /* #9e1417 */
+  background-color: #9e1417;
+}
+
 .title {
   text-align: center;
   margin-bottom: 20px;
@@ -1451,4 +1465,399 @@ select {
   text-align: left;
   color: #555;
   width: 35%;
+}
+
+
+/* last update */
+.card{
+    background:white;
+    border-radius:18px;
+    padding:28px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+    margin-bottom:25px;
+}
+
+.card_title{
+    font-size:22px;
+    font-weight:600;
+    margin-bottom:25px;
+    color:#1e293b;
+}
+
+body{
+    background:#f4f7fb;
+}
+
+.wrapper{
+    display:flex;
+    min-height:100vh;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+    width:260px;
+    background:linear-gradient(180deg,#0c1f3f,#132f5d);
+    color:white;
+    position:fixed;
+    top:0;
+    left:0;
+    bottom:0;
+}
+
+.logo{
+    height:80px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding-left:25px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo h2{
+    color:#ff4d4f;
+    font-size:30px;
+    font-weight:700;
+}
+
+.logo span{
+    font-size:13px;
+    letter-spacing:2px;
+}
+
+.menu{
+    padding-top:20px;
+}
+
+.menu a{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    color:white;
+    text-decoration:none;
+    padding:15px 25px;
+    font-size:15px;
+    transition:.3s;
+}
+
+.menu a:hover{
+    background:rgba(255,255,255,.08);
+}
+
+.menu a.active{
+    background:#2563eb;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+    margin-left:260px;
+    width:calc(100% - 260px);
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar{
+    height:80px;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 35px;
+    box-shadow:0 2px 12px rgba(0,0,0,.05);
+}
+
+.topbar h1{
+    font-size:30px;
+    color:#1e293b;
+}
+
+.user{
+    display:flex;
+    align-items:center;
+    gap:25px;
+    color:#64748b;
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#dbeafe;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.content{
+    padding:30px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.card{
+    background:white;
+    border-radius:18px;
+    padding:28px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+    margin-bottom:25px;
+}
+
+.card_title{
+    font-size:22px;
+    font-weight:600;
+    margin-bottom:25px;
+    color:#1e293b;
+}
+
+/* =========================
+   FILTER GRID
+========================= */
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin:10px;
+}
+
+.input_group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.input_group label{
+    font-size:13px;
+    color:#64748b;
+    font-weight:500;
+}
+
+.input_group input,
+.input_group select{
+    height:52px;
+    border:1px solid #dbe2ea;
+    border-radius:12px;
+    padding:0 16px;
+    font-size:15px;
+    background:white;
+    outline:none;
+}
+
+.input_group input:focus,
+.input_group select:focus{
+    border-color:#2563eb;
+}
+
+/* second row */
+
+.grid_bottom{
+    margin-top:18px;
+    display:grid;
+    grid-template-columns:
+        2fr 1fr 1fr auto auto auto auto;
+    gap:18px;
+    align-items:end;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn{
+    height:52px;
+    border:none;
+    border-radius:12px;
+    padding:0 22px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.search{
+    background:#2563eb;
+    color:white;
+}
+
+.clear{
+    background:#f1f5f9;
+    color: #000;
+}
+
+.export{
+    background:#22c55e;
+    color:white;
+}
+
+.add{
+    background:#0f172a;
+    color:white;
+}
+
+/* =========================
+   TABS
+========================= */
+
+.tabs{
+  width:90%;
+    background:white;
+    border-radius:18px;
+    display:flex;
+    overflow:hidden;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+    margin-bottom:25px;
+}
+
+.tab{
+    flex:1;
+    text-align:center;
+    padding:22px;
+    cursor:pointer;
+    font-size:17px;
+    font-weight:600;
+    color:#64748b;
+    background-color: #fff;
+    border-bottom:3px solid transparent;
+}
+
+.tab.active{
+    color:#dc3545;
+    border-bottom:3px solid #dc3545;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.table-card{
+    background:white;
+    border-radius:18px;
+    width:80%;
+    padding:20px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead{
+    background:#f8fafc;
+}
+
+th{
+    padding:18px;
+    text-align:left;
+    color:#334155;
+    font-size:15px;
+}
+
+td{
+    padding:18px;
+    border-top:1px solid #edf2f7;
+    color:#475569;
+}
+
+tbody tr:hover{
+    background:#f8fbff;
+}
+
+.patient{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.patient_avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#dbeafe;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#2563eb;
+    font-weight:700;
+}
+
+.pagination{
+    margin-top:25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:#64748b;
+}
+
+.pages{
+    display:flex;
+    gap:10px;
+}
+
+.page{
+    width:40px;
+    height:40px;
+    border-radius:10px;
+    background:#f1f5f9;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+
+.page.active{
+    background:#2563eb;
+    color:white;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1400px){
+
+.grid{
+    grid-template-columns:
+    repeat(3,1fr);
+}
+
+.grid_bottom{
+    grid-template-columns:
+    repeat(2,1fr);
+}
+
+}
+
+@media(max-width:1000px){
+
+.sidebar{
+    display:none;
+}
+
+.main{
+    margin-left:0;
+    width:100%;
+}
+
+.grid{
+    grid-template-columns:1fr;
+}
+
+.grid_bottom{
+    grid-template-columns:1fr;
+}
+
+.tabs{
+    flex-direction:column;
+}
+
 }

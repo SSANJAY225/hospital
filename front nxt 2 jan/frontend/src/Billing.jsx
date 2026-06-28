@@ -11,22 +11,23 @@ import BusinessList from "./Table";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt, faBroom } from '@fortawesome/free-solid-svg-icons';
 import { TbFilterCheck } from "react-icons/tb";
+import s from './style/Filter.module.css'
 const CONFIG = {
     common: {
         title: "common billing",
-        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-receptionbilling",
+        apiUrl: "http://localhost:5000/api/fetch-patients-receptionbilling",
         showStatus: true,
 
     },
     history: {
         title: "history",
-        apiUrl: "https://amrithaahospitals.visualplanetserver.in/get-files",
+        apiUrl: "http://localhost:5000/get-files",
         showStatus: false,
 
     },
     admin: {
         title: "admin billing",
-        apiUrl: "https://amrithaahospitals.visualplanetserver.in/get-adminfiles",
+        apiUrl: "http://localhost:5000/get-adminfiles",
         showStatus: false,
 
     },
@@ -56,8 +57,8 @@ const Billing = () => {
                 const role = decoded.roll;
                 console.log(role);
                 // let link = ''
-                // if (role === 'admin') { link = "https://amrithaahospitals.visualplanetserver.in/get-adminfiles" }
-                // else { link = "https://amrithaahospitals.visualplanetserver.in/get-files" }
+                // if (role === 'admin') { link = "http://localhost:5000/get-adminfiles" }
+                // else { link = "http://localhost:5000/get-files" }
                 const res = await axios.get(config.apiUrl, { headers: { Authorization: `Bearer ${token}` } })
                 const reversed = res.data.reverse();
                 console.log(reversed)
@@ -202,7 +203,7 @@ const Billing = () => {
         const name = encodeURIComponent(business.full_name)
         const visited = encodeURIComponent(business.visted)
         const id = encodeURIComponent(business.id);
-        // const req=await axios.get(`https://amrithaahospitals.visualplanetserver.in/billingdoc/${businessname}/${name}/${visited}`)
+        // const req=await axios.get(`http://localhost:5000/billingdoc/${businessname}/${name}/${visited}`)
         // // console.log(req.data)
         // loginlocation=${username}&
         navigate(`/BillingForm/${type}?user=${name}&businessname=${businessname}&name=${name}&id=${id}&visited=${visited}&MemberType=${MemberType}&belongedlocation=${belongedlocation}`);
@@ -236,81 +237,95 @@ const Billing = () => {
                 <span></span>
             </h1>
             {type != 'common' ? (<>
-                <div className={style.inbody}>
+                <div className={s.card}>
                     <h2>Billing History</h2>
                     <h3>Total Price: ₹{totalPrice.toFixed(2)}</h3>
-                    <div className={style.inbtn}>
-                        <div className={style.filter_item}>
+                    <div className={style.grid3}>
+                        <div className={s.input_group}>
+                            <label>Name</label>
                             <input
-                                className={style.input_AdminFollow}
+                                // className={style.input_group}
                                 type="text"
                                 placeholder="Search by Name"
                                 value={nameFilter}
                                 onChange={(e) => setNameFilter(e.target.value)}
                             />
                         </div>
-                        <div className={style.filter_item}>
+                        <div className={s.input_group}>
+                            <label>Phone Number</label>
                             <input
-                                className={style.input_AdminFollow}
+                                // className={style.input_AdminFollow}
                                 type="text"
                                 placeholder="Search by Phone Number"
                                 value={phoneFilter}
                                 onChange={(e) => setPhoneFilter(e.target.value)}
                             />
                         </div>
-                        <div className={style.filter_item}>
+                        <div className={s.input_group}>
+                            <label>Visited</label>
                             <input
-                                className={style.input_AdminFollow}
+                                // className={style.input_AdminFollow}
                                 type="text"
                                 placeholder="Search by Visited"
                                 value={visitFilter}
                                 onChange={(e) => setVisitFilter(e.target.value)}
                             />
                         </div>
-                        <div className={style.filter_item}>
-                            <DatePicker
+                    </div>
+                    <div className={style.grid3}>
+                        <div className={s.input_group}>
+                            {/* <DatePicker
                                 selected={fromDate}
                                 onChange={(date) => setFromDate(date)}
                                 placeholderText="From Date"
-                                className={style.input_AdminFollow}
+                                // className={style.input_AdminFollow}
                                 dateFormat="yyyy-MM-dd"
                                 wrapperClassName="datePickerWrapper"
                                 popperClassName="datePickerPopper"
                                 popperPlacement="bottom-start"
-                            />
+                            /> */}
+                            <label>From Date</label>
+                            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
                         </div>
-                        <div className={style.filter_item}>
-                            <DatePicker
+                        <div className={s.input_group}>
+                            <label>To Date</label>
+                            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+                            {/* <DatePicker
                                 selected={toDate}
                                 onChange={(date) => setToDate(date)}
                                 placeholderText="To Date"
-                                className={style.input_AdminFollow}
+                                // className={style.input_AdminFollow}
                                 dateFormat="yyyy-MM-dd"
                                 wrapperClassName="datePickerWrapper"
                                 popperClassName="datePickerPopper"
                                 popperPlacement="bottom-start"
-                            />
+                            /> */}
                         </div>
+                        <div className={`${s.input_group}`}>
+                            <label><br></br></label>
+                            <button className={`${s.btn} ${s.clear}`} onClick={handleClear}>
+                                Clear
+                            </button>
+                        </div>
+
                     </div>
-                    <div className={style.button_row}>
-                        <button className={`${style.inlabel} ${style.Afollowbuttonsearchblack}`} onClick={handleClear}>
-                            Clear
-                        </button>
-                    </div>
+
                 </div>
             </>) : (<>
-                <div className={style.inbody}>
-                    <div className={style.inbtn}>
-                        <div>
+                <div className={style.card}>
+                    <div className={style.grid}>
+                        <div className={style.input_group}>
+                            <label>Patient Name</label>
                             <input
-                                className={style.input_AdminFollow}
+                                // className={style.input_AdminFollow}
                                 type="text"
                                 placeholder='Enter Patient Name'
                                 value={nameFilter}
                                 onChange={(e) => setNameFilter(e.target.value)}
                             />
                         </div>
-                        <div>
+                        <div className={style.input_group}>
+                            <label>Phone Number</label>
                             <input
                                 className={style.input_AdminFollow}
                                 type="text"
@@ -319,7 +334,8 @@ const Billing = () => {
                                 onChange={(e) => setPhoneFilter(e.target.value)}
                             />
                         </div>
-                        <div>
+                        <div className={style.input_group}>
+                            <label>Patient Id</label>
                             <input
                                 className={style.input_AdminFollow}
                                 type="text"
@@ -328,42 +344,24 @@ const Billing = () => {
                                 onChange={handleBusinessIDChange}
                             />
                         </div>
-                        <div className={style.date_picker_container}>
-                            <DatePicker
-                                selected={fromDate}
-                                onChange={handleFromDateChange}
-                                customInput={<CustomInputF className={`${style.CustomInputF} ${style.grey}`} placeholder="FD" />}
-                                popperPlacement="bottom-start"
-                            />
-                            <DatePicker
-                                selected={toDate}
-                                onChange={handleToDateChange}
-                                customInput={<CustomInputT className={style.CustomInputT} placeholder="Select Date" />}
-                                popperPlacement="bottom"
-                            />
-                        </div>
                     </div>
-                    <div className={style.button_row}>
-                        {/* <button className='inlabel Afollowbuttonsearchblack' onClick={() => { handleClear(); }}>
-              Clear
-            </button> */}
-                        <span
-                            className={`${style.action_icon} ${style.clear_filters}`}
-                            onClick={() => { handleClear();  }}
-                            title="Clear Filters"
-                        >
-                            <FontAwesomeIcon icon={faBroom} />
-                        </span>
-                        {/* <button className='inlabel Afollowbuttonsearchblack' onClick={() => { handleSearch(); }}> */}
-                        <span
-                            className={`${style.action_icon} ${style.clear_filters}`}
-                            onClick={applyFilters}
-                            title="Search"
-                        >
-                            <TbFilterCheck />
-
-                        </span>
-                        {/* </button> */}
+                    <div className={s.grid}>
+                        <div className={`${s.input_group}`}>
+                            <label>From Date</label>
+                            <input type='date' value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+                        </div>
+                        <div className={`${s.input_group}`}>
+                            <label>To Date</label>
+                            <input type='date' value={toDate} onChange={(e) => setToDate(e.target.value)} />
+                        </div>
+                        <div className={`${s.input_group}`}>
+                            <label><br></br></label>
+                            <button className={`${style.btn} ${style.search}`} onClick={() => applyFilters()}>Apply</button>
+                        </div>
+                        <div className={`${s.input_group}`}>
+                            <label><br></br></label>
+                            <button className={`${style.btn} ${style.clear}`} onClick={() => handelclear()}>Clear</button>
+                        </div>
                     </div>
                 </div>
             </>)}
@@ -422,7 +420,7 @@ const Billing = () => {
                                     <td>{item.Visted}</td>
                                     <td>₹{parseFloat(item.total_price || 0).toFixed(2)}</td>
                                     <td>
-                                        <a href={`https://amrithaahospitals.visualplanetserver.in/downloadbill/${item.Phone_number}_${item.Visted}.pdf`}
+                                        <a href={`http://localhost:5000/downloadbill/${item.Phone_number}_${item.Visted}.pdf`}
                                         // download
                                         >
                                             <button>Download</button>

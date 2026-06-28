@@ -112,7 +112,7 @@ input, select {
     font-size: 16px;
 }
 
-button {
+.button {
     background: #e74c3c;
     color: white;
     padding: 10px;

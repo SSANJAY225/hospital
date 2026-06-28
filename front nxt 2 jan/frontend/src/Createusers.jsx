@@ -23,7 +23,7 @@ const Createusers = () => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const fetchLoginLocations = async () => {
         try {
-            const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/adminlocations');
+            const response = await axios.get('http://localhost:5000/adminlocations');
             setoptlocation(response.data);
         } catch (error) {
             console.error('Error fetching login locations:', error);
@@ -41,7 +41,7 @@ const Createusers = () => {
                 return;
             }
             try {
-                const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/locationsuggestion?search=${query}`);
+                const response = await axios.get(`http://localhost:5000/locationsuggestion?search=${query}`);
                 setSuggestions(response.data);
                 setShowSuggestions(true);
             } catch (error) {
@@ -103,7 +103,7 @@ const Createusers = () => {
         };
 
         try {
-            const response = await axios.post("https://amrithaahospitals.visualplanetserver.in/Createuser", dataToSend);
+            const response = await axios.post("http://localhost:5000/Createuser", dataToSend);
             console.log(response)
             if (response.status === 201) {
                 Swal.fire({
@@ -209,9 +209,10 @@ const Createusers = () => {
                         </div>
                     </div>
                     <div className={style.form_buttons}>
-                        <button type="submit">Submit</button>
+                        <button type="submit" className={style.button}>Submit</button>
                         <button
                             type="button"
+                            className={style.button}
                             onClick={() => navigate(`/manageusers?loginlocation=${username}&franchiselocation=${franchiselocation}`)}
                             style={{ backgroundColor: '#000000' }}
                         >

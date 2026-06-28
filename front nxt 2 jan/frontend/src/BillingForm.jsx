@@ -9,19 +9,19 @@ import SuggestionList from './suggestionList';
 const CONFIG = {
     common: {
         title: "common billing",
-        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-out",
+        apiUrl: "http://localhost:5000/api/fetch-patients-out",
         showStatus: true,
 
     },
     history: {
         title: "history",
-        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/getpatients",
+        apiUrl: "http://localhost:5000/api/getpatients",
         showStatus: false,
 
     },
     admin: {
         title: "admin billing",
-        apiUrl: "https://amrithaahospitals.visualplanetserver.in/get_billing",
+        apiUrl: "http://localhost:5000/get_billing",
         showStatus: false,
 
     },
@@ -69,7 +69,7 @@ const BillingFrom = () => {
 
     const basicData = async () => {
         const searchParams = new URLSearchParams(location.search);
-        const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get-basic-detail/${searchParams.get('id')}/${searchParams.get('user')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
+        const res = await axios.get(`http://localhost:5000/get-basic-detail/${searchParams.get('id')}/${searchParams.get('user')}/${searchParams.get('businessname')}/${searchParams.get('visited')}`)
         console.log("basic=>", res)
         setbasic(res.data)
     }
@@ -107,7 +107,7 @@ const BillingFrom = () => {
 
     const fetchMembershipTypes = async () => {
         try {
-            const response = await axios.get('https://amrithaahospitals.visualplanetserver.in/api/membership-types');
+            const response = await axios.get('http://localhost:5000/api/membership-types');
             console.log('Membership Types Response:', response.data);
             setMembershipTypes(response.data);
         } catch (error) {
@@ -118,7 +118,7 @@ const BillingFrom = () => {
 
     const fetchPaymentMethod = async () => {
         try {
-            const res = await axios.get('https://amrithaahospitals.visualplanetserver.in/get-paymentMethod')
+            const res = await axios.get('http://localhost:5000/get-paymentMethod')
             setoptpaymentmethod(res.data);
             console.log('Payment methods loaded:', res.data);
         } catch (e) {
@@ -141,7 +141,7 @@ const BillingFrom = () => {
 
             console.log('Fetching API data with params:', { user, visit, phonenumber });
 
-            const req = await axios.get(`https://amrithaahospitals.visualplanetserver.in/get_billing/${phonenumber}/${visit}/${user}`)
+            const req = await axios.get(`http://localhost:5000/get_billing/${phonenumber}/${visit}/${user}`)
             const api = req.data;
 
             console.log("API response:", api);
@@ -171,7 +171,7 @@ const BillingFrom = () => {
                 console.log("Processed services:", updatedServiceArray);
                 setServices(updatedServiceArray);
             }
-            const adv = await axios.get('https://amrithaahospitals.visualplanetserver.in/advance', {
+            const adv = await axios.get('http://localhost:5000/advance', {
                 params: {
                     Phone_number: phonenumber,
                     visited: visit,
@@ -213,7 +213,7 @@ const BillingFrom = () => {
         console.log("particular=>", document.querySelector('input[placeholder="Particular"]'))
         fetchSuggestions(
             document.querySelector('input[placeholder="Particular"]'),
-            'https://amrithaahospitals.visualplanetserver.in/api/particular-suggestion',
+            'http://localhost:5000/api/particular-suggestion',
             setParticularSuggestion
         );
         if (params.memberType && params.memberType !== 'null' && params.memberType !== 'undefined') {
@@ -259,7 +259,7 @@ const BillingFrom = () => {
 
     const fetchImage = async (phoneNumber, visited) => {
         try {
-            const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/user-photo`, {
+            const response = await axios.get(`http://localhost:5000/api/user-photo`, {
                 params: { phoneNumber, visited },
             });
             setImageUrl(response.data.imageUrl);
@@ -567,13 +567,13 @@ const BillingFrom = () => {
         console.log(billingData)
         try {
             console.log("data advance=>", finaladvance)
-            const req = await axios.post('https://amrithaahospitals.visualplanetserver.in/advance', data)
+            const req = await axios.post('http://localhost:5000/advance', data)
             console.log("advance=>", req)
-            const billingResponse = await axios.put('https://amrithaahospitals.visualplanetserver.in/api/update_billing', billingData);
+            const billingResponse = await axios.put('http://localhost:5000/api/update_billing', billingData);
             if (!billingResponse.data.success) {
                 throw new Error('Failed to save billing');
             }
-            // const mem=await axios.post('https://amrithaahospitals.visualplanetserver.in/api/update-membership',)
+            // const mem=await axios.post('http://localhost:5000/api/update-membership',)
             if (selectedMembership && selectedMembership !== urlParams.memberType) {
                 console.log("api name=>",apiData.user_name)
                 const membershipUpdateData = {
@@ -583,7 +583,7 @@ const BillingFrom = () => {
                     membership_type: selectedMembership,
                 };
 
-                const membershipResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/update-membership', membershipUpdateData);
+                const membershipResponse = await axios.post('http://localhost:5000/api/update-membership', membershipUpdateData);
                 console.log("membership api=>",membershipResponse)
                 if (!membershipResponse.data.success) {
                     console.error('Failed to update membership:', membershipResponse.data.message);
@@ -599,7 +599,7 @@ const BillingFrom = () => {
             }
             if (status == 'Generate_Invoice' || status == 'Final_Bill') {
                 const { pdfData, filename } = generatePDF();
-                const pdfResponse = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/save-bill-pdf', {
+                const pdfResponse = await axios.post('http://localhost:5000/api/save-bill-pdf', {
                     pdfData,
                     filename,
                     userId: urlParams.id || apiData.user_id,
@@ -754,6 +754,10 @@ const BillingFrom = () => {
                         <span className={style.info_label}>Service:</span>
                         <span className={style.info_value}>{basic.services}</span>
                     </div>
+                    <div className={style.info_row}>
+                        <span className={style.info_label}>Reference:</span>
+                        <span className={style.info_value}>{reference}</span>
+                    </div>
                 </div>
                 <div className={style.details_right}>
                     <div className={style.info_row}>
@@ -775,6 +779,10 @@ const BillingFrom = () => {
                     <div className={style.info_row}>
                         <span className={style.info_label}>Membership:</span>
                         <span className={style.info_value}>{basic.membertype ? basic.membertype : "No membership"}</span>
+                    </div>
+                    <div className={style.info_row}>
+                        <span className={style.info_label}>Address:</span>
+                        <span className={style.info_value}>{basic.address}</span>
                     </div>
                     {basic.room_number != null && (
                         <div className={style.info_row}>
@@ -836,7 +844,7 @@ const BillingFrom = () => {
                                         setParticularInput(value);
                                         fetchSuggestions(
                                             value,
-                                            'https://amrithaahospitals.visualplanetserver.in/api/particular-suggestion',
+                                            'http://localhost:5000/api/particular-suggestion',
                                             setParticularSuggestion
                                         );
                                     }}
@@ -980,7 +988,7 @@ const BillingFrom = () => {
                                         <td>{item.method}</td>
                                         <td>
                                             <button
-                                                className={`${style.buttondelete} ${style.responsive_button}`}
+                                                className={`${style.custom_delete_button}`}
                                                 onClick={() =>
                                                     handleDeleteHistory(advance, setAdvance, item)
                                                 }
@@ -1013,7 +1021,7 @@ const BillingFrom = () => {
             {/* Billing Footer */}
             <div className={style.billing_footer}>
                 <div className={style.footer_left}>
-                    <div className={style.info_row}>
+                    {/* <div className={style.info_row}>
                         <span className={style.info_label}>Reference:</span>
                         <input
                             type="text"
@@ -1022,7 +1030,7 @@ const BillingFrom = () => {
                             placeholder="Enter reference"
                             className={style.responsive_input}
                         />
-                    </div>
+                    </div> */}
                     <div className={style.info_row}>
                         <span className={style.info_label}>Review Date:</span>
                         <input

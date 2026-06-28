@@ -41,10 +41,10 @@ function Admin() {
   useEffect(() => {
     const fetchPatientCounts = async () => {
       try {
-        const inpatientResponse = await fetch(`https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-in?franchiselocation=${franchiselocation}`);
+        const inpatientResponse = await fetch(`http://localhost:5000/api/fetch-patients-in?franchiselocation=${franchiselocation}`);
         const inpatientData = await inpatientResponse.json();
         
-        const outpatientResponse = await fetch(`https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-out?franchiselocation=${franchiselocation}`);
+        const outpatientResponse = await fetch(`http://localhost:5000/api/fetch-patients-out?franchiselocation=${franchiselocation}`);
         const outpatientData = await outpatientResponse.json();
 
         setPatientCounts({
@@ -69,7 +69,7 @@ function Admin() {
 
   const handleBackup = async () => {
     try {
-      const response = await fetch('https://amrithaahospitals.visualplanetserver.in/api/backup', {
+      const response = await fetch('http://localhost:5000/api/backup', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -130,7 +130,7 @@ function Admin() {
                 <Link to={`/AddPatient?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Patient's Appointment</Link>
                 <Link to={`/billing/common?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Billing</Link>
                 <Link to={`/billing/history?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Billing History</Link>
-                <Link to={`/membership?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Manage Membership</Link>
+                {/* <Link to={`/membership?loginlocation=${username}&franchiselocation=${franchiselocation}`} className='btn-default'>Manage Membership</Link> */}
                 <button onClick={handleLogout} className='btn btn-danger'>
                   Logout
                 </button>

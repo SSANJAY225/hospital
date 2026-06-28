@@ -25,6 +25,7 @@ const AddPatient = () => {
     parentOccupation: '',
     referred: '',
     address: '',
+    idProof: '',
   });
   const [newreceptionName, setNewreceptionName] = useState('');
   const [nurseSuggestions, setNurseSuggestions] = useState([]);
@@ -47,6 +48,8 @@ const AddPatient = () => {
   const minDate = today.toISOString().split('T')[0];
   const [userRole, setUserRole] = useState("");
   const [locationsuggestion, SetSuggestionLocation] = useState([])
+  const [inputReception, setInputReception] = useState('')
+  const [idProofFile, setIdProofFile] = useState(null)
 
   const fetchToken = () => {
     const tok = localStorage.getItem("authToken");
@@ -55,15 +58,17 @@ const AddPatient = () => {
     setUserRole(decoded.roll);
     if (decoded.role !== "admin") {
       setSelectedLocation(decoded.frachiselocation);
+    } else {
+      setSelectedLocation(auth.frachiselocation)
     }
   };
-  
+
   const fetchServices = async () => {
     try {
-      const res = await axios.get('https://amrithaahospitals.visualplanetserver.in/getservices');
+      const res = await axios.get('http://localhost:5000/getservices');
       setServices(res.data);
       const decode = auth
-      const nurse = await axios.get(`https://amrithaahospitals.visualplanetserver.in/getnurse/${decode.frachiselocation}`);
+      const nurse = await axios.get(`http://localhost:5000/getnurse/${decode.frachiselocation}`);
     } catch (error) {
       console.error('Error fetching services:', error);
     }
@@ -71,7 +76,7 @@ const AddPatient = () => {
 
   const fetchVisitCount = async (phoneNumber) => {
     try {
-      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/checkpatient/${phoneNumber}`);
+      const response = await axios.get(`http://localhost:5000/api/checkpatient/${phoneNumber}`);
       const visitCount = response.data.exists ? response.data.visitCount + 1 : 1;
       return visitCount;
     } catch (error) {
@@ -82,7 +87,7 @@ const AddPatient = () => {
 
   const fetchPatientDetails = async (phoneNumber) => {
     try {
-      const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/patient-details/${phoneNumber}`);
+      const response = await axios.get(`http://localhost:5000/api/patient-details/${phoneNumber}`);
       const data = response.data;
       console.log(response)
       setIsNewPatient(false);
@@ -122,6 +127,7 @@ const AddPatient = () => {
         setCameraPhoto(null);
 
         fetchVisitCount(phoneNumber).then((visitCount) => {
+          const year = new Date().getFullYear();
           const newId = generatePatientId('A', '00', 'U', visitCount);
           setPatient((prev) => ({ ...prev, id: newId }));
         })
@@ -135,18 +141,20 @@ const AddPatient = () => {
       }
     }
   };
-
+  
   const generatePatientId = (fullName, age, gender, visitCount) => {
-    const firstLetter = fullName.charAt(0).toUpperCase() || 'A';
-    const ageStr = age || '00';
-    const genderCode = gender ? (gender === 'Male' ? 'M' : 'F') : 'U';
-    const baseId = `${firstLetter}${ageStr}${genderCode}${visitCount}`;
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const year = new Date().getFullYear();
+    const zone = franchiseLocation.toUpperCase().split("ZONE")[1]
+    const fran = franchiseLocation.slice(0, 3).toUpperCase()
+    const baseId = zone ? `${year}${fran}${zone}${visitCount}` : `${year}${fran}${visitCount}`;
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZqwertyuiopasdfghjklzxcvbnm0123456789';
+    const randomValues = new Uint32Array(4);
+    crypto.getRandomValues(randomValues);
+    const randomNum = Array.from(randomValues, v => chars[v % chars.length]).join('');
     return `${baseId}${randomNum}`;
   };
 
   useEffect(() => {
-    setSelectedLocation(searchParams.get('franchiselocation'))
     if (!auth) {
       Swal.fire({
         icon: 'warning',
@@ -163,11 +171,13 @@ const AddPatient = () => {
       }
     };
   }, [auth, navigate, stream]);
+ 
   const fetchAllLocation = async () => {
-    const res = await axios.get(`https://amrithaahospitals.visualplanetserver.in/location`)
+    const res = await axios.get(`http://localhost:5000/location`)
     SetSuggestionLocation(res.data)
     console.log("all location", res)
   }
+
   useEffect(() => {
     fetchAllLocation();
     if (patient.phoneNumber.length === 10) {
@@ -268,12 +278,15 @@ const AddPatient = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(selectedLocation)
-    if (!selectedLocation) {
+    console.log("selectedLocation =", selectedLocation);
+    console.log("auth =", auth);
+    console.log("auth.frachiselocation =", auth.frachiselocation);
+    if (!auth.frachiselocation) {
+      console.log("arr @278")
       Swal.fire({
         icon: 'error',
         title: 'Location Required',
-        text: 'Please select a franchise location.',
+        text: 'Please select a franchise locations.',
       });
       return;
     }
@@ -328,7 +341,7 @@ const AddPatient = () => {
     }
 
     try {
-      const checkResponse = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/checkpatient/${patient.phoneNumber}`);
+      const checkResponse = await axios.get(`http://localhost:5000/api/checkpatient/${patient.phoneNumber}`);
       const isExistingPatient = checkResponse.data.exists;
 
       const selectedPhoto = cameraPhoto || photo;
@@ -360,9 +373,11 @@ const AddPatient = () => {
       } else {
         formData.append('receptionistName', receptionName)
       }
-      if (franchiseLocation) {
-        formData.append('franchiseLocation', selectedLocation);
+      console.log(auth.frachiselocation)
+      if (auth.frachiselocation) {
+        formData.append('franchiseLocation', auth.frachiselocation);
       } else {
+        console.log("err")
         Swal.fire({
           icon: 'error',
           title: 'Missing Franchise Location',
@@ -370,19 +385,22 @@ const AddPatient = () => {
         });
         return;
       }
-
+      if (idProofFile) {
+        formData.append("idProof", idProofFile);
+      }
       if (selectedPhoto) {
         formData.append('photo', selectedPhoto, `photo.${cameraPhoto ? 'jpg' : selectedPhoto.name.split('.').pop()}`);
       }
       for (let [key, value] of formData.entries()) {
         console.log(key, value);
       }
-      const response = await axios.post('https://amrithaahospitals.visualplanetserver.in/api/patients', formData, {
+      console.log("before api")
+      const response = await axios.post('http://localhost:5000/api/patients', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+      console.log("after api")
       if (response.data.message) {
         Swal.fire({
           icon: 'success',
@@ -403,13 +421,15 @@ const AddPatient = () => {
     }
   };
   const fetchNurseSuggestions = async () => {
-    const req = await axios.get(`https://amrithaahospitals.visualplanetserver.in/reception?location=${franchiseLocation}`)
-    setNurseSuggestions(req.data.map((itm) => itm.name))
+    const req = await axios.get(`http://localhost:5000/reception?location=${franchiseLocation}`)
+    // setNurseSuggestions(req.data.map((itm) => itm.name))
   }
 
   const handleAddreceptionName = async (name) => {
     if (name.trim() === '') return;
-    if (!franchiseLocation) {
+    const location = selectedLocation
+    console.log("Location ", location)
+    if (!location) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -418,9 +438,9 @@ const AddPatient = () => {
       return;
     }
     try {
-      await axios.post('https://amrithaahospitals.visualplanetserver.in/addreception', {
+      await axios.post('http://localhost:5000/addreception', {
         reception: name,
-        location: franchiseLocation // Include location from urlParams
+        location: location // Include location from urlParams
       });
       setReceptionName(name);
       setIsNurseModalOpen(false);
@@ -430,10 +450,32 @@ const AddPatient = () => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Failed to add doctor name.',
+        text: 'Failed to add reception name.',
       });
     }
   };
+  useEffect(() => {
+    console.log("Selected Location Changed:", selectedLocation);
+  }, [selectedLocation])
+  const suggestionInput = async (value) => {
+    console.log(inputReception)
+    try {
+      const res = await axios(`http://localhost:5000/suggestion-reception?location=${franchiseLocation}&name=${value}`)
+      console.log(res)
+      setNurseSuggestions(res.data)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  const handleinputReception = (e) => {
+    const value = e.target.value
+    setInputReception(value)
+    if (!value.trim()) {
+      setNurseSuggestions([]);
+      return;
+    }
+    suggestionInput(value)
+  }
 
   return (
     <div className={style.patient_registration_page}>
@@ -445,7 +487,7 @@ const AddPatient = () => {
               <label>Select Franchise Location</label>
               <select
                 value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
+                onChange={(e) => { setSelectedLocation(e.target.value); console.log(selectedLocation) }}
               >
                 <option value="">Select Location</option>
                 {locationsuggestion.map((l, index) => (
@@ -466,28 +508,34 @@ const AddPatient = () => {
             </div>
             {isNurseModalOpen && (
               <div className={style.nurse_input_overlay}>
-                <label>Select Receptionist Name</label>
                 <div className={style.nurse_listbox}>
                   {nurseSuggestions === null ? (
                     <div className={style.nurse_listbox_item}>Loading Receptionist...</div>
-                  ) : nurseSuggestions.length > 0 ? (
-                    nurseSuggestions.map((doctor, index) => (
-                      <div
-                        key={index}
-                        className={`nurse-listbox-item ${receptionName === doctor ? 'selected' : ''}`}
-                        onClick={() => {
-                          setReceptionName(doctor);
-                          setIsNurseModalOpen(false);
-                        }}
-                      >
-                        {doctor}
-                      </div>
-                    ))
                   ) : (
-                    <div className={`${style.nurse_listbox_item} ${style.disabled}`}>
-                      {selectedLocation
-                        ? `No Receptionist available for ${selectedLocation}`
-                        : 'No location specified'}
+                    <div className={style.all}>
+                      <input type='text' name='inputReception' value={inputReception} onChange={handleinputReception} placeholder='Receptionist Name' />
+                      <div className={style.suggestionList}>
+                        {
+                          nurseSuggestions.length > 0 ? (
+                            nurseSuggestions.map((doctor, index) => (
+                              <div
+                                key={doctor.id}
+                                className={`nurse-listbox-item ${receptionName === doctor.name ? 'selected' : ''}`}
+                                onClick={() => {
+                                  setReceptionName(doctor.name);
+                                  setIsNurseModalOpen(false);
+                                }}
+                              >
+                                {doctor.name}
+                              </div>
+                            ))
+                          ) : (<div className={`${style.nurse_listbox_item} ${style.disabled}`}>
+                            {franchiseLocation
+                              ? `No Receptionist available for ${franchiseLocation}`
+                              : 'No location specified'}
+                          </div>)
+                        }
+                      </div>
                     </div>
                   )}
                 </div>
@@ -683,7 +731,7 @@ const AddPatient = () => {
                   </button>
                   <button
                     type="button"
-                    className={`${style.camera_button} ${secondary}`}
+                    className={`${style.camera_button} ${style.secondary}`}
                     onClick={() => setUseCamera(false)}
                   >
                     Cancel
@@ -711,7 +759,35 @@ const AddPatient = () => {
                 </div>
               )}
             </div>
-
+            <div className={style.registration_form_field}>
+              <label>ID Proof</label>
+              {(!idProofFile) && (
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={(e) => setIdProofFile(e.target.files[0])}
+                />
+              )}
+              {(idProofFile) && (
+                <div className={style.photo_preview_container}>
+                  <p>{idProofFile ? 'Photo captured from camera' : 'Photo uploaded'}</p>
+                  <img
+                    src={idProofFile ? URL.createObjectURL(idProofFile) : URL.createObjectURL(idProofFile)}
+                    alt="Selected or Captured"
+                    className={style.photo_preview}
+                  />
+                  <button
+                    type="button"
+                    className={`${style.camera_button} ${style.secondary}`}
+                    onClick={() => {
+                      setIdProofFile(null);
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
             <div className={style.registration_form_field}>
               <label htmlFor="id">Patient ID</label>
               <input type="text" id="id" name="id" value={patient.id} readOnly />

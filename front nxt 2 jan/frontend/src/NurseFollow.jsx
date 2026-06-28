@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { saveAs } from 'file-saver';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as XLSX from 'xlsx';
+import s from './style/Filter.module.css'
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import des from './style/Nursefollow.module.css';
 import BusinessList from './Table';
@@ -67,6 +68,7 @@ function NurseFollow() {
   const [inputFieldsVisible, setInputFieldsVisible] = useState(false);
   const filterRef = useRef(null);
   const [first, setFirst] = useState(true)
+
   const handleClearFilters = () => {
     setBusinessName('');
     setPhoneNumber('');
@@ -123,7 +125,13 @@ function NurseFollow() {
     setToDate(date);
   };
 
+  useEffect(() => {
+    handleSearch()
+    console.log("useeffect Hit")
+  }, [completionStatus])
+
   const handleCompletionStatusChange = (value) => {
+    console.log(value)
     setCompletionStatus(value);
     const today = new Date();
     const todayFormatted = today.toISOString().split('T')[0];
@@ -145,7 +153,7 @@ function NurseFollow() {
 
   const handleSearch = async (overrideCurrentDate, overrideNextDate) => {
     try {
-      console.log("con",first)
+      console.log("con", first)
       setIsLoading(true);
       const formattedDate = formatDateToYYMMDD(selectedDate);
       const formattedFromDate = formatDateToYYMMDD(fromDate);
@@ -174,10 +182,7 @@ function NurseFollow() {
 
       console.log('Query Parameters:', queryParams);
       const queryString = new URLSearchParams(queryParams).toString();
-
-      const response = await axios.get(
-        `https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-nurse?${queryString}`
-      );
+      const response = await axios.get(`http://localhost:5000/api/fetch-patients-nurse?${queryString}`);
       console.log(response.data)
       setBusinesses(response.data);
     } catch (error) {
@@ -196,7 +201,7 @@ function NurseFollow() {
     const debounce = setTimeout(() => {
       setIsLoading(true);
       if (first) {
-        
+
         handleSearch()
         setFirst(false)
       }
@@ -306,9 +311,10 @@ function NurseFollow() {
           <span></span>
         </h1>
 
-        <div className={des.inbody}>
-          <div className={des.inbtn}>
-            <div>
+        <div className={s.card}>
+          <div className={s.grid}>
+            <div className={`${s.input_group}`}>
+              <label>Patient Name</label>
               <input
                 className={des.input_AdminFollow}
                 type="text"
@@ -317,7 +323,8 @@ function NurseFollow() {
                 onChange={(e) => setBusinessName(e.target.value)}
               />
             </div>
-            <div>
+            <div className={`${s.input_group}`}>
+              <label>Phone Number</label>
               <input
                 className={des.input_AdminFollow}
                 type="text"
@@ -326,56 +333,43 @@ function NurseFollow() {
                 onChange={(e) => setPhoneNumber(e.target.value)}
               />
             </div>
-            {/* <div>
-              <input
-                className={des.input_AdminFollow}
-                type="text"
-                placeholder="Enter Patient ID"
-                value={BusinessID}
-                onChange={handleBusinessIDChange}
-              />
-            </div> */}
-            <div className={des.date_picker_container}>
-              <DatePicker
-                selected={fromDate}
-                onChange={handleFromDateChange}
-                customInput={<CustomInputF className="CustomInputF grey" placeholder="FD" />}
-                popperPlacement="bottom-start"
-                isClearable
-              />
-              <DatePicker
-                selected={toDate}
-                onChange={handleToDateChange}
-                customInput={<CustomInputT className="CustomInputT" placeholder="Select Date" />}
-                popperPlacement="bottom"
-                isClearable
-              />
+            <div className={`${s.input_group}`}>
+              <label>From Date</label>
+              <input type='date' onChange={handleFromDateChange} value={fromDate} />
             </div>
-            <div className={des.completion_status_filter}>
-              <label>
+            <div className={`${s.input_group}`}>
+              <label>To Date</label>
+              <input type='date' onChange={handleToDateChange} value={toDate} />
+            </div>
+          </div>
+          <div className={`${s.grid}`}>
+            <div className={s.input_group}>
+              <label className={des.status_label}>
                 <input
                   type="radio"
                   value="not_completed"
                   checked={completionStatus === 'not_completed'}
-                  onChange={() => handleCompletionStatusChange('not_completed')}
+                  onChange={() => { handleCompletionStatusChange('not_completed'); handleSearch() }}
                 />
                 Not Completed
               </label>
-              <label>
+            </div>
+            <div className={`${s.input_group}`}>
+              <label className={des.status_label}>
                 <input
                   type="radio"
                   value="completed"
                   checked={completionStatus === 'completed'}
-                  onChange={() => handleCompletionStatusChange('completed')}
+                  onChange={() => { handleCompletionStatusChange('completed'); handleSearch() }}
                 />
                 Completed
               </label>
             </div>
+            <button className={`${s.search} ${s.btn}`} onClick={handleSearch}>Apply</button>
+            <button className={`${s.clear} ${s.btn}`} onClick={handleClearFilters}>Clear</button>
           </div>
-          <div className={des.button_row}>
-            <button className={des.apply_button} onClick={handleSearch}>Apply</button>
-            <button className={des.apply_button} onClick={handleClearFilters}>Clear</button>
-            <span
+          <div className={s.grid}>
+            {/* <span
               className={`${des.action_icon} ${des.add_appointment}`}
               onClick={() =>
                 navigate(`/AddPatient?loginlocation=${username}&franchiselocation=${franchiselocation}`)
@@ -383,23 +377,9 @@ function NurseFollow() {
               title="Add Appointment"
             >
               <FontAwesomeIcon icon={faPlus} />
-            </span>
-            <span
-              className={`${des.action_icon} ${des.clear_filters}`}
-              onClick={handleClearFilters}
-              title="Clear Filters"
-            >
-              <FontAwesomeIcon icon={faBroom} />
-            </span>
-
-            <span
-              className={`${des.action_icon} ${des.logoutnurse}`}
-              onClick={handleLogout}
-              title="LogOut"
-            >
-              <FontAwesomeIcon icon={faSignOutAlt} />
-            </span>
-
+            </span> */}
+            <button onClick={() => navigate(`/AddPatient?loginlocation=${username}&franchiselocation=${franchiselocation}`)} className={`${s.export} ${s.btn}`}>Add Appoinment</button>
+            <button className={`${s.btn} ${s.logout}`} onClick={handleLogout}>Logout</button>
           </div>
         </div>
         <BusinessList onBusinessClick={handleBusinessClick} businesses={businesses} isLoading={isLoading} />

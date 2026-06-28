@@ -339,3 +339,26 @@
     width: 100%;
   }
 }
+
+.suggestionList {
+  max-height: 200px; /* roughly 5 items */
+  overflow-y: auto;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  margin: 5px;
+  width:40%;
+}
+
+.suggestionList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestionList::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+  border-radius: 10px;
+}
+.all{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

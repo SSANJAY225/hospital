@@ -17,22 +17,23 @@ import { jwtDecode } from "jwt-decode";
 import BusinessList from "./Table";
 import TableMembership from "./TableMembership";
 import SixFollowUp from "./SixFollowUp";
+import s from './style/Filter.module.css'
 const CONFIG = {
     in: {
         title: "Appointments (InPatients)",
-        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-in",
+        apiUrl: "http://localhost:5000/api/fetch-patients-in",
         showStatus: true,
 
     },
     out: {
         title: "Appointments (OutPatients)",
-        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/fetch-patients-out",
+        apiUrl: "http://localhost:5000/api/fetch-patients-out",
         showStatus: true,
 
     },
     admin: {
         title: "Patients",
-        apiUrl: "https://amrithaahospitals.visualplanetserver.in/api/getpatients",
+        apiUrl: "http://localhost:5000/api/getpatients",
         showStatus: false,
 
     },
@@ -65,12 +66,14 @@ function PatientsFollowUpCommon() {
     const [filter, setfilter] = useState();
     const [filterData, setFilterData] = useState()
     const [display, setDisplay] = useState('common')
+    const [docinput,setdocinput]=useState("")
     const [currentDate, setCurrentDate] = useState(() => {
         const today = new Date();
         return today.toISOString().split('T')[0];
     });
     const handleDisplay = (value) => {
-        setDisplay(prev => prev === value ? "common" : value);
+        setDisplay(value);
+        // prev => prev === value ? "common" : 
 
     }
     const getCookie = () => {
@@ -98,8 +101,12 @@ function PatientsFollowUpCommon() {
     };
     useEffect(() => {
         fetchData();
-    }, [display]);
+    }, [status,display]);
+    // useEffect(()=>{
+    //     fetchData()
+    // },[])
     const fetchData = async () => {
+        
         try {
             const today = new Date();
             const todayFormatted = today.toISOString().split('T')[0];
@@ -111,11 +118,11 @@ function PatientsFollowUpCommon() {
             if (display === 'common')
                 url = config.apiUrl
             else if (display === 'membership')
-                url = 'https://amrithaahospitals.visualplanetserver.in/membershipren'
-            else if(display ==='followup6')
-                url='https://amrithaahospitals.visualplanetserver.in/sixfollowup'
-            else if(display==='followupcall')
-                url='https://amrithaahospitals.visualplanetserver.in/followupcall'
+                url = 'http://localhost:5000/membershipren'
+            else if (display === 'followup6')
+                url = 'http://localhost:5000/sixfollowup'
+            else if (display === 'followupcall')
+                url = 'http://localhost:5000/followupcall'
             else
                 url = config.apiUrl
             console.log("url", url)
@@ -124,8 +131,8 @@ function PatientsFollowUpCommon() {
                     BusinessName: name,
                     PhoneNumber: phone,
                     BusinessID: patientId,
-                    fromDate: formattedFromDate,
-                    toDate: formattedToDate,
+                    fromDate: fromDate,
+                    toDate: toDate,
                     selectedDate: formattedDate,
                     // loginlocation: username,
                     franchiselocation,
@@ -138,6 +145,8 @@ function PatientsFollowUpCommon() {
                 },
             });
             console.log("get patient", res.data)
+            console.log(toDate+" "+fromDate)
+
             setData(res.data);
             setFilterData(data)
             setLoading(true);
@@ -197,10 +206,10 @@ function PatientsFollowUpCommon() {
         const fetchNursesAndDoctors = async () => {
             try {
                 const [nurseResponse, doctorResponse] = await Promise.all([
-                    axios.get('https://amrithaahospitals.visualplanetserver.in/api/nurse-suggestions', {
+                    axios.get('http://localhost:5000/api/nurse-suggestions', {
                         params: { franchiselocation }
                     }),
-                    axios.get('https://amrithaahospitals.visualplanetserver.in/api/doctor-suggestions', {
+                    axios.get('http://localhost:5000/api/doctor-suggestions', {
                         params: { franchiselocation }
                     })
                 ]);
@@ -224,7 +233,10 @@ function PatientsFollowUpCommon() {
         setSelectedDoctor(event.target.value);
     }
     const handelclear = () => {
-        console.log('clear')
+        setName("")
+        setPhone("")                            
+        setFromDate("")
+        setToDate("")
     }
     const handleSearch = async () => {
         try {
@@ -262,7 +274,7 @@ function PatientsFollowUpCommon() {
             }
             const queryString = new URLSearchParams(queryParams).toString();
             console.log("params=>", queryParams)
-            const response = await axios.get(`https://amrithaahospitals.visualplanetserver.in/api/getpatients?${queryString}`);
+            const response = await axios.get(`http://localhost:5000/api/getpatients?${queryString}`);
             const sortedPatients = response.data.sort((a, b) => b.id - a.id);
             if (type == 'admin') {
                 setBusinesses(sortedPatients)
@@ -304,9 +316,12 @@ function PatientsFollowUpCommon() {
             <h2 className={style.bus}></h2>
 
             {/* 🔍 FILTERS */}
-            <div className={`${style.inbody}`}>
-                <div className={style.inbtn}>
-                    <div>
+            <div className={`${style.card}`}>
+                <div className={`${style.card_title}`}> Search & Filter</div>
+                {/* <div className={style.inbtn}> */}
+                <div className={`${style.grid}`}>
+                    <div className={`${style.input_group}`}>
+                        <label>Patient Name</label>
                         <input
                             placeholder="Patient Name"
                             value={name}
@@ -314,7 +329,8 @@ function PatientsFollowUpCommon() {
                             className={style.input_AdminFollow}
                         />
                     </div>
-                    <div>
+                    <div className={`${style.input_group}`}>
+                        <label>Phone Number</label>
                         <input
                             placeholder="Phone"
                             value={phone}
@@ -330,8 +346,36 @@ function PatientsFollowUpCommon() {
                             onChange={(e) => setPatientId(e.target.value)}
                         />
                     </div> */}
+                    <div className={`${style.input_group}`}>
+                        {/* <DatePicker
+                            selected={fromDate}
+                            onChange={setFromDate}
+                            placeholderText="From Date"
+                            popperPlacement="bottom"
+                            customInput={<CustomInputF className="custom-input grey" placeholder="From Date" />}
+                        /> */}
+                        <label>From Date</label>
+                        <input type="date"
+                            value={fromDate}
+                            onChange={(e)=>setFromDate(e.target.value)}
+                        />
+                    </div>
+                    <div className={`${style.input_group}`}>
+                        <label>To Date</label>
+                        <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)}/>
+                        {/* <DatePicker
+                            selected={toDate}
+                            onChange={setToDate}
+                            placeholderText="To Date"
+                            popperPlacement="bottom"
+                            customInput={<CustomInputT className="custom-input" placeholder="To Date" />}
+                        /> */}
+                    </div>
+                </div>
+                <div className={`${style.grid}`}>
                     {!config.showStatus && (<>
-                        <div>
+                        <div className={`${style.input_group}`}>
+                            <label>Service</label>
                             <input
                                 className={style.input_AdminFollow}
                                 type="text"
@@ -340,7 +384,8 @@ function PatientsFollowUpCommon() {
                                 onChange={(e) => setSelectedServices(e.target.value)}
                             />
                         </div>
-                        <div>
+                        <div className={`${style.input_group}`}>
+                            <label>Nurse Name</label>
                             <select
                                 className={style.input_AdminFollow}
                                 value={selectedNurse}
@@ -356,17 +401,19 @@ function PatientsFollowUpCommon() {
                                 )}
                             </select>
                         </div>
-                        <div>
+                        <div className={`${style.input_group}`}>
+                            <label>Patient Type</label>
                             <select
                                 className={style.input_AdminFollow}
                                 value={PatientType}
-                                onChange={(e) => { setPatientType(e.target.value); console.log(e.target.value) }}>
-                                <option value="">Select patient type</option>
+                                onChange={(e) => { setPatientType(e.target.value)}}>
+                                <option value="">Select Patient Type</option>
                                 <option value="Inpatient">In-Patient</option>
                                 <option value="Outpatient">Out-Patient</option>
                             </select>
                         </div>
-                        <div>
+                        <div className={`${style.input_group}`}>
+                            <label>Doctor Name</label>
                             <select
                                 className={style.input_AdminFollow}
                                 value={selectedDoctor}
@@ -383,22 +430,6 @@ function PatientsFollowUpCommon() {
                             </select>
                         </div>
                     </>)}
-                    <div className={style.filter_dates}>
-                        <DatePicker
-                            selected={fromDate}
-                            onChange={setFromDate}
-                            placeholderText="From Date"
-                            popperPlacement="bottom"
-                            customInput={<CustomInputF className="custom-input grey" placeholder="From Date" />}
-                        />
-                        <DatePicker
-                            selected={toDate}
-                            onChange={setToDate}
-                            placeholderText="To Date"
-                            popperPlacement="bottom"
-                            customInput={<CustomInputT className="custom-input" placeholder="To Date" />}
-                        />
-                    </div>
                     {config.showStatus && (
                         <div className={style.filter_status}>
                             <label className={style.status_label}>
@@ -422,10 +453,11 @@ function PatientsFollowUpCommon() {
                         </div>
                     )}
                 </div>
-                <div className={style.button_row}>
-                    <span onClick={fetchData}><button>apply</button></span>
-                    <span
-                        className={`${style.action_icon} ${style.add_appointment}`}
+                {/* </div> */}
+                <div className={`${style.grid}`}>
+                    <button onClick={fetchData} className={`${s.btn} ${s.search}`}>apply</button>
+                    <button
+                        className={`${style.btn} ${style.add_appointment}`}
                         onClick={() => {
                             if (username === 'admin') {
                                 navigate(`/AddPatient?loginlocation=${username}`)
@@ -436,45 +468,23 @@ function PatientsFollowUpCommon() {
                         }
                         title="Add Appointment"
                     >
-                        <FontAwesomeIcon icon={faPlus} />
-                    </span>
-                    <span
-                        className={`${style.action_icon} ${style.clear_filters}`}
-                        onClick={handelclear}
-                        title="Clear Filters"
-                    >
-                        <FontAwesomeIcon icon={faBroom} />
-                    </span>
-                    <span
-                        className={`${style.action_icon} ${style.clear_filters}`}
-                        onClick={handleSearch}
-                        title='Apply'
-                    >
-                        <TbFilterCheck />
-                    </span>
-                    <span className={`${style.action_icon} ${style.clear_filters}`}
-                        onClick={handleExportToExcel}
-                        title='Export to Excel'>
-                        <RiFileExcel2Line />
-                    </span>
-                    <span
-                        onClick={() => { handelclear(); navigate(`/nursefollow?loginlocation=${username}&franchiselocation=${franchiselocation}`) }}
-                        title="Appoinments"
-                        className={`${style.action_icon} ${style.clear_filters}`}
-                    >
-                        <HiMiniCalendarDateRange />
-                    </span>
-                </div>
-                <div className={style.button_row}>
-                    <button className={style.renewal_button} onClick={() => { handleDisplay("membership") }}>{display === 'membership' ? "Patients" : "Membership Renewal"}</button>
-                    <button className={style.month_folloup_button} onClick={() => { handleDisplay("followup6") }}>{display === 'followup6' ? "Patients" : "6 Month Follow-up"}</button>
-                    <button className={style.followup_call} onClick={() => { handleDisplay("followupcall") }}>{display === 'followupcall' ? "Patients" : "Follow-up call"}</button>
+                        Add Appoinments
+                    </button>
+                    <button className={`${style.btn} ${style.clear}`} onClick={handelclear}>Clear</button>
+                    <button className={`${style.btn} ${style.export}`} onClick={handleExportToExcel}> Export Excel </button>
                 </div>
             </div>
+            <div className={s.tabs}>
+                <button className={`${s.tab} ${display === "common" ? s.active : ""}`} onClick={() => { handleDisplay("common") }}>all patient</button>
+                <button className={`${s.tab} ${display === "membership" ? s.active : ""}`} onClick={() => { handleDisplay("membership") }}>Membership Renewal </button>
+                <button className={`${s.tab} ${display === "followup6" ? s.active : ""}`} onClick={() => { handleDisplay("followup6") }}>6 Month Follow-up </button>
+                <button className={`${s.tab} ${display === "followupcall" ? s.active : ""}`} onClick={() => { handleDisplay("followupcall") }}>Follow-up call</button>
+            </div>
+
             {display === 'common' && <BusinessList onBusinessClick={handleRowClick} businesses={data} type={type} ></BusinessList>}
             {display === 'membership' && <TableMembership data={data}></TableMembership>}
-            {(display==='followup6'|| display=='followupcall') &&<SixFollowUp data={data}></SixFollowUp>}
-            
+            {(display === 'followup6' || display == 'followupcall') && <SixFollowUp data={data}></SixFollowUp>}
+
         </div>
     </>);
 }

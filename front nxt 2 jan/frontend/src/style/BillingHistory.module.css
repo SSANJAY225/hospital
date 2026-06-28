@@ -330,3 +330,70 @@
 .inbtn {
     overflow: visible !important;
 }
+.card{
+    background:white;
+    border-radius:18px;
+    padding:28px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+    margin-bottom:25px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin: 10px;
+   
+}
+.grid3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin: 10px;
+}
+.input_group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.input_group label{
+    font-size:13px;
+    color:#64748b;
+    font-weight:500;
+}
+
+.input_group input,
+.input_group select{
+    height:52px;
+    border:1px solid #dbe2ea;
+    border-radius:12px;
+    padding:0 16px;
+    font-size:15px;
+    background:white;
+    outline:none;
+}
+
+.input_group input:focus,
+.input_group select:focus{
+    border-color:#2563eb;
+}
+.clear{
+    background:#f1f5f9;
+    color: #000;
+}
+.btn{
+    height:52px;
+    border:none;
+    border-radius:12px;
+    padding:0 22px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    
+}
+
+.search{
+    background:#2563eb;
+    color:white;
+}
